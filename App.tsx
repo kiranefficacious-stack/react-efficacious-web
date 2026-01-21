@@ -34,6 +34,8 @@ import ESmartTeam from './pages/ESmartTeam';
 import ESmartSociety from './pages/ESmartSociety';
 import ChannelPartners from './pages/ChannelPartners';
 import Admin from './pages/Admin';
+import Login from './pages/Login';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   const { isDark, toggleTheme } = useTheme();
@@ -70,7 +72,15 @@ function App() {
                 <main className="flex-grow">
                   <ErrorBoundary>
                     <Routes>
-                      <Route path="/admin" element={<Admin />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route 
+                        path="/admin" 
+                        element={
+                          <ProtectedRoute>
+                            <Admin />
+                          </ProtectedRoute>
+                        } 
+                      />
                       <Route path="/" element={<Home />} />
                       <Route path="/about" element={<About />} />
                       <Route path="/services" element={<Services />} />

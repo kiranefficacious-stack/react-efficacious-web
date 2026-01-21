@@ -11,15 +11,19 @@ if (!rootElement) {
 import { ContentProvider } from './hooks/useContent';
 import { ToastProvider } from './hooks/useToast';
 
+import { AuthProvider } from './hooks/useAuth';
+
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <ToastProvider>
-      <ContentProvider>
-        <HashRouter>
-          <App />
-        </HashRouter>
-      </ContentProvider>
+      <AuthProvider>
+        <ContentProvider>
+          <HashRouter>
+            <App />
+          </HashRouter>
+        </ContentProvider>
+      </AuthProvider>
     </ToastProvider>
   </React.StrictMode>
 );

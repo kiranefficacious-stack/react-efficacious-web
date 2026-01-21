@@ -33,6 +33,7 @@ export const initialData = {
     office: "Sushma Niwas Plot no 7, Road no 6 Sector 1, New Panvel, Navi Mumbai 410206",
     email: "info@efficacious.co.in",
     phone: "+91 8454943806",
+    website: "https://efficacious.co.in",
     socials: {
       linkedin: "#",
       twitter: "#",

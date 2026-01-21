@@ -12,6 +12,7 @@ interface ServiceForm {
   description: string;
   iconName: string;
   color: string;
+  deliverables: string[];
 }
 
 // Available Lucide icons for selection
@@ -32,10 +33,12 @@ const ServicesManager: React.FC = () => {
     title: '',
     description: '',
     iconName: 'Code',
-    color: 'blue'
+    color: 'blue',
+    deliverables: []
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [iconSearch, setIconSearch] = useState('');
+  const [newDeliverable, setNewDeliverable] = useState('');
   const [deleteDialog, setDeleteDialog] = useState<{
     isOpen: boolean;
     id: number | null;
@@ -65,7 +68,8 @@ const ServicesManager: React.FC = () => {
         title: service.title,
         description: service.description,
         iconName: service.iconName,
-        color: service.color
+        color: service.color,
+        deliverables: service.deliverables || []
       });
     } else {
       setEditingId(null);
@@ -73,20 +77,23 @@ const ServicesManager: React.FC = () => {
         title: '',
         description: '',
         iconName: 'Code',
-        color: 'blue'
+        color: 'blue',
+        deliverables: []
       });
     }
     setErrors({});
     setIconSearch('');
+    setNewDeliverable('');
     setIsFormOpen(true);
   };
 
   const handleCloseForm = () => {
     setIsFormOpen(false);
     setEditingId(null);
-    setFormData({ title: '', description: '', iconName: 'Code', color: 'blue' });
+    setFormData({ title: '', description: '', iconName: 'Code', color: 'blue', deliverables: [] });
     setErrors({});
     setIconSearch('');
+    setNewDeliverable('');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -200,6 +207,11 @@ const ServicesManager: React.FC = () => {
                     <span className="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded capitalize">
                       {service.color}
                     </span>
+                    {service.deliverables && service.deliverables.length > 0 && (
+                      <span className="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded">
+                        {service.deliverables.length} Deliverables
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -264,6 +276,75 @@ const ServicesManager: React.FC = () => {
                 rows={3}
                 placeholder="Brief description of the service"
               />
+
+              {/* Key Deliverables */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  Key Deliverables
+                </label>
+                <div className="flex gap-2 mb-3">
+                  <input
+                    type="text"
+                    value={newDeliverable}
+                    onChange={(e) => setNewDeliverable(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (newDeliverable.trim()) {
+                          setFormData({
+                            ...formData,
+                            deliverables: [...formData.deliverables, newDeliverable.trim()]
+                          });
+                          setNewDeliverable('');
+                        }
+                      }
+                    }}
+                    placeholder="Add a deliverable..."
+                    className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 dark:bg-slate-800 dark:text-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (newDeliverable.trim()) {
+                        setFormData({
+                          ...formData,
+                          deliverables: [...formData.deliverables, newDeliverable.trim()]
+                        });
+                        setNewDeliverable('');
+                      }
+                    }}
+                    className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-medium transition-colors"
+                  >
+                    <Plus size={20} />
+                  </button>
+                </div>
+                
+                {formData.deliverables.length > 0 && (
+                  <div className="space-y-2">
+                    {formData.deliverables.map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg group"
+                      >
+                        <span className="flex-1 text-sm text-slate-700 dark:text-slate-300">
+                          {item}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newDeliverables = [...formData.deliverables];
+                            newDeliverables.splice(index, 1);
+                            setFormData({ ...formData, deliverables: newDeliverables });
+                          }}
+                          className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors opacity-0 group-hover:opacity-100"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* Icon Picker */}
               <div className="mb-4">

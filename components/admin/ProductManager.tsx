@@ -33,6 +33,7 @@ const ProductManager: React.FC = () => {
   const [newFeature, setNewFeature] = useState('');
   const [newModule, setNewModule] = useState('');
   const [errors, setErrors] = useState<ValidationErrors>({});
+  const [confirmAction, setConfirmAction] = useState<{ type: 'toggle', payload: any } | null>(null);
 
   const validationRules = {
     title: {
@@ -54,6 +55,20 @@ const ProductManager: React.FC = () => {
       return item.title || item.name || item.text || 'Untitled Item';
     }
     return '';
+  };
+
+  const handleConfirmAction = () => {
+    if (!confirmAction) return;
+
+    if (confirmAction.type === 'toggle') {
+      const product = confirmAction.payload;
+      toggleProduct(product.id);
+      showToast(
+        'success',
+        `Product ${!product.enabled ? 'enabled' : 'disabled'} successfully!`
+      );
+    }
+    setConfirmAction(null);
   };
 
   const handleOpenForm = (product: any) => {
@@ -143,13 +158,7 @@ const ProductManager: React.FC = () => {
                 {product.title}
               </h3>
               <button
-                onClick={() => {
-                  toggleProduct(product.id);
-                  showToast(
-                    'success',
-                    `Product ${!product.enabled ? 'enabled' : 'disabled'} successfully!`
-                  );
-                }}
+                onClick={() => setConfirmAction({ type: 'toggle', payload: product })}
                 className={`p-2 rounded-lg transition-colors ${
                   product.enabled
                     ? 'text-green-600 bg-green-50 dark:bg-green-900/20'
@@ -369,6 +378,20 @@ const ProductManager: React.FC = () => {
           </div>
         </div>
       )}
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={!!confirmAction}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={handleConfirmAction}
+        title={confirmAction?.type === 'toggle' ? (confirmAction.payload.enabled ? 'Disable Product?' : 'Enable Product?') : 'Confirm Action'}
+        message={
+          confirmAction?.type === 'toggle' 
+            ? `Are you sure you want to ${confirmAction.payload.enabled ? 'disable' : 'enable'} "${confirmAction.payload.title}"? This will affect its visibility on the website.` 
+            : 'Are you sure you want to proceed?'
+        }
+        confirmText={confirmAction?.payload.enabled ? 'Disable' : 'Enable'}
+        danger={confirmAction?.payload.enabled}
+      />
     </div>
   );
 };

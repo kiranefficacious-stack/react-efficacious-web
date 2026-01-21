@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Settings, Newspaper, Phone, Layout, Image, Briefcase, 
-  Users, Info, Box
+  Users, Info, Box, LogOut, LayoutDashboard
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
 // Import all managers
+import DashboardManager from '../components/admin/DashboardManager';
 import NewsManager from '../components/admin/NewsManager';
 import GalleryManager from '../components/admin/GalleryManager';
 import ServicesManager from '../components/admin/ServicesManager';
@@ -15,11 +18,20 @@ import BlogsManager from '../components/admin/BlogsManager';
 import PartnersManager from '../components/admin/PartnersManager';
 import ContactManager from '../components/admin/ContactManager';
 import ProductManager from '../components/admin/ProductManager';
+import AboutManager from '../components/admin/AboutManager';
 
 const Admin: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('news');
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const tabs = [
+    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
     { id: 'news', label: 'News & Events', icon: <Newspaper size={18} /> },
     { id: 'gallery', label: 'Gallery', icon: <Image size={18} /> },
     { id: 'services', label: 'Services', icon: <Layout size={18} /> },
@@ -56,6 +68,17 @@ const Admin: React.FC = () => {
             </button>
           ))}
         </nav>
+        
+        {/* Logout Button in Sidebar Footer */}
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
+        </div>
       </div>
 
       {/* Main Content */}
@@ -76,6 +99,7 @@ const Admin: React.FC = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
+              {activeTab === 'dashboard' && <DashboardManager />}
               {activeTab === 'news' && <NewsManager />}
               {activeTab === 'gallery' && <GalleryManager />}
               {activeTab === 'services' && <ServicesManager />}
@@ -85,26 +109,7 @@ const Admin: React.FC = () => {
               {activeTab === 'partners' && <PartnersManager />}
               {activeTab === 'products' && <ProductManager />}
               {activeTab === 'contact' && <ContactManager />}
-              
-              {/* Placeholder for About manager */}
-              {activeTab === 'about' && (
-                <div className="bg-white dark:bg-slate-900 p-12 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 text-center">
-                  <div className="max-w-md mx-auto">
-                    <div className="w-16 h-16 rounded-full bg-brand-100 dark:bg-brand-900/20 flex items-center justify-center mx-auto mb-4">
-                      <Info className="w-8 h-8 text-brand-600 dark:text-brand-400" />
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                      About Manager
-                    </h3>
-                    <p className="text-slate-500 dark:text-slate-400 mb-4">
-                      The About section content can be edited directly in the data.ts file.
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      A dedicated multi-section editor for About content is planned for a future update.
-                    </p>
-                  </div>
-                </div>
-              )}
+              {activeTab === 'about' && <AboutManager />}
             </motion.div>
           </AnimatePresence>
         </main>

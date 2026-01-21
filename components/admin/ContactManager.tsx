@@ -25,10 +25,10 @@ const ContactManager: React.FC = () => {
     email: data.contact?.email || '',
     phone: data.contact?.phone || '',
     website: data.contact?.website || '',
-    facebook: data.contact?.social?.facebook || '',
-    twitter: data.contact?.social?.twitter || '',
-    linkedin: data.contact?.social?.linkedin || '',
-    instagram: data.contact?.social?.instagram || ''
+    facebook: data.contact?.socials?.facebook || '',
+    twitter: data.contact?.socials?.twitter || '',
+    linkedin: data.contact?.socials?.linkedin || '',
+    instagram: data.contact?.socials?.instagram || ''
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -71,7 +71,7 @@ const ContactManager: React.FC = () => {
       email: formData.email,
       phone: formData.phone,
       website: formData.website,
-      social: {
+      socials: {
         facebook: formData.facebook || '',
         twitter: formData.twitter || '',
         linkedin: formData.linkedin || '',
