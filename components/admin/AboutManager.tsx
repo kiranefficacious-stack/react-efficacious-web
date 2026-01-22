@@ -15,8 +15,10 @@ interface AboutForm {
   whoWeAreImage: string;
   visionTitle: string;
   visionContent: string;
+  visionPoints: string[];
   missionTitle: string;
   missionContent: string;
+  missionPoints: string[];
   values: Array<{ title: string; description: string; iconName: string }>;
 }
 
@@ -34,8 +36,10 @@ const AboutManager: React.FC = () => {
     whoWeAreImage: data.about?.whoWeAre?.image || '',
     visionTitle: data.about?.vision?.title || '',
     visionContent: data.about?.vision?.content || '',
+    visionPoints: data.about?.vision?.points || [],
     missionTitle: data.about?.mission?.title || '',
     missionContent: data.about?.mission?.content || '',
+    missionPoints: data.about?.mission?.points || [],
     values: data.about?.values || []
   });
   
@@ -88,6 +92,36 @@ const AboutManager: React.FC = () => {
     setFormData({ ...formData, values: newValues });
   };
 
+  const addVisionPoint = () => {
+    setFormData({ ...formData, visionPoints: [...formData.visionPoints, ''] });
+  };
+
+  const updateVisionPoint = (index: number, value: string) => {
+    const newPoints = [...formData.visionPoints];
+    newPoints[index] = value;
+    setFormData({ ...formData, visionPoints: newPoints });
+  };
+
+  const removeVisionPoint = (index: number) => {
+    const newPoints = formData.visionPoints.filter((_, i) => i !== index);
+    setFormData({ ...formData, visionPoints: newPoints });
+  };
+
+  const addMissionPoint = () => {
+    setFormData({ ...formData, missionPoints: [...formData.missionPoints, ''] });
+  };
+
+  const updateMissionPoint = (index: number, value: string) => {
+    const newPoints = [...formData.missionPoints];
+    newPoints[index] = value;
+    setFormData({ ...formData, missionPoints: newPoints });
+  };
+
+  const removeMissionPoint = (index: number) => {
+    const newPoints = formData.missionPoints.filter((_, i) => i !== index);
+    setFormData({ ...formData, missionPoints: newPoints });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -121,14 +155,14 @@ const AboutManager: React.FC = () => {
         image: formData.whoWeAreImage
       },
       vision: {
-        ...data.about.vision, // Preserve points array
         title: formData.visionTitle,
-        content: formData.visionContent
+        content: formData.visionContent,
+        points: formData.visionPoints
       },
       mission: {
-        ...data.about.mission, // Preserve points array
         title: formData.missionTitle,
-        content: formData.missionContent
+        content: formData.missionContent,
+        points: formData.missionPoints
       },
       values: formData.values
     };
@@ -288,6 +322,41 @@ const AboutManager: React.FC = () => {
                 required
                 rows={4}
               />
+              
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  Key Points (Optional)
+                </label>
+                <div className="space-y-2">
+                  {formData.visionPoints.map((point, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={point}
+                        onChange={(e) => updateVisionPoint(index, e.target.value)}
+                        className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 dark:bg-slate-700 dark:text-white"
+                        placeholder={`Point ${index + 1}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeVisionPoint(index)}
+                        className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                        title="Remove point"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addVisionPoint}
+                    className="text-sm text-brand-600 font-medium hover:underline flex items-center gap-1"
+                  >
+                    <Plus size={16} />
+                    Add key point
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -315,6 +384,41 @@ const AboutManager: React.FC = () => {
                 required
                 rows={4}
               />
+              
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  Key Points (Optional)
+                </label>
+                <div className="space-y-2">
+                  {formData.missionPoints.map((point, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={point}
+                        onChange={(e) => updateMissionPoint(index, e.target.value)}
+                        className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 dark:bg-slate-700 dark:text-white"
+                        placeholder={`Point ${index + 1}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeMissionPoint(index)}
+                        className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                        title="Remove point"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addMissionPoint}
+                    className="text-sm text-brand-600 font-medium hover:underline flex items-center gap-1"
+                  >
+                    <Plus size={16} />
+                    Add key point
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
