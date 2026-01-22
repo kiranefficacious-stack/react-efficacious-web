@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useContent } from '../../hooks/useContent';
 import { useToast } from '../../hooks/useToast';
 import { validateForm, ValidationErrors } from '../../utils/validation';
 import FormField from './FormField';
 import ConfirmDialog from './ConfirmDialog';
-import { Eye, EyeOff, Edit2, X, Plus } from 'lucide-react';
+import { Eye, EyeOff, Edit2, X, Plus, Trash2, ExternalLink } from 'lucide-react';
 
 // Adjusted interface to allow for either strings or objects as described in your error
 interface ProductForm {
@@ -12,12 +13,13 @@ interface ProductForm {
   description: string;
   iconName: string;
   enabled: boolean;
+  href: string;
   features: any[]; 
   modules: any[];
 }
 
 const ProductManager: React.FC = () => {
-  const { data, updateContent, toggleProduct } = useContent();
+  const { data, updateContent, toggleProduct, addItem, deleteItem } = useContent();
   const { showToast } = useToast();
   
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -33,7 +35,7 @@ const ProductManager: React.FC = () => {
   const [newFeature, setNewFeature] = useState('');
   const [newModule, setNewModule] = useState('');
   const [errors, setErrors] = useState<ValidationErrors>({});
-  const [confirmAction, setConfirmAction] = useState<{ type: 'toggle', payload: any } | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{ type: 'toggle' | 'delete', payload: any } | null>(null);
 
   const validationRules = {
     title: {
@@ -45,6 +47,12 @@ const ProductManager: React.FC = () => {
       required: true,
       minLength: 10,
       maxLength: 200
+    },
+    href: {
+      required: true,
+      minLength: 5,
+      pattern: /^\/products\/.+/,
+      customMessage: 'Route must start with /products/'
     }
   };
 
@@ -67,8 +75,28 @@ const ProductManager: React.FC = () => {
         'success',
         `Product ${!product.enabled ? 'enabled' : 'disabled'} successfully!`
       );
+    } else if (confirmAction.type === 'delete') {
+      deleteItem('products', confirmAction.payload.id);
+      showToast('success', 'Product deleted successfully!');
     }
     setConfirmAction(null);
+  };
+
+  const handleAddProduct = () => {
+    setEditingId(null);
+    setFormData({
+      title: '',
+      description: '',
+      iconName: 'Box',
+      enabled: false,
+      href: '/products/',
+      features: [],
+      modules: []
+    });
+    setErrors({});
+    setNewFeature('');
+    setNewModule('');
+    setIsFormOpen(true);
   };
 
   const handleOpenForm = (product: any) => {
@@ -78,6 +106,7 @@ const ProductManager: React.FC = () => {
       description: product.description,
       iconName: product.iconName || 'Box',
       enabled: product.enabled,
+      href: product.href || '/products/',
       features: product.features || [],
       modules: product.modules || []
     });
@@ -126,23 +155,43 @@ const ProductManager: React.FC = () => {
     }
 
     if (editingId !== null) {
+      // Edit existing product
       const updatedProducts = data.products.map((p: any) =>
         p.id === editingId ? { ...p, ...formData } : p
       );
       updateContent('products', updatedProducts);
       showToast('success', 'Product updated successfully!');
-      handleCloseForm();
+    } else {
+      // Add new product
+      const newProduct = {
+        ...formData,
+        gradient: 'from-slate-400 via-slate-500 to-slate-600',
+        bgAccent: 'bg-slate-500/10',
+        textAccent: 'text-slate-600 dark:text-slate-400'
+      };
+      addItem('products', newProduct);
+      showToast('success', 'Product created successfully!');
     }
+    handleCloseForm();
   };
 
   return (
     <div>
       {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Products</h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">
-          Manage product visibility and details
-        </p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Products</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
+            Manage product visibility and details
+          </p>
+        </div>
+        <button
+          onClick={handleAddProduct}
+          className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-medium transition-colors shadow-lg shadow-brand-500/30"
+        >
+          <Plus size={20} />
+          Add New Product
+        </button>
       </div>
 
       {/* Products Grid */}
@@ -215,14 +264,34 @@ const ProductManager: React.FC = () => {
               </div>
             )}
 
-            {/* Edit Button */}
-            <button
-              onClick={() => handleOpenForm(product)}
-              className="w-full py-2 px-4 bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-            >
-              <Edit2 size={16} />
-              Edit Details
-            </button>
+            {/* Learn More Link */}
+            {product.href && (
+              <Link
+                to={product.href}
+                className="block w-full py-2 px-4 mb-3 bg-brand-50 dark:bg-brand-900/20 hover:bg-brand-100 dark:hover:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 border border-brand-200 dark:border-brand-800"
+              >
+                <ExternalLink size={16} />
+                Learn More
+              </Link>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleOpenForm(product)}
+                className="flex-1 py-2 px-4 bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+              >
+                <Edit2 size={16} />
+                Edit
+              </button>
+              <button
+                onClick={() => setConfirmAction({ type: 'delete', payload: product })}
+                className="py-2 px-4 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                title="Delete product"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -233,7 +302,7 @@ const ProductManager: React.FC = () => {
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-slate-200 dark:border-slate-700">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                Edit Product
+                {editingId !== null ? 'Edit Product' : 'Add New Product'}
               </h3>
             </div>
 
@@ -258,6 +327,17 @@ const ProductManager: React.FC = () => {
                 required
                 rows={3}
                 placeholder="Brief product description"
+              />
+
+              <FormField
+                label="Navigation Route"
+                name="href"
+                value={formData.href}
+                onChange={(value) => setFormData({ ...formData, href: value })}
+                error={errors.href}
+                required
+                placeholder="/products/product-name"
+                helpText="URL path where users will be redirected when clicking 'Learn More'"
               />
 
               <FormField
@@ -371,7 +451,7 @@ const ProductManager: React.FC = () => {
                   type="submit"
                   className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-medium transition-colors"
                 >
-                  Update Product
+                  {editingId !== null ? 'Update Product' : 'Create Product'}
                 </button>
               </div>
             </form>
@@ -383,14 +463,28 @@ const ProductManager: React.FC = () => {
         isOpen={!!confirmAction}
         onClose={() => setConfirmAction(null)}
         onConfirm={handleConfirmAction}
-        title={confirmAction?.type === 'toggle' ? (confirmAction.payload.enabled ? 'Disable Product?' : 'Enable Product?') : 'Confirm Action'}
+        title={
+          confirmAction?.type === 'toggle' 
+            ? (confirmAction.payload.enabled ? 'Disable Product?' : 'Enable Product?')
+            : confirmAction?.type === 'delete'
+            ? 'Delete Product?'
+            : 'Confirm Action'
+        }
         message={
           confirmAction?.type === 'toggle' 
-            ? `Are you sure you want to ${confirmAction.payload.enabled ? 'disable' : 'enable'} "${confirmAction.payload.title}"? This will affect its visibility on the website.` 
+            ? `Are you sure you want to ${confirmAction.payload.enabled ? 'disable' : 'enable'} "${confirmAction.payload.title}"? This will affect its visibility on the website.`
+            : confirmAction?.type === 'delete'
+            ? `Are you sure you want to delete "${confirmAction.payload.title}"? This action cannot be undone.`
             : 'Are you sure you want to proceed?'
         }
-        confirmText={confirmAction?.payload.enabled ? 'Disable' : 'Enable'}
-        danger={confirmAction?.payload.enabled}
+        confirmText={
+          confirmAction?.type === 'toggle'
+            ? (confirmAction.payload.enabled ? 'Disable' : 'Enable')
+            : confirmAction?.type === 'delete'
+            ? 'Delete'
+            : 'Confirm'
+        }
+        danger={confirmAction?.type === 'delete' || confirmAction?.payload.enabled}
       />
     </div>
   );

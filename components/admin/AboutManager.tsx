@@ -3,7 +3,7 @@ import { useContent } from '../../hooks/useContent';
 import { useToast } from '../../hooks/useToast';
 import { validateForm, ValidationErrors, commonRules } from '../../utils/validation';
 import FormField from './FormField';
-import { Info, Save, Target, Eye, Users } from 'lucide-react';
+import { Info, Save, Target, Eye, Users, Heart, Plus, X } from 'lucide-react';
 
 interface AboutForm {
   heroTitle: string;
@@ -17,6 +17,7 @@ interface AboutForm {
   visionContent: string;
   missionTitle: string;
   missionContent: string;
+  values: Array<{ title: string; description: string; iconName: string }>;
 }
 
 const AboutManager: React.FC = () => {
@@ -34,7 +35,8 @@ const AboutManager: React.FC = () => {
     visionTitle: data.about?.vision?.title || '',
     visionContent: data.about?.vision?.content || '',
     missionTitle: data.about?.mission?.title || '',
-    missionContent: data.about?.mission?.content || ''
+    missionContent: data.about?.mission?.content || '',
+    values: data.about?.values || []
   });
   
   const [errors, setErrors] = useState<ValidationErrors>({});
@@ -66,6 +68,24 @@ const AboutManager: React.FC = () => {
   const removeParagraph = (index: number) => {
     const newContent = formData.whoWeAreContent.filter((_, i) => i !== index);
     setFormData({ ...formData, whoWeAreContent: newContent });
+  };
+
+  const addValue = () => {
+    setFormData({
+      ...formData,
+      values: [...formData.values, { title: '', description: '', iconName: 'Heart' }]
+    });
+  };
+
+  const updateValue = (index: number, field: string, value: string) => {
+    const newValues = [...formData.values];
+    newValues[index] = { ...newValues[index], [field]: value };
+    setFormData({ ...formData, values: newValues });
+  };
+
+  const removeValue = (index: number) => {
+    const newValues = formData.values.filter((_, i) => i !== index);
+    setFormData({ ...formData, values: newValues });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -109,7 +129,8 @@ const AboutManager: React.FC = () => {
         ...data.about.mission, // Preserve points array
         title: formData.missionTitle,
         content: formData.missionContent
-      }
+      },
+      values: formData.values
     };
 
     updateContent('about', updatedAbout);
@@ -295,6 +316,83 @@ const AboutManager: React.FC = () => {
                 rows={4}
               />
             </div>
+          </div>
+        </div>
+
+        {/* Section 4: Core Values */}
+        <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+            <Heart size={20} className="text-brand-600" />
+            Core Values
+          </h3>
+          
+          <div className="space-y-4">
+            {formData.values.map((value, index) => (
+              <div key={index} className="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
+                <div className="flex justify-between items-start mb-3">
+                  <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    Value #{index + 1}
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={() => removeValue(index)}
+                    className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                    title="Remove value"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+                
+                <div className="space-y-3">
+                  <FormField
+                    label="Title"
+                    name={`value-title-${index}`}
+                    value={value.title}
+                    onChange={(val) => updateValue(index, 'title', val)}
+                    placeholder="e.g., Innovation"
+                    required
+                  />
+                  
+                  <FormField
+                    label="Description"
+                    name={`value-description-${index}`}
+                    type="textarea"
+                    value={value.description}
+                    onChange={(val) => updateValue(index, 'description', val)}
+                    placeholder="Describe this core value..."
+                    rows={2}
+                    required
+                  />
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                      Icon
+                    </label>
+                    <select
+                      value={value.iconName}
+                      onChange={(e) => updateValue(index, 'iconName', e.target.value)}
+                      className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 dark:bg-slate-700 dark:text-white"
+                    >
+                      <option value="Heart">Heart</option>
+                      <option value="Shield">Shield</option>
+                      <option value="Zap">Zap</option>
+                      <option value="Users">Users</option>
+                      <option value="Target">Target</option>
+                      <option value="Eye">Eye</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            <button
+              type="button"
+              onClick={addValue}
+              className="w-full py-3 px-4 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-brand-600 dark:text-brand-400 font-medium hover:bg-brand-50 dark:hover:bg-brand-900/10 transition-colors flex items-center justify-center gap-2"
+            >
+              <Plus size={20} />
+              Add Core Value
+            </button>
           </div>
         </div>
 
