@@ -103,7 +103,7 @@ const Contact: React.FC = () => {
                             <input 
                                 type="text" 
                                 id="name" 
-                                placeholder="John Doe"
+                                placeholder="Amol Tyagi"
                                 className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
                                 required 
                             />
@@ -131,7 +131,7 @@ const Contact: React.FC = () => {
                         <input 
                             type="email" 
                             id="email" 
-                            placeholder="john@example.com"
+                            placeholder="Amol@example.com"
                             className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
                             required
                         />
