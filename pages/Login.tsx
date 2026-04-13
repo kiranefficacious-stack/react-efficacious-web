@@ -177,14 +177,14 @@ const Login: React.FC = () => {
             </button>
           </form>
 
-          {/* Development Info */}
+          {/* Firebase Info */}
           <div className="px-8 py-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-700">
             <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
-              <strong>Development Credentials:</strong>
+              <strong>Admin Credentials Configured via Firebase</strong>
               <br />
-              Email: admin@efficacious.co.in
+              Login requires a valid account created in the
               <br />
-              Password: Admin@123
+              Firebase Authentication Console.
             </p>
           </div>
         </div>

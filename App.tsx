@@ -9,6 +9,9 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ChatWidget from './components/ChatWidget';
 import ErrorBoundary from './components/ErrorBoundary';
+import FirebaseLoader from './components/FirebaseLoader';
+import { useContent } from './hooks/useContent';
+import { useAuth } from './hooks/useAuth';
 
 import Home from './pages/Home';
 import About from './pages/About';
@@ -44,6 +47,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 function App() {
   const { isDark, toggleTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
+  const { contentLoading } = useContent();
+  const { loading: authLoading } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
@@ -64,11 +69,12 @@ function App() {
     <>
       <AnimatePresence>
         {isLoading && <LoadingScreen />}
+        {!isLoading && (contentLoading || authLoading) && <FirebaseLoader />}
       </AnimatePresence>
 
       {/* Main Wrapper with Flex Column for Sticky Footer */}
-      <div className={`flex flex-col min-h-screen transition-opacity duration-700 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
-        {!isLoading && (
+      <div className={`flex flex-col min-h-screen transition-opacity duration-700 ${isLoading || contentLoading || authLoading ? 'opacity-0' : 'opacity-100'}`}>
+        {!isLoading && !contentLoading && !authLoading && (
             <>
                 <Navbar isDark={isDark} toggleTheme={toggleTheme} />
                 

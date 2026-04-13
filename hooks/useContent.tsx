@@ -1,89 +1,110 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { initialData } from '../data';
-
-const CONTENT_KEY = 'efficacious_site_content_v3';
+import { db } from '../lib/firebase';
+import { collection, doc, onSnapshot, setDoc, updateDoc, getDocs, getDoc } from 'firebase/firestore';
 
 const ContentContext = createContext<any>(null);
 
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [data, setData] = useState(() => {
-    const saved = localStorage.getItem(CONTENT_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-
-        // If cached blogs are missing 'content' (new field), use fresh initialData blogs
-        const cachedBlogsMissingContent =
-          !parsed.blogs ||
-          parsed.blogs.length === 0 ||
-          parsed.blogs.some((b: any) => !b.content);
-
-        return {
-          ...initialData,
-          ...parsed,
-          // Always keep team from cache if it exists, otherwise use initialData
-          team: parsed.team || initialData.team,
-          // Use fresh blogs if any cached entry is missing the 'content' field
-          blogs: cachedBlogsMissingContent ? initialData.blogs : parsed.blogs,
-        };
-      } catch {
-        return initialData;
-      }
-    }
-    return initialData;
-  });
-
+  const [data, setData] = useState<any>(initialData);
+  const [contentLoading, setContentLoading] = useState(true);
 
   useEffect(() => {
-    localStorage.setItem(CONTENT_KEY, JSON.stringify(data));
-  }, [data]);
+    const collRef = collection(db, 'websiteContent');
+    
+    // Check if DB is empty and seed it if needed
+    getDocs(collRef).then((snapshot) => {
+      if (snapshot.empty) {
+        console.log("Firestore empty, seeding initial data...");
+        for (const [key, value] of Object.entries(initialData)) {
+            setDoc(doc(db, 'websiteContent', key), { data: value }).catch(e => console.error("Could not seed doc:", e));
+        }
+      }
+    }).catch((error) => {
+      console.warn("Firestore getDocs permission issue or network error:", error);
+    });
 
-  const updateContent = (section: string, newValue: any) => {
-    setData((prev: any) => ({
-      ...prev,
-      [section]: newValue
-    }));
+    const unsubscribe = onSnapshot(collRef, (snapshot) => {
+      const newParsedData: any = {};
+      
+      snapshot.forEach(docSnap => {
+          newParsedData[docSnap.id] = docSnap.data().data;
+      });
+
+      if (!snapshot.empty) {
+          // Deep merge the fetched data over the initialData.
+          // This ensures that if the database is only partially seeded or missing entire documents (like contact/about),
+          // top-level components outside the ErrorBoundary (like Footer) won't fatally crash.
+          setData({ ...initialData, ...newParsedData });
+      } else {
+          setData(initialData);
+      }
+      setContentLoading(false);
+    }, (error) => {
+      console.error("Firestore real-time sync error:", error);
+      // Fallback to static data so the website still functions for visitors
+      setData(initialData);
+      setContentLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const updateContent = async (section: string, newValue: any) => {
+    await setDoc(doc(db, 'websiteContent', section), { data: newValue });
   };
 
-  const addItem = (section: string, item: any) => {
-    setData((prev: any) => ({
-      ...prev,
-      [section]: [...(prev[section] || []), { ...item, id: Date.now() }]
-    }));
+  const addItem = async (section: string, item: any) => {
+    const docRef = doc(db, 'websiteContent', section);
+    getDoc(docRef).then(async (snap) => {
+      let currentArr = snap.exists() ? (snap.data().data || []) : ((initialData as any)[section] || []);
+      const newItem = { ...item, id: Date.now() };
+      currentArr.push(newItem);
+      await setDoc(docRef, { data: currentArr });
+    });
   };
 
-  const editItem = (section: string, id: number, updatedFields: any) => {
-    setData((prev: any) => ({
-      ...prev,
-      [section]: prev[section].map((item: any) => 
-        item.id === id ? { ...item, ...updatedFields } : item
-      )
-    }));
+  const editItem = async (section: string, id: number, updatedFields: any) => {
+    const docRef = doc(db, 'websiteContent', section);
+    getDoc(docRef).then(async (snap) => {
+        let currentArr = snap.exists() ? (snap.data().data || []) : ((initialData as any)[section] || []);
+        const index = currentArr.findIndex((item:any) => item.id === id);
+        if (index !== -1) {
+            currentArr[index] = { ...currentArr[index], ...updatedFields };
+            await setDoc(docRef, { data: currentArr });
+        }
+    });
   };
 
-  const deleteItem = (section: string, id: number) => {
-    setData((prev: any) => ({
-      ...prev,
-      [section]: prev[section].filter((item: any) => item.id !== id)
-    }));
+  const deleteItem = async (section: string, id: number) => {
+    const docRef = doc(db, 'websiteContent', section);
+    getDoc(docRef).then(async (snap) => {
+        let currentArr = snap.exists() ? (snap.data().data || []) : ((initialData as any)[section] || []);
+        const newArr = currentArr.filter((item:any) => item.id !== id);
+        await setDoc(docRef, { data: newArr });
+    });
   };
 
-  const toggleProduct = (id: number) => {
-    setData((prev: any) => ({
-      ...prev,
-      products: prev.products.map((p: any) => 
-        p.id === id ? { ...p, enabled: !p.enabled } : p
-      )
-    }));
+  const toggleProduct = async (id: number) => {
+    const docRef = doc(db, 'websiteContent', 'products');
+    getDoc(docRef).then(async (snap) => {
+         let currentArr = snap.exists() ? (snap.data().data || []) : ((initialData as any)['products'] || []);
+         const index = currentArr.findIndex((item:any) => item.id === id);
+         if(index !== -1) {
+             currentArr[index].enabled = !currentArr[index].enabled;
+             await setDoc(docRef, { data: currentArr });
+         }
+    });
   };
 
   return (
     <ContentContext.Provider value={{ 
       data, 
+      contentLoading,
       updateContent, 
       addItem, 
-      editItem, 
+      editItem,
+      updateItem: editItem, // alias for admins
       deleteItem,
       toggleProduct
     }}>
