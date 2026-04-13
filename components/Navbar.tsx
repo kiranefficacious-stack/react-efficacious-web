@@ -109,14 +109,13 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group relative z-50">
-            <div className="bg-gradient-to-br from-brand-500 to-brand-700 p-2 rounded-xl text-white shadow-lg shadow-brand-500/30 group-hover:scale-105 transition-transform duration-300">
-                <ShieldCheck size={24} />
-            </div>
-            <span className={`text-2xl font-bold tracking-tight transition-colors duration-300 ${
-                useDarkThemeNav ? 'text-white' : 'text-slate-900 dark:text-white'
-            }`}>
-            Efficacious<span className="text-brand-500">.</span>
-            </span>
+            <img 
+              src="https://res.cloudinary.com/davnxvrps/image/upload/v1776072917/Frame_3_1_pytiwd.png" 
+              alt="Efficacious Logo" 
+              className={`h-[80px] w-auto transition-transform duration-300 group-hover:scale-105 ${
+                  useDarkThemeNav ? 'brightness-0 invert' : 'dark:brightness-0 dark:invert'
+              }`}
+            />
         </Link>
 
         {/* Desktop Nav */}

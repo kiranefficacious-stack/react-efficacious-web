@@ -25,10 +25,11 @@ const Footer: React.FC = () => {
           {/* Logo & About */}
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 bg-brand-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-black text-xl">E</span>
-              </div>
-              <span className="text-2xl font-black tracking-tight text-white uppercase">Efficacious</span>
+              <img 
+                src="https://res.cloudinary.com/davnxvrps/image/upload/v1776072917/Frame_3_1_pytiwd.png" 
+                alt="Efficacious Logo" 
+                className="h-[80px] w-auto brightness-0 invert"
+              />
             </div>
             <p className="text-sm leading-relaxed mb-6">
               Empowering organizations with smart ERP solutions. We believe in efficiency, security, and seamless innovation.
