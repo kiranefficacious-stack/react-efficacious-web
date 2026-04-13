@@ -15,7 +15,11 @@ import About from './pages/About';
 import Services from './pages/Services';
 import Products from './pages/Products';
 import Portfolio from './pages/Portfolio';
+import PortfolioDetail from './pages/PortfolioDetail';
 import Blogs from './pages/Blogs';
+import BlogDetail from './pages/BlogDetail';
+import NewsList from './pages/NewsList';
+import NewsDetail from './pages/NewsDetail';
 import Partners from './pages/Partners';
 import Careers from './pages/Careers';
 import Contact from './pages/Contact';
@@ -93,13 +97,17 @@ function App() {
                       <Route path="/services/pvc-card-printing" element={<PVCCardPrinting />} />
                       <Route path="/products" element={<Products />} />
                       <Route path="/products/esmart-school" element={<ESmartSchool />} />
-                      <Route path="/products/esmart-track" element={<ESmartTrack />} />
+                      {/* <Route path="/products/esmart-track" element={<ESmartTrack />} /> */}
                       <Route path="/products/esmart-restaurant" element={<ESmartRestaurant />} />
                       <Route path="/products/esmart-health" element={<ESmartHealth />} />
-                      <Route path="/products/esmart-team" element={<ESmartTeam />} />
-                      <Route path="/products/esmart-society" element={<ESmartSociety />} />
+                      {/* <Route path="/products/esmart-team" element={<ESmartTeam />} />
+                      <Route path="/products/esmart-society" element={<ESmartSociety />} /> */}
                       <Route path="/portfolio" element={<Portfolio />} />
+                      <Route path="/portfolio/:id" element={<PortfolioDetail />} />
+                      <Route path="/news" element={<NewsList />} />
+                      <Route path="/news/:id" element={<NewsDetail />} />
                       <Route path="/blogs" element={<Blogs />} />
+                      <Route path="/blogs/:id" element={<BlogDetail />} />
                       <Route path="/partners" element={<Partners />} />
                       <Route path="/channel-partners" element={<ChannelPartners />} />
                       <Route path="/careers" element={<Careers />} />

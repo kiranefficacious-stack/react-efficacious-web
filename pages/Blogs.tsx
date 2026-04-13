@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Contact from '../components/Contact';
 import { Calendar, User, ArrowRight, Clock, Search, Sparkles } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
 
 const Blogs: React.FC = () => {
   const { data } = useContent();
-  const blogs = data.blogs;
+  const navigate = useNavigate();
+  const blogs: any[] = data.blogs || [];
   const featuredPost = blogs[0] || {
+    id: 1,
     title: "The Future of AI in Education",
     excerpt: "Discover how AI-driven analytics...",
     category: "EdTech",
@@ -17,7 +20,21 @@ const Blogs: React.FC = () => {
     image: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=1200",
   };
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery]   = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
+
+  /* Derive unique categories from data */
+  const categories = ['All', ...Array.from(new Set(blogs.map((b: any) => b.category)))];
+
+  /* Filter logic */
+  const filtered = blogs.filter((post: any) => {
+    const matchCat   = activeCategory === 'All' || post.category === activeCategory;
+    const matchSearch = searchQuery.trim() === '' ||
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.category.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchCat && matchSearch;
+  });
 
   return (
     <div className="w-full bg-slate-50 dark:bg-dark-bg transition-colors duration-300">
@@ -81,21 +98,24 @@ const Blogs: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 -mt-24 relative z-20">
           
           {/* Featured Article */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-700 mb-16 grid md:grid-cols-2 group cursor-pointer hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] transition-all"
+            onClick={() => navigate(`/blogs/${featuredPost.id}`)}
+            className="bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-700 mb-16 grid md:grid-cols-2 group cursor-pointer hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] transition-all duration-300"
           >
               <div className="relative h-72 md:h-auto overflow-hidden">
-                  <img 
-                    src={featuredPost.image} 
-                    alt={featuredPost.title} 
+                  <img
+                    src={featuredPost.image}
+                    alt={featuredPost.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
+                  {/* overlay on hover */}
+                  <div className="absolute inset-0 bg-brand-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute top-6 left-6">
                       <span className="px-4 py-1.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-full text-xs font-bold text-violet-600 uppercase tracking-wider">
-                          Featured Story
+                          ★ Featured Story
                       </span>
                   </div>
               </div>
@@ -112,30 +132,31 @@ const Blogs: React.FC = () => {
                   </p>
                   <div className="flex items-center justify-between mt-auto">
                       <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
-                              <User size={20} className="text-slate-500 dark:text-slate-400" />
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-violet-500 flex items-center justify-center text-white font-bold text-base">
+                              {featuredPost.author?.charAt(0) || 'A'}
                           </div>
                           <div>
                               <p className="text-sm font-bold text-slate-900 dark:text-white">{featuredPost.author}</p>
-                              <p className="text-xs text-slate-500">CEO, Efficacious</p>
+                              <p className="text-xs text-slate-500">{featuredPost.authorRole || 'Efficacious'}</p>
                           </div>
                       </div>
-                      <span className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center group-hover:bg-brand-600 group-hover:text-white transition-all">
+                      <span className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center group-hover:bg-brand-600 group-hover:text-white transition-all duration-300">
                           <ArrowRight size={20} />
                       </span>
                   </div>
               </div>
           </motion.div>
 
-          {/* Filters / Categories (Visual Only) */}
+          {/* Filters / Categories */}
           <div className="flex flex-wrap gap-2 mb-12">
-              {["All", "Security", "EdTech", "Hospitality", "Corporate", "Technology"].map((cat, i) => (
-                  <button 
+              {categories.map((cat, i) => (
+                  <button
                     key={i}
+                    onClick={() => setActiveCategory(cat)}
                     className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all border ${
-                        i === 0 
-                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent shadow-lg shadow-slate-900/20' 
-                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500'
+                        activeCategory === cat
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent shadow-lg shadow-slate-900/20'
+                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-brand-400 dark:hover:border-brand-500 hover:text-brand-600 dark:hover:text-brand-400'
                     }`}
                   >
                       {cat}
@@ -144,55 +165,77 @@ const Blogs: React.FC = () => {
           </div>
 
           {/* Blog Grid */}
+          {filtered.length === 0 ? (
+              <div className="text-center py-24">
+                  <p className="text-5xl mb-4">🔍</p>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No articles found</h3>
+                  <p className="text-slate-500 dark:text-slate-400">Try a different category or search term.</p>
+                  <button
+                    onClick={() => { setActiveCategory('All'); setSearchQuery(''); }}
+                    className="mt-6 px-6 py-2.5 rounded-full bg-brand-600 text-white text-sm font-bold hover:bg-brand-500 transition-colors"
+                  >
+                      Clear Filters
+                  </button>
+              </div>
+          ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {blogs.map((post, index) => (
+              {filtered.map((post: any, index: number) => (
                   <motion.div
                     key={post.id}
                     initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="group bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full hover:-translate-y-1"
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.08, duration: 0.45 }}
+                    onClick={() => navigate(`/blogs/${post.id}`)}
+                    className="group bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full hover:-translate-y-1.5 cursor-pointer"
                   >
+                      {/* Image */}
                       <div className="relative h-56 overflow-hidden">
-                          <img 
-                            src={post.image} 
-                            alt={post.title} 
+                          <img
+                            src={post.image}
+                            alt={post.title}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                           />
-                          <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                           <div className="absolute top-4 left-4">
-                              <span className={`px-3 py-1 rounded-full text-xs font-bold bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-sm uppercase tracking-wide text-${post.color}-600 dark:text-${post.color}-400`}>
+                              <span className={`px-3 py-1 rounded-full text-xs font-bold bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-sm uppercase tracking-wide text-${post.color || 'brand'}-600 dark:text-${post.color || 'brand'}-400`}>
                                   {post.category}
                               </span>
                           </div>
+                          {/* Read More pill that appears on hover */}
+                          <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                              <span className="flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-slate-900 rounded-full text-xs font-bold text-brand-600 dark:text-brand-400 shadow-lg">
+                                  Read More <ArrowRight size={13} />
+                              </span>
+                          </div>
                       </div>
-                      
+
+                      {/* Body */}
                       <div className="p-6 flex flex-col flex-grow">
                           <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mb-3">
                               <span className="flex items-center gap-1"><Calendar size={12} /> {post.date}</span>
                               <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
                               <span className="flex items-center gap-1"><Clock size={12} /> {post.readTime}</span>
                           </div>
-                          
-                          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 line-clamp-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+
+                          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 line-clamp-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors leading-snug">
                               {post.title}
                           </h3>
-                          
+
                           <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4 line-clamp-3 flex-grow">
                               {post.excerpt}
                           </p>
-                          
+
                           <div className="pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
                               <span className="text-xs font-medium text-slate-500 dark:text-slate-400">By {post.author}</span>
-                              <button className="text-sm font-bold text-brand-600 dark:text-brand-400 flex items-center gap-1 group-hover:gap-2 transition-all">
-                                  Read More <ArrowRight size={16} />
-                              </button>
+                              <span className="text-sm font-bold text-brand-600 dark:text-brand-400 flex items-center gap-1 group-hover:gap-2.5 transition-all duration-200">
+                                  Read More <ArrowRight size={15} />
+                              </span>
                           </div>
                       </div>
                   </motion.div>
               ))}
           </div>
+          )}
 
           {/* Newsletter Section */}
           <div className="mt-20 bg-slate-900 rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden text-center shadow-2xl">

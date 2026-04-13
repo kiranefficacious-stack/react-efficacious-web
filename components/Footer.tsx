@@ -62,7 +62,7 @@ const Footer: React.FC = () => {
             <h4 className="text-white font-bold mb-6 uppercase text-sm tracking-widest">Solutions</h4>
             <ul className="space-y-4 text-sm">
               <li><Link to="/products/esmart-school" className="hover:text-white">eSmart School</Link></li>
-              <li><Link to="/products/esmart-track" className="hover:text-white">eSmart Track</Link></li>
+              <li><Link to="/products/esmart-health" className="hover:text-white">eSmart Health</Link></li>
               <li><Link to="/products/esmart-restaurant" className="hover:text-white">eSmart Restaurant</Link></li>
               <li><Link to="/services" className="hover:text-white">All Services</Link></li>
             </ul>

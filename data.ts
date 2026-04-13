@@ -113,8 +113,48 @@ export const initialData = {
     ]
   },
   gallery: [
-    { id: 1, url: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200", caption: "Main Office" },
-    { id: 2, url: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&q=80&w=1200", caption: "Conference Room" }
+    { id: 1, url: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200", caption: "Main Office", category: "Workspace" },
+    { id: 2, url: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&q=80&w=1200", caption: "Conference Room", category: "Meetings" },
+    { id: 3, url: "/images/gallery/collaboration.png", caption: "Collaborative Space", category: "Innovation" },
+    { id: 4, url: "/images/gallery/workspace.png", caption: "Developer HQ", category: "Technology" },
+    { id: 5, url: "/images/gallery/breakarea.png", caption: "Creative Breakout", category: "Culture" }
+  ],
+  team: [
+    { 
+      id: 1,
+      name: "Kamal Agrawal", 
+      role: "Founder & CEO", 
+      image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=250",
+      description: "Visionary leader and core finance professional with a passion for innovative IT solutions."
+    },
+    { 
+      id: 2,
+      name: "Kiran Kshirsagar", 
+      role: "Senior Flutter Android + iOS App Developer", 
+      image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=250",
+      description: "Expert in building robust, high-performance cross-platform mobile experiences with smooth animations."
+    },
+    { 
+      id: 3,
+      name: "Pranav Patil", 
+      role: "Sr. .Net Developer", 
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250",
+      description: "Specializes in highly scalable backend architectures, database optimization, and secure integrations."
+    },
+    { 
+      id: 4,
+      name: "Rahul Chauhan", 
+      role: "Sr. .Net Developer", 
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=250",
+      description: "Passionate about clean code, high-performance web services, and robust cloud infrastructure."
+    },
+    { 
+      id: 5,
+      name: "Nandini", 
+      role: "Documentation Specialist", 
+      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=250",
+      description: "Ensures clear, concise, and structured documentation for smooth handoffs and client understanding."
+    }
   ],
   portfolio: [
     {
@@ -132,13 +172,185 @@ export const initialData = {
     {
       id: 1,
       title: "5 Ways to Secure Your School Data",
-      excerpt: "In the digital age, securing student data is paramount.",
+      excerpt: "In the digital age, securing student data is paramount. Learn how to protect your institution's most sensitive information from threats.",
       category: "Security",
-      author: "Tech Team",
+      author: "Kamal Agrawal",
+      authorRole: "Founder & CEO",
       date: "Mar 15, 2024",
       readTime: "5 min read",
-      image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800",
-      color: "blue"
+      image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=1200",
+      color: "blue",
+      tags: ["Cybersecurity", "ERP", "Data Privacy"],
+      content: [
+        {
+          heading: "Why School Data Security Matters",
+          body: "Educational institutions handle a goldmine of sensitive data — student records, parent contact details, fee history, health information, and academic progress. A single breach can expose thousands of families, erode institutional trust overnight, and invite regulatory penalties. According to recent studies, the education sector ranks among the top targets for ransomware attacks globally."
+        },
+        {
+          heading: "1. Enforce Role-Based Access Control (RBAC)",
+          body: "Not every staff member needs access to every record. Implement a strict hierarchy: teachers access only their class data, accountants see only financial records, and principals get a broad but monitored view. eSmart School's RBAC module lets you define granular permissions so sensitive data is always on a need-to-know basis."
+        },
+        {
+          heading: "2. Encrypt Data at Rest and in Transit",
+          body: "All student data stored in your ERP should be encrypted using AES-256 standards. More critically, data transmitted between devices — parent apps, teacher dashboards, admin panels — must travel over TLS 1.3 encrypted channels. Avoid SMS-based OTPs for authentication; prefer TOTP authenticators."
+        },
+        {
+          heading: "3. Schedule Regular Security Audits",
+          body: "Quarterly penetration tests and annual third-party security audits are non-negotiable for 500+ student institutions. These audits uncover misconfigured servers, unpatched software vulnerabilities, and weak password policies before attackers do. Our team at Efficacious facilitates compliance-ready audit reporting for our ERP clients."
+        },
+        {
+          heading: "4. Enable Multi-Factor Authentication",
+          body: "MFA adds a critical second layer of defense. Even if a staff member's password is compromised via phishing, an attacker still cannot log in without the second factor. Enforce MFA for all administrative accounts and make it available as an opt-in for parents using the student portal."
+        },
+        {
+          heading: "5. Train Your People",
+          body: "Technology alone cannot seal every gap. A staff member clicking a phishing link or plugging in an unknown USB drive can undo the strongest technical safeguards. Conduct bi-annual cybersecurity awareness workshops, simulate phishing attacks, and establish a clear incident-reporting protocol so threats are surfaced quickly."
+        }
+      ]
+    },
+    {
+      id: 2,
+      title: "The Future of AI in Education",
+      excerpt: "Discover how AI-driven analytics are transforming the way schools operate, predict student outcomes, and personalize learning at scale.",
+      category: "EdTech",
+      author: "Kiran Kshirsagar",
+      authorRole: "Sr. Flutter Developer",
+      date: "Apr 02, 2024",
+      readTime: "7 min read",
+      image: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=1200",
+      color: "violet",
+      tags: ["AI", "Machine Learning", "EdTech"],
+      content: [
+        {
+          heading: "Redefining the Classroom with Artificial Intelligence",
+          body: "The global EdTech market is projected to surpass $400 billion by 2028, with AI at its core. From intelligent tutoring systems that adapt to each student's learning pace, to automated grading tools that give teachers back hours every week, AI is no longer a futuristic concept — it is an operational reality in leading schools today."
+        },
+        {
+          heading: "Predictive Analytics: Catching At-Risk Students Early",
+          body: "One of AI's most powerful applications in education is identifying students who are at risk of falling behind — weeks before traditional assessments would reveal the problem. By analyzing attendance patterns, homework submission rates, and quiz performance, machine-learning models can flag individual students for early intervention, allowing counselors and teachers to provide targeted support."
+        },
+        {
+          heading: "Personalized Learning Paths",
+          body: "No two students learn at the same pace or through the same modalities. AI-powered adaptive learning platforms analyze each student's interaction history and serve content — videos, quizzes, projects — calibrated to their current mastery level. This approach has shown to improve learning outcomes by up to 30% in pilot programs run across schools in Maharashtra and Karnataka."
+        },
+        {
+          heading: "Administrative Automation",
+          body: "Beyond the classroom, AI is slashing administrative burdens. Automated fee reminders, AI-generated timetables that minimize conflicts, and smart attendance — including facial-recognition check-ins — are freeing up principals and administrators to focus on strategy rather than operations. eSmart School integrates these capabilities natively."
+        },
+        {
+          heading: "The Road Ahead",
+          body: "As natural language processing matures, we will see AI-powered chat tutors capable of answering student queries at 2 AM, and voice-based interfaces allowing young children to interact with digital learning tools without typing. Efficacious is actively investing in these capabilities to ensure our clients stay at the forefront of educational innovation."
+        }
+      ]
+    },
+    {
+      id: 3,
+      title: "How ERP Systems Are Transforming Hospital Management",
+      excerpt: "From paperless OPD to real-time bed tracking, modern healthcare ERP solutions are eliminating inefficiencies that cost hospitals time and lives.",
+      category: "Healthcare",
+      author: "Pranav Patil",
+      authorRole: "Sr. .Net Developer",
+      date: "Apr 10, 2024",
+      readTime: "6 min read",
+      image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=1200",
+      color: "emerald",
+      tags: ["Healthcare", "ERP", "Digital Transformation"],
+      content: [
+        {
+          heading: "The Paper-Pile Problem",
+          body: "Walk into any mid-sized Indian hospital and you will likely find towers of patient files, handwritten prescriptions deciphered by pharmacists with medical-degree-level guesswork, and registration queues stretching out the door. This is not a resource problem — it is a systems problem. Modern healthcare ERP is the antidote."
+        },
+        {
+          heading: "Real-Time Bed Management",
+          body: "One of the most impactful immediate wins from an ERP implementation is live bed-status visibility. Ward managers can see — in real time — which beds are occupied, which are awaiting cleaning, and which are ready for admission. This single capability reduces average patient wait time for inpatient admission by 40% in hospitals that have deployed eSmart Health."
+        },
+        {
+          heading: "Integrated EMR and E-Prescriptions",
+          body: "Electronic Medical Records (EMR) give doctors instant access to a patient's full history — past diagnoses, allergies, test results, surgical history — from any terminal in the hospital. E-prescriptions eliminate illegible handwriting, reduce dispensing errors, and create a digital audit trail. Pharmacies integrated with the ERP auto-verify against allergy records before dispensing."
+        },
+        {
+          heading: "Billing Transparency and NABH Compliance",
+          body: "Healthcare ERP automates patient billing, consolidating charges from pharmacy, radiology, laboratory, OT, and ward stays into a single clear invoice. For institutions seeking NABH accreditation, the audit trails, consent management modules, and SOP enforcement built into modern ERP systems dramatically reduce the compliance preparation burden."
+        },
+        {
+          heading: "Getting Started with Digital Transformation",
+          body: "The transition from legacy systems does not have to be disruptive. Efficacious follows a phased implementation methodology — departments go live in tranches, parallel runs ensure continuity, and on-site training ensures staff adoption. Most clients achieve full operational go-live within 90 days."
+        }
+      ]
+    },
+    {
+      id: 4,
+      title: "GPS Fleet Tracking: A Game-Changer for School Bus Safety",
+      excerpt: "Parents should never wonder where their child's bus is. Real-time GPS tracking transforms school transport into a transparent, accountable, and safer system.",
+      category: "Technology",
+      author: "Rahul Chauhan",
+      authorRole: "Sr. .Net Developer",
+      date: "Apr 18, 2024",
+      readTime: "5 min read",
+      image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=1200",
+      color: "amber",
+      tags: ["GPS", "Child Safety", "Transport"],
+      content: [
+        {
+          heading: "The Anxiety Every Parent Knows",
+          body: "Every morning, thousands of parents wave goodbye and spend the next hour wondering: Has the bus arrived at school? Was my child safely picked up? Is traffic causing a delay? This uncertainty is unnecessary in 2024. Real-time GPS tracking, deeply integrated with the school ERP, can answer all these questions automatically — before the parent even thinks to ask."
+        },
+        {
+          heading: "How Real-Time Tracking Works",
+          body: "A tamper-proof GPS device installed in each school bus transmits its location every 5–10 seconds via cellular network to eSmart School's servers. The parent app renders the bus as a moving pin on a Google Maps view. As the bus enters a geofence drawn around the school gate or the student's stop, the parent receives an automatic push notification — 'Your child's bus is 2 minutes away.'"
+        },
+        {
+          heading: "Speed Alerts and Driver Accountability",
+          body: "Beyond location, the system monitors bus speed in real time. If the driver exceeds a configured limit — typically 60 km/h in school zones — an immediate alert is sent to the transport manager. Trip replays allow supervisors to review the entire route history, ensuring accountability and adherence to approved paths."
+        },
+        {
+          heading: "Emergency SOS Integration",
+          body: "Every bus can be equipped with a physical SOS button. In an emergency, a single press alerts the school control room, transport manager, and pre-designated parents simultaneously, sharing the bus's live location. This capability has been a decisive factor for schools in remote areas with unreliable communication."
+        },
+        {
+          heading: "ROI Beyond Safety",
+          body: "Schools that have deployed eSmart Track report a 15% reduction in fuel costs due to optimized routing and reduced idling. Insurance premiums have dropped for some clients as insurers recognise the risk mitigation inherent in a supervised, GPS-tracked fleet. Child safety and operational efficiency — a rare win-win."
+        }
+      ]
+    },
+    {
+      id: 5,
+      title: "5 Signs Your Restaurant Needs a POS & ERP Upgrade",
+      excerpt: "Long queues, kitchen mix-ups, and end-of-day inventory nightmares — these are symptoms of a restaurant technology problem that has a clear solution.",
+      category: "Hospitality",
+      author: "Tech Team",
+      authorRole: "Efficacious",
+      date: "Apr 25, 2024",
+      readTime: "4 min read",
+      image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=1200",
+      color: "rose",
+      tags: ["Restaurant Tech", "POS", "Operations"],
+      content: [
+        {
+          heading: "When Growth Outpaces Systems",
+          body: "A restaurant that thrives on a spreadsheet and a basic POS when serving 50 covers a day will buckle under the same setup when demand scales to 200. The signs of system stress are unmistakable — and costly. Here are five that should prompt an immediate technology audit."
+        },
+        {
+          heading: "Sign 1: Your Waitstaff Are Running Order Slips to the Kitchen",
+          body: "Paper dockets are the single largest source of kitchen errors in F&B operations. Misread handwriting, lost slips, and miscommunicated modifications translate directly to food waste, re-fires, and angry customers. A Kitchen Display System (KDS) integrated with a digital POS routes orders to the exact kitchen station the moment a waiter taps 'Submit' on a tablet."
+        },
+        {
+          heading: "Sign 2: You Cannot Tell Your Food Cost Percentage in Real Time",
+          body: "If calculating your daily food cost requires a manual stock-take and an Excel formula, you are flying blind. A proper restaurant ERP tracks ingredient consumption per dish, flags variance from recipe standards, and gives you live food cost percentage — so you can course-correct pricing or portion size proactively rather than retrospectively."
+        },
+        {
+          heading: "Sign 3: Table Turnover Is Slowing Down",
+          body: "Slow billing is the silent killer of restaurant revenue. If your staff are queuing at a single POS terminal to process payments, or manually splitting bills between five friends, you are losing table turns. Mobile POS handhelds on the floor — with integrated payment gateways — can reduce average billing time from 8 minutes to under 90 seconds."
+        },
+        {
+          heading: "Sign 4: You Have No Data On Your Best and Worst Sellers",
+          body: "Menu engineering — the practice of analysing profitability and popularity of individual dishes to inform placement and pricing decisions — is impossible without sales data. A modern restaurant ERP gives you a daily menu performance heatmap. Drop the loss-makers, promote the stars, and watch margin climb."
+        },
+        {
+          heading: "Sign 5: Reservation Management Is a Notebook",
+          body: "A paper reservation book cannot send SMS reminders, cannot integrate with a Google Business listing for online bookings, and certainly cannot auto-release no-show tables to a digital waitlist. eSmart Restaurant's table reservation module does all three. The average no-show rate for restaurants using automated reminders drops by 60%."
+        }
+      ]
     }
   ],
   careers: [
@@ -262,7 +474,7 @@ export const initialData = {
     {
       id: 2,
       title: "eSmart Track",
-      enabled: true,
+      enabled: false,
       href: "/products/esmart-track",
       iconName: "Truck",
       gradient: "from-orange-400 via-amber-500 to-yellow-600",
@@ -330,6 +542,88 @@ export const initialData = {
         { label: "Average Fuel Savings", value: "20%" },
         { label: "Vehicles Tracked", value: "15k+" },
         { label: "Increased Efficiency", value: "30%" }
+      ]
+    },
+    {
+      id: 3,
+      title: "eSmart Health",
+      enabled: true,
+      href: "/products/esmart-health",
+      iconName: "Activity",
+      gradient: "from-emerald-400 via-teal-500 to-cyan-600",
+      bgAccent: "bg-emerald-500/10",
+      textAccent: "text-emerald-600 dark:text-emerald-400",
+      description: "A comprehensive, paperless solution for hospitals and clinics. Enhance patient care, optimize resources, and streamline administration.",
+      features: [
+        {
+          id: 30,
+          title: "Patient Management",
+          description: "Streamline the entire patient journey from registration to discharge. Manage appointments, bed allocation, and patient history effortlessly.",
+          iconName: "Users",
+          details: ["Online Appointments", "Real-time Bed Status", "Discharge Summary"],
+          color: "bg-emerald-500",
+          textAccent: "text-emerald-600"
+        },
+        {
+          id: 31,
+          title: "Doctor's Workbench",
+          description: "Empower doctors with a dedicated digital workspace. Access electronic medical records (EMR), write prescriptions, and view lab reports instantly.",
+          iconName: "Stethoscope",
+          details: ["E-Prescriptions", "Patient History", "Diagnosis Tools"],
+          color: "bg-teal-500",
+          textAccent: "text-teal-600"
+        }
+      ],
+      modules: [
+        { title: "EMR / EHR", iconName: "Activity" },
+        { title: "OT Management", iconName: "Monitor" },
+        { title: "Pharmacy Management", iconName: "Database" }
+      ],
+      stats: [
+        { label: "Wait Time Reduction", value: "40%" },
+        { label: "Paperless Operations", value: "100%" },
+        { label: "Support", value: "24/7" }
+      ]
+    },
+    {
+      id: 4,
+      title: "eSmart Restaurant",
+      enabled: true,
+      href: "/products/esmart-restaurant",
+      iconName: "Utensils",
+      gradient: "from-rose-400 via-pink-500 to-orange-600",
+      bgAccent: "bg-rose-500/10",
+      textAccent: "text-rose-600 dark:text-rose-400",
+      description: "Digitize your restaurant operations from kitchen to customer. Enhance service speed, reduce wastage, and increase profitability.",
+      features: [
+        {
+          id: 40,
+          title: "Digital Menu & Ordering",
+          description: "Provide a seamless contactless experience. Customers can scan QR codes to view vivid menus and place orders directly.",
+          iconName: "QrCode",
+          details: ["Contactless Ordering", "Dynamic Menu Updates", "Upselling Prompts"],
+          color: "bg-rose-500",
+          textAccent: "text-rose-600"
+        },
+        {
+          id: 41,
+          title: "Kitchen Display System",
+          description: "Streamline your kitchen operations. Replace noisy printers with smart screens that route orders to specific stations.",
+          iconName: "Monitor",
+          details: ["Station-wise Routing", "Color-coded Status", "Prep Time Tracking"],
+          color: "bg-orange-500",
+          textAccent: "text-orange-600"
+        }
+      ],
+      modules: [
+        { title: "Table Reservation", iconName: "Layers" },
+        { title: "Waitlist Management", iconName: "Coffee" },
+        { title: "Billing & POS", iconName: "CreditCard" }
+      ],
+      stats: [
+        { label: "Table Turnover", value: "+30%" },
+        { label: "Food Cost Reduction", value: "15%" },
+        { label: "Order Errors", value: "0%" }
       ]
     }
     // ...

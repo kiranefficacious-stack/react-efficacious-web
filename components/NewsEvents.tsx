@@ -5,9 +5,11 @@ import { Calendar, ArrowRight } from 'lucide-react';
 const motion = m as any;
 
 import { useContent } from '../hooks/useContent';
+import { useNavigate } from 'react-router-dom';
 
 const NewsEvents: React.FC = () => {
   const { data } = useContent();
+  const navigate = useNavigate();
   const newsItems = data.news;
 
   return (
@@ -31,6 +33,7 @@ const NewsEvents: React.FC = () => {
             </motion.div>
             
             <motion.button 
+                onClick={() => navigate('/news')}
                 className="hidden md:flex items-center gap-2 text-brand-600 dark:text-brand-400 font-semibold hover:text-brand-700 dark:hover:text-brand-300 transition-colors"
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -78,16 +81,22 @@ const NewsEvents: React.FC = () => {
                         <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4 line-clamp-3">
                             {item.excerpt}
                         </p>
-                        <a href="#" className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 dark:text-brand-400 hover:gap-2 transition-all">
+                        <button 
+                            onClick={() => navigate(`/news/${item.id}`)}
+                            className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 dark:text-brand-400 hover:gap-2 transition-all mt-auto"
+                        >
                             Read Full Story <ArrowRight size={16} />
-                        </a>
+                        </button>
                     </div>
                 </motion.div>
             ))}
         </div>
         
         <div className="mt-8 md:hidden text-center">
-             <button className="inline-flex items-center gap-2 text-brand-600 dark:text-brand-400 font-semibold hover:text-brand-700 dark:hover:text-brand-300 transition-colors">
+             <button 
+                onClick={() => navigate('/news')}
+                className="inline-flex items-center gap-2 text-brand-600 dark:text-brand-400 font-semibold hover:text-brand-700 dark:hover:text-brand-300 transition-colors"
+             >
                 View All Updates <ArrowRight size={20} />
             </button>
         </div>

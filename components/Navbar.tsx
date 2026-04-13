@@ -27,11 +27,8 @@ const serviceItems = [
 
 const productItems = [
   { name: 'E-Smart School', href: '/products/esmart-school', icon: <GraduationCap size={18} /> },
-  { name: 'E-Smart Track', href: '/products/esmart-track', icon: <Truck size={18} /> },
   { name: 'E-Smart Restaurant', href: '/products/esmart-restaurant', icon: <Utensils size={18} /> },
   { name: 'E-Smart Health', href: '/products/esmart-health', icon: <Activity size={18} /> },
-  { name: 'E-Smart Team', href: '/products/esmart-team', icon: <Users size={18} /> },
-  { name: 'E-Smart Society', href: '/products/esmart-society', icon: <Building2 size={18} /> },
 ];
 
 const partnerItems = [
@@ -53,11 +50,8 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
   // Pages that have a dark hero section regardless of theme mode
   const darkHeroRoutes = [
     '/products/esmart-school', 
-    '/products/esmart-track', 
     '/products/esmart-restaurant',
     '/products/esmart-health',
-    '/products/esmart-team',
-    '/products/esmart-society',
     '/channel-partners',
     '/partners',
     '/careers',

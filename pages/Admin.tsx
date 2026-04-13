@@ -19,6 +19,7 @@ import PartnersManager from '../components/admin/PartnersManager';
 import ContactManager from '../components/admin/ContactManager';
 import ProductManager from '../components/admin/ProductManager';
 import AboutManager from '../components/admin/AboutManager';
+import TeamManager from '../components/admin/TeamManager';
 
 const Admin: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -42,6 +43,7 @@ const Admin: React.FC = () => {
     { id: 'products', label: 'Products', icon: <Box size={18} /> },
     { id: 'contact', label: 'Contact', icon: <Phone size={18} /> },
     { id: 'about', label: 'About', icon: <Info size={18} /> },
+    { id: 'team', label: 'Team', icon: <Users size={18} /> },
   ];
 
   return (
@@ -108,8 +110,9 @@ const Admin: React.FC = () => {
               {activeTab === 'blogs' && <BlogsManager />}
               {activeTab === 'partners' && <PartnersManager />}
               {activeTab === 'products' && <ProductManager />}
-              {activeTab === 'contact' && <ContactManager />}
+              { activeTab === 'contact' && <ContactManager />}
               {activeTab === 'about' && <AboutManager />}
+              {activeTab === 'team' && <TeamManager />}
             </motion.div>
           </AnimatePresence>
         </main>

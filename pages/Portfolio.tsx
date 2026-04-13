@@ -4,10 +4,12 @@ import PageHero from '../components/PageHero';
 import Contact from '../components/Contact';
 import { ArrowRight, Quote } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
+import { useNavigate } from 'react-router-dom';
 
 const Portfolio: React.FC = () => {
   const { data } = useContent();
-  const projects = data.portfolio;
+  const navigate = useNavigate();
+  const projects = data.portfolio || [];
   const [activeFilter, setActiveFilter] = useState("All");
 
   const categories = ["All", ...new Set(projects.map((p: any) => p.category))];
@@ -141,7 +143,10 @@ const Portfolio: React.FC = () => {
                                       ))}
                                   </div>
 
-                                  <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-50 dark:bg-slate-700 text-brand-600 dark:text-brand-400 font-bold text-sm hover:bg-brand-50 dark:hover:bg-slate-600 transition-colors group/btn">
+                                  <button 
+                                      onClick={() => navigate(`/portfolio/${project.id}`)}
+                                      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-50 dark:bg-slate-700 text-brand-600 dark:text-brand-400 font-bold text-sm hover:bg-brand-50 dark:hover:bg-slate-600 transition-colors group/btn"
+                                  >
                                       View Case Study <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
                                   </button>
                               </div>

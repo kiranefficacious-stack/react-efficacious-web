@@ -22,18 +22,6 @@ const slides = [
   },
   {
     id: 1,
-    tag: "Fleet Management",
-    title: "eSmart Truck",
-    highlight: "Real-time Tracking",
-    description: "Advanced vehicle tracking offering live monitoring, fuel theft prevention, and route deviation alerts for total fleet control.",
-    color: "from-blue-500 via-indigo-600 to-cyan-500",
-    icon: <Map className="w-5 h-5" />,
-    btnText: "View Solutions",
-    href: "/products/esmart-track",
-    blobColor: "rgba(59,130,246,0.4)" // Blue
-  },
-  {
-    id: 2,
     tag: "Hospitality",
     title: "eSmart Restaurant",
     highlight: "Smart Dining",
@@ -45,7 +33,7 @@ const slides = [
     blobColor: "rgba(244,63,94,0.4)" // Rose
   },
   {
-    id: 3,
+    id: 2,
     tag: "Healthcare",
     title: "eSmart Health",
     highlight: "Patient Care First",
@@ -55,30 +43,6 @@ const slides = [
     btnText: "Learn More",
     href: "/products/esmart-health",
     blobColor: "rgba(16,185,129,0.4)" // Emerald
-  },
-  {
-    id: 4,
-    tag: "Workforce",
-    title: "eSmart Team",
-    highlight: "Boost Productivity",
-    description: "Comprehensive workforce management tools for attendance tracking, task delegation, and team collaboration.",
-    color: "from-violet-500 via-purple-600 to-fuchsia-500",
-    icon: <Users className="w-5 h-5" />,
-    btnText: "Get Started",
-    href: "/products/esmart-team",
-    blobColor: "rgba(139,92,246,0.4)" // Violet
-  },
-  {
-    id: 5,
-    tag: "Housing",
-    title: "eSmart Society",
-    highlight: "Secure Living",
-    description: "Complete management system for housing societies ensuring security, visitor tracking, and smooth administration.",
-    color: "from-indigo-500 via-blue-600 to-sky-500",
-    icon: <Building2 className="w-5 h-5" />,
-    btnText: "View Details",
-    href: "/products/esmart-society",
-    blobColor: "rgba(99,102,241,0.4)" // Indigo
   }
 ];
 
