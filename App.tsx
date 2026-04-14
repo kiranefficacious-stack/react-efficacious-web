@@ -14,6 +14,7 @@ import { useContent } from './hooks/useContent';
 import { useAuth } from './hooks/useAuth';
 
 import Home from './pages/Home';
+import DirectChat from './pages/DirectChat';
 import About from './pages/About';
 import Services from './pages/Services';
 import Products from './pages/Products';
@@ -77,7 +78,9 @@ function App() {
       <div className={`flex flex-col min-h-screen transition-opacity duration-700 ${isLoading || contentLoading || authLoading ? 'opacity-0' : 'opacity-100'}`}>
         {!isLoading && !contentLoading && !authLoading && (
             <>
-                <Navbar isDark={isDark} toggleTheme={toggleTheme} />
+                {!location.pathname.startsWith('/direct-chat/') && (
+                  <Navbar isDark={isDark} toggleTheme={toggleTheme} />
+                )}
                 
                 {/* Main content grows to push footer down */}
                 <main className="flex-grow">
@@ -92,6 +95,7 @@ function App() {
                           </ProtectedRoute>
                         } 
                       />
+                      <Route path="/direct-chat/:sessionId" element={<DirectChat />} />
                       <Route path="/" element={<Home />} />
                       <Route path="/about" element={<About />} />
                       <Route path="/services" element={<Services />} />
@@ -124,8 +128,12 @@ function App() {
                   </ErrorBoundary>
                 </main>
                 
-                <Footer />
-                <ChatWidget />
+                {!location.pathname.startsWith('/direct-chat/') && (
+                  <>
+                    <Footer />
+                    <ChatWidget />
+                  </>
+                )}
             </>
         )}
       </div>

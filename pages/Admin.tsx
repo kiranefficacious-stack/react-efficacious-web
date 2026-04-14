@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Settings, Newspaper, Phone, Layout, Image, Briefcase, 
-  Users, Info, Box, LogOut, LayoutDashboard
+  Users, Info, Box, LogOut, LayoutDashboard, MessageSquare
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 // Import all managers
@@ -20,9 +20,11 @@ import ContactManager from '../components/admin/ContactManager';
 import ProductManager from '../components/admin/ProductManager';
 import AboutManager from '../components/admin/AboutManager';
 import TeamManager from '../components/admin/TeamManager';
+import ChatManager from '../components/admin/ChatManager';
 
 const Admin: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'dashboard');
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -42,6 +44,7 @@ const Admin: React.FC = () => {
     { id: 'partners', label: 'Partners', icon: <Users size={18} /> },
     { id: 'products', label: 'Products', icon: <Box size={18} /> },
     { id: 'contact', label: 'Contact', icon: <Phone size={18} /> },
+    { id: 'chat', label: 'Chat & Support', icon: <MessageSquare size={18} /> },
     { id: 'about', label: 'About', icon: <Info size={18} /> },
     { id: 'team', label: 'Team', icon: <Users size={18} /> },
   ];
@@ -111,6 +114,7 @@ const Admin: React.FC = () => {
               {activeTab === 'partners' && <PartnersManager />}
               {activeTab === 'products' && <ProductManager />}
               { activeTab === 'contact' && <ContactManager />}
+              {activeTab === 'chat' && <ChatManager />}
               {activeTab === 'about' && <AboutManager />}
               {activeTab === 'team' && <TeamManager />}
             </motion.div>
