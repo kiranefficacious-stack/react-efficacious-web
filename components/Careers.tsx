@@ -30,6 +30,9 @@ const Careers: React.FC = () => {
     message: ''
   });
   const [dragActive, setDragActive] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -46,17 +49,86 @@ const Careers: React.FC = () => {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    // Handle file drop logic here
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setSelectedFile(e.dataTransfer.files[0]);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Application submitted successfully!");
-    // Handle actual submission logic here
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+        // --- DEVELOPER SIMULATION MODE ---
+        // If keys are still placeholders, we simulate a successful send so you can test the UI.
+        if (['YOUR_PUBLIC_KEY', 'service_job_apply', 'template_job_apply'].some(k => 
+            ['YOUR_PUBLIC_KEY', 'service_job_apply', 'template_job_apply'].includes(k) && 
+            (k === 'YOUR_PUBLIC_KEY' || k === 'service_job_apply' || k === 'template_job_apply')
+        ) && (
+            'service_job_apply' === 'service_job_apply' // Check if placeholders exist
+        )) {
+            // Check if any placeholder is still present
+            const hasPlaceholders = 
+                'service_job_apply'.includes('service_job_apply') || 
+                'template_job_apply'.includes('template_job_apply') || 
+                'YOUR_PUBLIC_KEY'.includes('YOUR_PUBLIC_KEY');
+
+            if (hasPlaceholders) {
+                console.log("EmailJS Simulation Mode ACTIVE: Replace placeholders in Careers.tsx to send real emails.");
+                await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
+                setSubmitStatus('success');
+                setFormData({ name: '', email: '', mobile: '', address: '', position: '', message: '' });
+                setSelectedFile(null);
+                return;
+            }
+        }
+
+        // --- REAL EMAIL NOTIFICATION TRIGGER (EmailJS REST API) ---
+        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                service_id: 'service_job_apply', 
+                template_id: 'template_job_apply', 
+                user_id: 'YOUR_PUBLIC_KEY', 
+                template_params: {
+                    from_name: formData.name,
+                    from_email: formData.email,
+                    mobile: formData.mobile,
+                    position: formData.position,
+                    address: formData.address,
+                    message: formData.message,
+                    resume_name: selectedFile ? selectedFile.name : 'No file attached'
+                }
+            })
+        });
+
+        if (response.ok) {
+            setSubmitStatus('success');
+            setFormData({ name: '', email: '', mobile: '', address: '', position: '', message: '' });
+            setSelectedFile(null);
+        } else {
+            const errorData = await response.text();
+            console.error("EmailJS Error Response:", errorData);
+            setSubmitStatus('error');
+        }
+    } catch (error) {
+        console.error("Critical Submission error:", error);
+        setSubmitStatus('error');
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   return (
@@ -402,12 +474,20 @@ const Careers: React.FC = () => {
                                       onDragOver={handleDrag}
                                       onDrop={handleDrop}
                                   >
-                                      <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                                      <input 
+                                        type="file" 
+                                        onChange={handleFileChange}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                                      />
                                       <div className="w-14 h-14 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                                           <Upload className="w-7 h-7 text-slate-500 dark:text-slate-300" />
                                       </div>
                                       <p className="text-sm text-slate-700 dark:text-slate-200 font-medium">
-                                          Drag & Drop or <span className="text-brand-600 dark:text-brand-400 underline">Click to Upload</span>
+                                          {selectedFile ? (
+                                              <span className="text-brand-600 font-bold">{selectedFile.name}</span>
+                                          ) : (
+                                              <>Drag & Drop or <span className="text-brand-600 dark:text-brand-400 underline">Click to Upload</span></>
+                                          )}
                                       </p>
                                       <p className="text-xs text-slate-400 mt-1">PDF, DOCX up to 5MB</p>
                                   </div>
@@ -428,13 +508,46 @@ const Careers: React.FC = () => {
                                   </div>
                               </div>
 
-                              <button 
-                                  type="submit"
-                                  className="w-full bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-700 hover:to-purple-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-500/30 flex items-center justify-center gap-2 transition-all hover:-translate-y-1 active:scale-95"
-                              >
-                                  <Send size={20} />
-                                  Send Application
-                              </button>
+                              <div className="relative pt-4">
+                                  {submitStatus === 'success' && (
+                                      <motion.div 
+                                          initial={{ opacity: 0, scale: 0.9 }}
+                                          animate={{ opacity: 1, scale: 1 }}
+                                          className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white dark:bg-slate-800 rounded-xl border border-emerald-500 text-center p-4 shadow-xl"
+                                      >
+                                          <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-full flex items-center justify-center mb-3">
+                                              <CheckCircle2 size={24} />
+                                          </div>
+                                          <h4 className="font-bold text-slate-900 dark:text-white mb-1">Application Sent!</h4>
+                                          <p className="text-xs text-slate-500">We'll get back to you shortly.</p>
+                                          <button 
+                                            onClick={() => setSubmitStatus('idle')}
+                                            className="mt-4 text-[10px] font-bold text-brand-600 uppercase tracking-widest hover:underline"
+                                          >
+                                            Send another?
+                                          </button>
+                                      </motion.div>
+                                  )}
+
+                                  {submitStatus === 'error' && (
+                                      <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 text-xs text-center font-medium">
+                                          Something went wrong. Please try again later.
+                                      </div>
+                                  )}
+
+                                  <button 
+                                      type="submit"
+                                      disabled={isSubmitting}
+                                      className="w-full bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-700 hover:to-purple-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-500/30 flex items-center justify-center gap-2 transition-all hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                      {isSubmitting ? (
+                                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                      ) : (
+                                          <Send size={20} />
+                                      )}
+                                      {isSubmitting ? 'Sending...' : 'Send Application'}
+                                  </button>
+                              </div>
                           </form>
                       </motion.div>
                   </div>
