@@ -39,6 +39,7 @@ import ESmartRestaurant from './pages/ESmartRestaurant';
 import ESmartHealth from './pages/ESmartHealth';
 import ESmartTeam from './pages/ESmartTeam';
 import ESmartSociety from './pages/ESmartSociety';
+import ESmartQueue from './pages/ESmartQueue';
 import ChannelPartners from './pages/ChannelPartners';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
@@ -106,6 +107,7 @@ function App() {
                       {/* <Route path="/products/esmart-track" element={<ESmartTrack />} /> */}
                       <Route path="/products/esmart-restaurant" element={<ESmartRestaurant />} />
                       <Route path="/products/esmart-health" element={<ESmartHealth />} />
+                      <Route path="/products/emart-queue" element={<ESmartQueue />} />
                       {/* <Route path="/products/esmart-team" element={<ESmartTeam />} />
                       <Route path="/products/esmart-society" element={<ESmartSociety />} /> */}
                       <Route path="/portfolio" element={<Portfolio />} />

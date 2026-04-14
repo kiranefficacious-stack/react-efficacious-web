@@ -404,6 +404,8 @@ export const initialData = {
       enabled: true,
       href: "/products/esmart-school",
       iconName: "GraduationCap",
+      appStoreLink: "#",
+      playStoreLink: "#",
       gradient: "from-blue-400 via-indigo-500 to-purple-600",
       bgAccent: "bg-blue-500/10",
       textAccent: "text-blue-600 dark:text-blue-400",
@@ -477,6 +479,8 @@ export const initialData = {
       enabled: false,
       href: "/products/esmart-track",
       iconName: "Truck",
+      appStoreLink: "#",
+      playStoreLink: "#",
       gradient: "from-orange-400 via-amber-500 to-yellow-600",
       bgAccent: "bg-orange-500/10",
       textAccent: "text-orange-600 dark:text-orange-400",
@@ -550,6 +554,8 @@ export const initialData = {
       enabled: true,
       href: "/products/esmart-health",
       iconName: "Activity",
+      appStoreLink: "#",
+      playStoreLink: "#",
       gradient: "from-emerald-400 via-teal-500 to-cyan-600",
       bgAccent: "bg-emerald-500/10",
       textAccent: "text-emerald-600 dark:text-emerald-400",
@@ -591,6 +597,8 @@ export const initialData = {
       enabled: true,
       href: "/products/esmart-restaurant",
       iconName: "Utensils",
+      appStoreLink: "#",
+      playStoreLink: "#",
       gradient: "from-rose-400 via-pink-500 to-orange-600",
       bgAccent: "bg-rose-500/10",
       textAccent: "text-rose-600 dark:text-rose-400",
@@ -624,6 +632,54 @@ export const initialData = {
         { label: "Table Turnover", value: "+30%" },
         { label: "Food Cost Reduction", value: "15%" },
         { label: "Order Errors", value: "0%" }
+      ]
+    },
+    {
+      id: 5,
+      title: "emart Queue",
+      enabled: true,
+      href: "/products/emart-queue",
+      iconName: "Timer",
+      appStoreLink: "#",
+      playStoreLink: "#",
+      gradient: "from-violet-400 via-fuchsia-500 to-pink-600",
+      bgAccent: "bg-violet-500/10",
+      textAccent: "text-violet-600 dark:text-violet-400",
+      description: "Eliminate physical queues with smart slot booking and QR-based entry for banks, hospitals, post offices, temples, and more.",
+      heroTitle: "End Queues. Start Living.",
+      heroSubtitle: "A next-generation slot-booking platform that connects citizens to any service provider, replacing waiting lines with mobile bookings and contactless QR-code entry.",
+      features: [
+        {
+          id: 50,
+          title: "Smart Slot Booking",
+          description: "End users select date, time, and service provider from the mobile app. Instant availability check and confirmation in under 60 seconds.",
+          iconName: "Calendar",
+          details: ["Date & Time Selection", "Real-time Availability", "Instant Confirmation"],
+          color: "bg-violet-600",
+          textAccent: "text-violet-600"
+        },
+        {
+          id: 51,
+          title: "QR Code Entry Pass",
+          description: "A unique encrypted QR code is generated on slot confirmation. Users present it at the entry scanner for contactless, queue-free access.",
+          iconName: "QrCode",
+          details: ["Encrypted QR Generation", "Tap-to-Show on Mobile", "Contactless Entry"],
+          color: "bg-indigo-600",
+          textAccent: "text-indigo-600"
+        }
+      ],
+      modules: [
+        { title: "User Mobile App", iconName: "Smartphone" },
+        { title: "Admin Dashboard", iconName: "BarChart3" },
+        { title: "QR Scanner Portal", iconName: "QrCode" },
+        { title: "Push Notifications", iconName: "Bell" },
+        { title: "Analytics", iconName: "TrendingUp" },
+        { title: "Multi-branch", iconName: "Building2" }
+      ],
+      stats: [
+        { label: "Wait Time Reduction", value: "70%" },
+        { label: "Service Categories", value: "50+" },
+        { label: "Physical Queues", value: "Zero" }
       ]
     }
     // ...

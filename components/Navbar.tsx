@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
+import * as LucideIcons from 'lucide-react';
 import { 
-  Menu, X, Sun, Moon, ShieldCheck, ChevronDown, 
+  Menu, X, Sun, Moon, ChevronDown, 
   Layout, Smartphone, Palette, Globe, TrendingUp, Brain, CreditCard,
-  GraduationCap, Truck, Utensils, Activity, Users, Building2, Briefcase,
-  FolderOpen, Star, Award
+  Users, Briefcase
 } from 'lucide-react';
+import { useContent } from '../hooks/useContent';
 
 const motion = m as any;
 
@@ -25,11 +26,7 @@ const serviceItems = [
   { name: 'PVC Card Printing', href: '/services/pvc-card-printing', icon: <CreditCard size={18} /> },
 ];
 
-const productItems = [
-  { name: 'E-Smart School', href: '/products/esmart-school', icon: <GraduationCap size={18} /> },
-  { name: 'E-Smart Restaurant', href: '/products/esmart-restaurant', icon: <Utensils size={18} /> },
-  { name: 'E-Smart Health', href: '/products/esmart-health', icon: <Activity size={18} /> },
-];
+
 
 const partnerItems = [
   { name: 'Channel Partners', href: '/channel-partners', icon: <Users size={18} /> },
@@ -41,8 +38,21 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
-  
+
+  const { data } = useContent();
   const location = useLocation();
+
+  // Build product dropdown dynamically from enabled products
+  const productItems = (data.products as any[])
+    .filter((p: any) => p.enabled)
+    .map((p: any) => {
+      const IconComp = (LucideIcons as any)[p.iconName];
+      return {
+        name: p.title,
+        href: p.href,
+        icon: IconComp ? <IconComp size={18} /> : null,
+      };
+    });
 
   // Check if the current route is an admin route
   const isAdminRoute = location.pathname.startsWith('/admin');
@@ -52,6 +62,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
     '/products/esmart-school', 
     '/products/esmart-restaurant',
     '/products/esmart-health',
+    '/products/emart-queue',
     '/channel-partners',
     '/partners',
     '/careers',
@@ -67,7 +78,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
     { name: 'Home', href: '/' },
     { name: 'About Us', href: '/about' },
     { name: 'Services', href: '/services', dropdownItems: serviceItems },
-    { name: 'Products', href: '/products', dropdownItems: productItems },
+    { name: 'Products', href: '/products', dropdownItems: productItems.length ? productItems : undefined },
     { name: 'Portfolio', href: '/portfolio' },
     { name: 'Blogs', href: '/blogs' },
     { name: 'Partners', href: '/partners', dropdownItems: partnerItems },

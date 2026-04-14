@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronRight, ChevronLeft, Shield, Map, Utensils, Activity, Users, Building2 } from 'lucide-react';
+import { ArrowRight, ChevronRight, ChevronLeft, Shield, Utensils, Activity, Timer } from 'lucide-react';
 import PhoneMockup from './PhoneMockup';
+import { useContent } from '../hooks/useContent';
 
 const motion = m as any;
 
@@ -18,7 +19,9 @@ const slides = [
     icon: <Shield className="w-5 h-5" />,
     btnText: "Explore Schools",
     href: "/products/esmart-school",
-    blobColor: "rgba(14,165,233,0.4)" // Sky
+    blobColor: "rgba(14,165,233,0.4)",
+    appStoreLink: "#",
+    playStoreLink: "#",
   },
   {
     id: 1,
@@ -30,7 +33,9 @@ const slides = [
     icon: <Utensils className="w-5 h-5" />,
     btnText: "See Features",
     href: "/products/esmart-restaurant",
-    blobColor: "rgba(244,63,94,0.4)" // Rose
+    blobColor: "rgba(244,63,94,0.4)",
+    appStoreLink: "#",
+    playStoreLink: "#",
   },
   {
     id: 2,
@@ -42,8 +47,24 @@ const slides = [
     icon: <Activity className="w-5 h-5" />,
     btnText: "Learn More",
     href: "/products/esmart-health",
-    blobColor: "rgba(16,185,129,0.4)" // Emerald
-  }
+    blobColor: "rgba(16,185,129,0.4)",
+    appStoreLink: "#",
+    playStoreLink: "#",
+  },
+  {
+    id: 3,
+    tag: "Queue Management",
+    title: "Semart Queue",
+    highlight: "End Queues. Start Living.",
+    description: "Book time slots at banks, hospitals, post offices, temples & more from your phone. Enter with a QR code — zero waiting in line.",
+    color: "from-violet-500 via-fuchsia-600 to-pink-500",
+    icon: <Timer className="w-5 h-5" />,
+    btnText: "Explore App",
+    href: "/products/emart-queue",
+    blobColor: "rgba(124,58,237,0.4)",
+    appStoreLink: "#",
+    playStoreLink: "#",
+  },
 ];
 
 // Inline SVGs for Store Buttons
@@ -61,6 +82,7 @@ const PlayStoreIcon = ({ className }: { className?: string }) => (
 
 const Hero: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const { data } = useContent();
 
   // Auto-play slider with reset on interaction
   useEffect(() => {
@@ -78,7 +100,16 @@ const Hero: React.FC = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
-  const activeContent = slides[currentSlide];
+  // Find dynamic product data for the current slide
+  const activeSlideData = slides[currentSlide];
+  const matchingProduct = data.products.find((p: any) => p.href === activeSlideData.href);
+  
+  const activeContent = {
+    ...activeSlideData,
+    appStoreLink: matchingProduct?.appStoreLink || activeSlideData.appStoreLink,
+    playStoreLink: matchingProduct?.playStoreLink || activeSlideData.playStoreLink
+  };
+
   const nextColor = slides[(currentSlide + 1) % slides.length]?.blobColor || slides[0].blobColor;
 
   return (
@@ -192,14 +223,14 @@ const Hero: React.FC = () => {
 
                 {/* App Store Buttons */}
                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
-                    <a href="#" className="flex items-center gap-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2.5 rounded-xl hover:scale-105 transition-transform shadow-lg border border-transparent dark:border-slate-200">
+                    <a href={activeContent.appStoreLink || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2.5 rounded-xl hover:scale-105 transition-transform shadow-lg border border-transparent dark:border-slate-200">
                         <AppleIcon className="w-6 h-6 fill-current mb-1" />
                         <div className="flex flex-col items-start leading-none">
                             <span className="text-[9px] font-medium opacity-80 mb-0.5">Download on the</span>
                             <span className="text-sm font-bold tracking-tight">App Store</span>
                         </div>
                     </a>
-                    <a href="#" className="flex items-center gap-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2.5 rounded-xl hover:scale-105 transition-transform shadow-lg border border-transparent dark:border-slate-200">
+                    <a href={activeContent.playStoreLink || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2.5 rounded-xl hover:scale-105 transition-transform shadow-lg border border-transparent dark:border-slate-200">
                         <PlayStoreIcon className="w-5 h-5 fill-current mb-0.5" />
                         <div className="flex flex-col items-start leading-none">
                             <span className="text-[9px] font-medium opacity-80 mb-0.5">GET IT ON</span>
