@@ -41,7 +41,7 @@ const Features: React.FC = () => {
   return (
     <section id="solutions" className="py-24 bg-white dark:bg-dark-bg relative overflow-hidden">
         {/* Decor */}
-        <div className="absolute left-0 bottom-0 w-64 h-64 bg-brand-500/5 rounded-tr-full" />
+        <div className="absolute left-0 bottom-0 w-64 h-64 bg-[#E99400]/5 rounded-tr-full" />
         
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
@@ -55,16 +55,16 @@ const Features: React.FC = () => {
           {features.map((feature, index) => (
             <motion.div
               key={index}
-              className="group p-8 bg-slate-50 dark:bg-slate-800/50 rounded-2xl hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-brand-200 dark:hover:border-slate-600 shadow-sm hover:shadow-xl transition-all duration-300"
+              className="group p-8 bg-slate-50 dark:bg-slate-800/50 rounded-2xl hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-[#E99400]/30 dark:hover:border-slate-600 shadow-sm hover:shadow-xl transition-all duration-300"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
             >
-              <div className="w-12 h-12 bg-white dark:bg-slate-700 rounded-lg flex items-center justify-center text-brand-600 dark:text-brand-400 shadow-sm mb-6 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 bg-white dark:bg-slate-700 rounded-lg flex items-center justify-center text-[#E99400] shadow-sm mb-6 group-hover:scale-110 transition-transform">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-brand-600 transition-colors">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-[#E99400] transition-colors">
                 {feature.title}
               </h3>
               <p className="text-slate-600 dark:text-slate-400 leading-relaxed">

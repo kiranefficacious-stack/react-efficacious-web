@@ -142,12 +142,12 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                 // Determine text color based on state and context
                 let textColorClass = '';
                 if (active || isDropdownOpen) {
-                    textColorClass = 'text-brand-600 dark:text-white';
+                    textColorClass = 'text-[#E99400] dark:text-white';
                     if (useDarkThemeNav) textColorClass = 'text-white font-bold';
                 } else {
                     textColorClass = useDarkThemeNav 
                         ? 'text-slate-200 hover:text-white' 
-                        : 'text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-slate-200';
+                        : 'text-slate-600 dark:text-slate-400 hover:text-[#E99400] dark:hover:text-slate-200';
                 }
 
                 return (
@@ -198,10 +198,10 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                                         onClick={() => setActiveDropdown(null)}
                                         className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-50 dark:hover:bg-slate-800 transition-colors group"
                                       >
-                                          <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-brand-500 group-hover:scale-110 transition-transform shadow-sm">
+                                          <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-[#E99400] group-hover:scale-110 transition-transform shadow-sm">
                                             {item.icon}
                                           </div>
-                                          <span className="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-brand-600 dark:group-hover:text-brand-400">
+                                          <span className="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-[#E99400] dark:group-hover:text-[#E99400]">
                                             {item.name}
                                           </span>
                                       </Link>
@@ -244,8 +244,8 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className={`p-1 transition-colors ${
                 useDarkThemeNav && !isMobileMenuOpen
-                ? 'text-white hover:text-brand-400' 
-                : 'text-slate-700 dark:text-white hover:text-brand-600'
+                ? 'text-white hover:text-[#E99400]' 
+                : 'text-slate-700 dark:text-white hover:text-[#E99400]'
             }`}
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -271,7 +271,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                         onClick={handleLinkClick}
                         className={`text-xl font-medium ${
                             isActive(link.href)
-                            ? 'text-brand-600 dark:text-brand-400'
+                            ? 'text-[#E99400]'
                             : 'text-slate-800 dark:text-slate-200'
                         }`}
                         >
@@ -307,9 +307,9 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                                         key={idx}
                                         to={item.href}
                                         onClick={handleLinkClick}
-                                        className="flex items-center gap-3 py-2 text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400"
+                                        className="flex items-center gap-3 py-2 text-slate-600 dark:text-slate-400 hover:text-[#E99400] dark:hover:text-[#E99400]"
                                     >
-                                        <div className="text-brand-500">{item.icon}</div>
+                                        <div className="text-[#E99400]">{item.icon}</div>
                                         <span className="text-sm font-medium">{item.name}</span>
                                     </Link>
                                 ))}

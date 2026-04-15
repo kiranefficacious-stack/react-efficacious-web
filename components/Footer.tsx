@@ -35,13 +35,13 @@ const Footer: React.FC = () => {
               Empowering organizations with smart ERP solutions. We believe in efficiency, security, and seamless innovation.
             </p>
             <div className="flex gap-4">
-              <a href={contact.socials.linkedin || "#"} className="hover:text-brand-500 transition-colors" target="_blank" rel="noopener noreferrer">
+              <a href={contact.socials.linkedin || "#"} className="hover:text-[#E99400] transition-colors" target="_blank" rel="noopener noreferrer">
                 <Linkedin className="w-5 h-5" />
               </a>
-              <a href={contact.socials.twitter || "#"} className="hover:text-brand-500 transition-colors" target="_blank" rel="noopener noreferrer">
+              <a href={contact.socials.twitter || "#"} className="hover:text-[#E99400] transition-colors" target="_blank" rel="noopener noreferrer">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href={contact.socials.facebook || "#"} className="hover:text-brand-500 transition-colors" target="_blank" rel="noopener noreferrer">
+              <a href={contact.socials.facebook || "#"} className="hover:text-[#E99400] transition-colors" target="_blank" rel="noopener noreferrer">
                 <Facebook className="w-5 h-5" />
               </a>
             </div>
@@ -51,10 +51,10 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-bold mb-6 uppercase text-sm tracking-widest">Company</h4>
             <ul className="space-y-4 text-sm">
-              <li><Link to="/about" className="hover:text-white">About Us</Link></li>
-              <li><Link to="/careers" className="hover:text-white">Careers</Link></li>
-              <li><Link to="/partners" className="hover:text-white">Partners</Link></li>
-              <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
+              <li><Link to="/about" className="hover:text-[#E99400]">About Us</Link></li>
+              <li><Link to="/careers" className="hover:text-[#E99400]">Careers</Link></li>
+              <li><Link to="/partners" className="hover:text-[#E99400]">Partners</Link></li>
+              <li><a href="#" className="hover:text-[#E99400]">Privacy Policy</a></li>
             </ul>
           </div>
 
@@ -62,10 +62,10 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-bold mb-6 uppercase text-sm tracking-widest">Solutions</h4>
             <ul className="space-y-4 text-sm">
-              <li><Link to="/products/esmart-school" className="hover:text-white">eSmart School</Link></li>
-              <li><Link to="/products/esmart-health" className="hover:text-white">eSmart Health</Link></li>
-              <li><Link to="/products/esmart-restaurant" className="hover:text-white">eSmart Restaurant</Link></li>
-              <li><Link to="/services" className="hover:text-white">All Services</Link></li>
+              <li><Link to="/products/esmart-school" className="hover:text-[#E99400]">eSmart School</Link></li>
+              <li><Link to="/products/esmart-health" className="hover:text-[#E99400]">eSmart Health</Link></li>
+              <li><Link to="/products/esmart-restaurant" className="hover:text-[#E99400]">eSmart Restaurant</Link></li>
+              <li><Link to="/services" className="hover:text-[#E99400]">All Services</Link></li>
             </ul>
           </div>
 
@@ -74,15 +74,15 @@ const Footer: React.FC = () => {
             <h4 className="text-white font-bold mb-6 uppercase text-sm tracking-widest">Contact</h4>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-brand-500 shrink-0 mt-0.5" />
+                <MapPin className="w-5 h-5 text-[#E99400] shrink-0 mt-0.5" />
                 <span className="text-sm">{contact.office}</span>
               </li>
               <li className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-brand-500 shrink-0" />
-                <a href={`mailto:${contact.email}`} className="hover:text-white text-sm">{contact.email}</a>
+                <Mail className="w-5 h-5 text-[#E99400] shrink-0" />
+                <a href={`mailto:${contact.email}`} className="hover:text-[#E99400] text-sm">{contact.email}</a>
               </li>
               <li className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-brand-500 shrink-0" />
+                <Phone className="w-5 h-5 text-[#E99400] shrink-0" />
                 <span className="text-sm">{contact.phone}</span>
               </li>
             </ul>
@@ -94,9 +94,9 @@ const Footer: React.FC = () => {
             © {new Date().getFullYear()} Efficacious India Limited. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-slate-400 hover:text-white transition-colors"><Linkedin size={20} /></a>
-            <a href="#" className="text-slate-400 hover:text-white transition-colors"><Twitter size={20} /></a>
-            <a href="#" className="text-slate-400 hover:text-white transition-colors"><Facebook size={20} /></a>
+            <a href="#" className="text-slate-400 hover:text-[#E99400] transition-colors"><Linkedin size={20} /></a>
+            <a href="#" className="text-slate-400 hover:text-[#E99400] transition-colors"><Twitter size={20} /></a>
+            <a href="#" className="text-slate-400 hover:text-[#E99400] transition-colors"><Facebook size={20} /></a>
           </div>
         </div>
       </div>
