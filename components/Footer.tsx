@@ -26,9 +26,9 @@ const Footer: React.FC = () => {
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center gap-2 mb-6">
               <img 
-                src="https://res.cloudinary.com/davnxvrps/image/upload/v1776072917/Frame_3_1_pytiwd.png" 
+                src="https://res.cloudinary.com/davnxvrps/image/upload/v1776243556/dark_icon_jhu54g.png" 
                 alt="Efficacious Logo" 
-                className="h-[80px] w-auto brightness-0 invert"
+                className="h-[80px] w-auto object-contain"
               />
             </div>
             <p className="text-sm leading-relaxed mb-6">

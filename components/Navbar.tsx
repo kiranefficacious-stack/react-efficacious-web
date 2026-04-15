@@ -121,11 +121,9 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group relative z-50">
             <img 
-              src="https://res.cloudinary.com/davnxvrps/image/upload/v1776072917/Frame_3_1_pytiwd.png" 
+              src={useDarkThemeNav || isDark ? "https://res.cloudinary.com/davnxvrps/image/upload/v1776243556/dark_icon_jhu54g.png" : "https://res.cloudinary.com/davnxvrps/image/upload/v1776243556/light-icon_rmesur.png"} 
               alt="Efficacious Logo" 
-              className={`h-[80px] w-auto transition-transform duration-300 group-hover:scale-105 ${
-                  useDarkThemeNav ? 'brightness-0 invert' : 'dark:brightness-0 dark:invert'
-              }`}
+              className="h-[80px] w-auto object-contain transition-transform duration-300 group-hover:scale-105"
             />
         </Link>
 
