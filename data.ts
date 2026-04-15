@@ -165,8 +165,34 @@ export const initialData = {
       description: "A comprehensive ERP solution managing 5000+ students.",
       stats: ["5000+ Students", "98% Efficiency", "Paperless"],
       tags: ["ERP", "Mobile App", "GPS"]
+    },
+    {
+      id: 2,
+      title: "Apollo City Hospital",
+      category: "Healthcare",
+      image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=1000",
+      description: "Digital transformation of a multi-specialty hospital with 200+ beds using eSmart Health.",
+      stats: ["40% Wait Reduction", "100% Paperless", "200+ Beds"],
+      tags: ["Hospital ERP", "EMR", "Inventory"]
+    },
+    {
+      id: 3,
+      title: "Orchid Residency",
+      category: "Real Estate",
+      image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=1000",
+      description: "Smart society management for a premium gated community of 500+ apartments.",
+      stats: ["500+ Apartments", "Zero Unauth. Entry", "100% Digital"],
+      tags: ["Society ERP", "Visitor Mgmt", "Billing"]
+    },
+    {
+      id: 4,
+      title: "SwiftLogistics Fleet",
+      category: "Logistics",
+      image: "https://images.unsplash.com/photo-1519003722824-192d99a24bb1?auto=format&fit=crop&q=80&w=1000",
+      description: "Real-time fleet tracking and fuel monitoring for a logistics fleet of 100+ heavy vehicles.",
+      stats: ["100+ Trucks", "20% Fuel Saved", "30% Efficiency"],
+      tags: ["GPS Tracking", "Fleet Mgmt", "Logistics"]
     }
-    // ...
   ],
   blogs: [
     {
@@ -476,7 +502,7 @@ export const initialData = {
     {
       id: 2,
       title: "eSmart Track",
-      enabled: false,
+      enabled: true,
       href: "/products/esmart-track",
       iconName: "Truck",
       appStoreLink: "#",
@@ -681,7 +707,99 @@ export const initialData = {
         { label: "Service Categories", value: "50+" },
         { label: "Physical Queues", value: "Zero" }
       ]
+    },
+    {
+      id: 6,
+      title: "eSmart Team",
+      enabled: true,
+      href: "/products/esmart-team",
+      iconName: "Briefcase",
+      appStoreLink: "#",
+      playStoreLink: "#",
+      gradient: "from-violet-500 via-purple-600 to-fuchsia-700",
+      bgAccent: "bg-violet-500/10",
+      textAccent: "text-violet-600 dark:text-violet-400",
+      description: "Empower your team with a unified platform for attendance, tasks, and collaboration.",
+      heroTitle: "Maximize Productivity, Minimize Chaos",
+      heroSubtitle: "Empower your team with a unified platform for attendance, tasks, and collaboration. Built for both office and remote workforce.",
+      features: [
+        {
+          id: 60,
+          title: "Task Management",
+          description: "Assign tasks, track progress, and collaborate in real-time. Ensure your team stays aligned.",
+          iconName: "CheckSquare",
+          details: ["Kanban Boards", "Task Reminders", "File Sharing"],
+          color: "bg-violet-500",
+          textAccent: "text-violet-600"
+        },
+        {
+          id: 61,
+          title: "Smart Attendance",
+          description: "Geo-fenced and biometric attendance systems tailored for office and field staff.",
+          iconName: "Calendar",
+          details: ["Geo-Tagging", "Selfie Attendance", "Shift Management"],
+          color: "bg-purple-500",
+          textAccent: "text-purple-600"
+        }
+      ],
+      modules: [
+        { title: "HRIS Core", iconName: "Users" },
+        { title: "Payroll Processing", iconName: "DollarSign" },
+        { title: "Recruitment", iconName: "Briefcase" }
+      ],
+      stats: [
+        { label: "Productivity Boost", value: "25%" },
+        { label: "Time Saved/Week", value: "10hrs" },
+        { label: "Transparency", value: "100%" }
+      ]
+    },
+    {
+      id: 7,
+      title: "eSmart Society",
+      enabled: true,
+      href: "/products/esmart-society",
+      iconName: "Building2",
+      appStoreLink: "#",
+      playStoreLink: "#",
+      gradient: "from-indigo-500 via-blue-600 to-cyan-700",
+      bgAccent: "bg-indigo-500/10",
+      textAccent: "text-indigo-600 dark:text-indigo-400",
+      description: "A comprehensive platform to manage housing societies and gated communities.",
+      heroTitle: "Smart Living, Secure Community",
+      heroSubtitle: "A comprehensive platform to manage housing societies, apartments, and gated communities. Connect residents effortlessly.",
+      features: [
+        {
+          id: 70,
+          title: "Visitor Management",
+          description: "Secure your premises with a digital gate pass system. Pre-approve guests instantly.",
+          iconName: "Users",
+          details: ["Digital Gate Pass", "IVR Notifications", "Staff Attendance"],
+          color: "bg-indigo-500",
+          textAccent: "text-indigo-600"
+        },
+        {
+          id: 71,
+          title: "Billing & Accounting",
+          description: "Automate society maintenance bills and payments. Residents can pay online via the app.",
+          iconName: "CreditCard",
+          details: ["Auto-Invoicing", "Payment Gateway", "Expense Tracking"],
+          color: "bg-blue-500",
+          textAccent: "text-blue-600"
+        }
+      ],
+      modules: [
+        { title: "Admin Dashboard", iconName: "Building2" },
+        { title: "Guard App", iconName: "ShieldCheck" },
+        { title: "Resident App", iconName: "Smartphone" }
+      ],
+      stats: [
+        { label: "Unauth. Entries", value: "Zero" },
+        { label: "Digital Payments", value: "100%" },
+        { label: "Complaint Res.", value: "24h" }
+      ]
     }
-    // ...
-  ]
+  ],
+  gallerySettings: {
+    enabled: true
+  }
 };

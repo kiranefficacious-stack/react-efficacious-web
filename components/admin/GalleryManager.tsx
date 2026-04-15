@@ -4,18 +4,26 @@ import { useToast } from '../../hooks/useToast';
 import { validateForm, ValidationErrors, commonRules } from '../../utils/validation';
 import FormField from './FormField';
 import ConfirmDialog from './ConfirmDialog';
-import { Plus, Edit2, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit2, Trash2, Image as ImageIcon, Eye, EyeOff, Layout } from 'lucide-react';
 
 interface GalleryForm {
   url: string;
   caption: string;
   category?: string;
   size?: string;
+  isActive?: boolean;
 }
 
 const GalleryManager: React.FC = () => {
-  const { data, addItem, updateItem, deleteItem } = useContent();
+  const { data, addItem, updateItem, deleteItem, updateContent } = useContent();
   const { showToast } = useToast();
+  
+  const isGalleryEnabled = data.gallerySettings?.enabled !== false;
+
+  const toggleGallerySection = () => {
+    updateContent('gallerySettings', { enabled: !isGalleryEnabled });
+    showToast('success', `Gallery section ${!isGalleryEnabled ? 'enabled' : 'disabled'} successfully!`);
+  };
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -23,7 +31,8 @@ const GalleryManager: React.FC = () => {
     url: '',
     caption: '',
     category: 'Office',
-    size: 'medium'
+    size: 'medium',
+    isActive: true
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [deleteDialog, setDeleteDialog] = useState<{
@@ -52,7 +61,8 @@ const GalleryManager: React.FC = () => {
         url: item.url,
         caption: item.caption,
         category: item.category || 'Office',
-        size: item.size || 'medium'
+        size: item.size || 'medium',
+        isActive: item.isActive !== false
       });
     } else {
       setEditingId(null);
@@ -60,7 +70,8 @@ const GalleryManager: React.FC = () => {
         url: '',
         caption: '',
         category: 'Office',
-        size: 'medium'
+        size: 'medium',
+        isActive: true
       });
     }
     setErrors({});
@@ -70,7 +81,7 @@ const GalleryManager: React.FC = () => {
   const handleCloseForm = () => {
     setIsFormOpen(false);
     setEditingId(null);
-    setFormData({ url: '', caption: '', category: 'Office', size: 'medium' });
+    setFormData({ url: '', caption: '', category: 'Office', size: 'medium', isActive: true });
     setErrors({});
   };
 
@@ -107,6 +118,11 @@ const GalleryManager: React.FC = () => {
     }
   };
 
+  const toggleActive = (item: any) => {
+    updateItem('gallery', item.id, { ...item, isActive: item.isActive === false ? true : false });
+    showToast('success', `Gallery image marked as ${item.isActive === false ? 'active' : 'inactive'}!`);
+  };
+
   const openDeleteDialog = (id: number) => {
     setDeleteDialog({ isOpen: true, id });
   };
@@ -123,13 +139,26 @@ const GalleryManager: React.FC = () => {
             Manage office gallery images
           </p>
         </div>
-        <button
-          onClick={() => handleOpenForm()}
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
-        >
-          <Plus size={20} />
-          Add Image
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleGallerySection}
+            className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-all duration-300 border ${
+              isGalleryEnabled 
+                ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800' 
+                : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+            }`}
+          >
+            {isGalleryEnabled ? <Eye size={18} /> : <EyeOff size={18} />}
+            {isGalleryEnabled ? 'Section: Enabled' : 'Section: Disabled'}
+          </button>
+          <button
+            onClick={() => handleOpenForm()}
+            className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
+          >
+            <Plus size={20} />
+            Add Image
+          </button>
+        </div>
       </div>
 
       {/* Gallery Grid */}
@@ -148,6 +177,13 @@ const GalleryManager: React.FC = () => {
               />
               {/* Hover Overlay */}
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <button
+                  onClick={() => toggleActive(item)}
+                  className={`p-2 rounded-lg transition-colors ${item.isActive !== false ? 'bg-white text-green-600 hover:bg-green-50' : 'bg-white text-slate-400 hover:bg-slate-50'}`}
+                  title={item.isActive !== false ? 'Deactivate' : 'Activate'}
+                >
+                  {item.isActive !== false ? <Eye size={18} /> : <EyeOff size={18} />}
+                </button>
                 <button
                   onClick={() => handleOpenForm(item)}
                   className="p-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
@@ -171,6 +207,9 @@ const GalleryManager: React.FC = () => {
                 {item.caption}
               </h3>
               <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <span className={`px-2 py-1 rounded inline-flex items-center gap-1 ${item.isActive !== false ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-400'}`}>
+                  {item.isActive !== false ? 'Active' : 'Inactive'}
+                </span>
                 {item.category && (
                   <span className="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded">
                     {item.category}
@@ -248,6 +287,19 @@ const GalleryManager: React.FC = () => {
                   { value: 'wide', label: 'Wide' }
                 ]}
               />
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  checked={formData.isActive !== false}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  className="w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500"
+                />
+                <label htmlFor="isActive" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Active (Visible on website)
+                </label>
+              </div>
 
               <div className="flex gap-3 justify-end pt-4">
                 <button
