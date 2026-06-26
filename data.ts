@@ -507,40 +507,40 @@ export const initialData = {
       href: "/products/esmart-health",
       iconName: "Activity",
       appStoreLink: "#",
-      playStoreLink: "#",
+      playStoreLink: "https://play.google.com/store/apps/details?id=com.efficacious.esmarthealth&hl=en",
       gradient: "from-emerald-400 via-teal-500 to-cyan-600",
       bgAccent: "bg-emerald-500/10",
       textAccent: "text-emerald-600 dark:text-emerald-400",
-      description: "A comprehensive, paperless solution for hospitals and clinics. Enhance patient care, optimize resources, and streamline administration.",
+      description: "Your secure personal health manager. Store medical records, track prescriptions, and find trusted healthcare providers nearby.",
       features: [
         {
-          id: 30,
-          title: "Patient Management",
-          description: "Streamline the entire patient journey from registration to discharge. Manage appointments, bed allocation, and patient history effortlessly.",
-          iconName: "Users",
-          details: ["Online Appointments", "Real-time Bed Status", "Discharge Summary"],
+          id: 3,
+          title: "Your Health Manager",
+          description: "Securely store, organize, and manage medical records—including lab reports, vaccination certificates, prescriptions, and hospital visits—in one safe, unified digital vault.",
+          iconName: "FolderHeart",
+          details: ["Secure PDF/Image Uploads", "Categorized Diagnostic Reports", "Digital Prescriptions Log"],
           color: "bg-emerald-500",
           textAccent: "text-emerald-600"
         },
         {
-          id: 31,
-          title: "Doctor's Workbench",
-          description: "Empower doctors with a dedicated digital workspace. Access electronic medical records (EMR), write prescriptions, and view lab reports instantly.",
-          iconName: "Stethoscope",
-          details: ["E-Prescriptions", "Patient History", "Diagnosis Tools"],
+          id: 40,
+          title: "Manage Health & Prescriptions",
+          description: "Track doctor visits, follow complex prescription schedules, set timely medication pill reminders, and manage overall wellness for your family.",
+          iconName: "Clock",
+          details: ["Smart Pill Reminders", "Doctor Visit Schedules", "Adherence Tracking"],
           color: "bg-teal-500",
           textAccent: "text-teal-600"
         }
       ],
       modules: [
-        { title: "EMR / EHR", iconName: "Activity" },
-        { title: "OT Management", iconName: "Monitor" },
-        { title: "Pharmacy Management", iconName: "Database" }
+        { title: "Health Records", iconName: "FolderHeart" },
+        { title: "Pill Reminders", iconName: "Bell" },
+        { title: "Care Search", iconName: "Search" }
       ],
       stats: [
-        { label: "Wait Time Reduction", value: "40%" },
-        { label: "Paperless Operations", value: "100%" },
-        { label: "Support", value: "24/7" }
+        { label: "Secure Storage", value: "100%" },
+        { label: "Specialties Covered", value: "10+" },
+        { label: "Health Records Access", value: "24/7" }
       ]
     },
     {
@@ -588,7 +588,7 @@ export const initialData = {
     },
     {
       id: 4,
-      title: "emart Queue",
+      title: "eSmart Queue",
       enabled: true,
       href: "/products/emart-queue",
       iconName: "Timer",

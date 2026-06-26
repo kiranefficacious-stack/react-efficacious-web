@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { 
   Activity, HeartPulse, Stethoscope, Microscope, 
   FileText, ArrowRight, CheckCircle2, Clock, 
-  Smartphone, Database, Shield, Monitor, ArrowDown
+  Smartphone, Database, Shield, Monitor, ArrowDown,
+  FolderHeart, Lock, Search, Calendar, Bell, MapPin
 } from 'lucide-react';
 import PhoneMockup from '../components/PhoneMockup';
 import Contact from '../components/Contact';
@@ -20,59 +21,59 @@ const UsersIcon = ({ className }: { className?: string }) => (
 
 const features = [
   {
-    id: 3, // Matches Health Screen ID in PhoneMockup
-    title: "Patient Management (OPD/IPD)",
-    description: "Streamline the entire patient journey from registration to discharge. Manage appointments, bed allocation, and patient history effortlessly.",
-    icon: <UsersIcon className="w-6 h-6" />,
-    details: ["Online Appointments", "Real-time Bed Status", "Discharge Summary"],
+    id: 3, // Matches Health Screen ID in PhoneMockup (Medical Records Vault)
+    title: "Your Health Manager",
+    description: "Securely store, organize, and manage medical records—including lab reports, vaccination certificates, prescriptions, and hospital visits—in one safe, unified digital vault.",
+    icon: <FolderHeart className="w-6 h-6" />,
+    details: ["Secure PDF/Image Uploads", "Categorized Diagnostic Reports", "Digital Prescriptions Log"],
     color: "bg-emerald-500",
     textAccent: "text-emerald-600"
   },
   {
     id: 40,
-    title: "Doctor's Workbench",
-    description: "Empower doctors with a dedicated digital workspace. Access electronic medical records (EMR), write prescriptions, and view lab reports instantly.",
-    icon: <Stethoscope className="w-6 h-6" />,
-    details: ["E-Prescriptions", "Patient History", "Diagnosis Tools"],
+    title: "Manage Health & Prescriptions",
+    description: "Track doctor visits, follow complex prescription schedules, set timely medication pill reminders, and manage overall wellness for your family.",
+    icon: <Clock className="w-6 h-6" />,
+    details: ["Smart Pill Reminders", "Doctor Visit Schedules", "Adherence Tracking"],
     color: "bg-teal-500",
     textAccent: "text-teal-600"
   },
   {
     id: 41,
-    title: "Laboratory & Radiology",
-    description: "Integrated diagnostics module. Direct machine interfacing for error-free reporting and instant availability of results to doctors and patients.",
-    icon: <Microscope className="w-6 h-6" />,
-    details: ["Machine Integration", "Auto-Approval", "SMS/Email Reports"],
+    title: "Smart Care Locator (Smart Search)",
+    description: "Instantly find and connect with trusted doctors, clinics, hospitals, pharmacies, and diagnostic centers near you. Filter by specialty, location, or availability.",
+    icon: <Search className="w-6 h-6" />,
+    details: ["Nearby Health Finder", "Filter by Specialization", "Direct Maps Navigation"],
     color: "bg-blue-500",
     textAccent: "text-blue-600"
   },
   {
     id: 42,
-    title: "Pharmacy Management",
-    description: "Complete inventory control for your hospital pharmacy. Track stock levels, manage expirations, and handle billing with GST compliance.",
-    icon: <Database className="w-6 h-6" />,
-    details: ["Stock Alerts", "Expiry Tracking", "Alternative Medicine Suggestion"],
+    title: "Online Consultations & Bookings",
+    description: "Book appointment slots with top healthcare professionals and doctors online. Check real-time availability and manage schedules effortlessly.",
+    icon: <Calendar className="w-6 h-6" />,
+    details: ["Real-time Slot Selector", "Consultation Reminders", "Easy Rescheduling Options"],
     color: "bg-cyan-500",
     textAccent: "text-cyan-600"
   },
   {
     id: 43,
-    title: "Billing & Insurance (TPA)",
-    description: "Simplify the complex billing process. Handle multi-mode payments, insurance claims, and TPA processing with transparency.",
-    icon: <FileText className="w-6 h-6" />,
-    details: ["Cashless Processing", "Package Billing", "TPA Integration"],
+    title: "Secure Family Health Vault",
+    description: "Share specific health files and medical records securely with doctors when consulting. Keep your family's health history safe with advanced privacy controls.",
+    icon: <Lock className="w-6 h-6" />,
+    details: ["End-to-End Encryption", "Family Profile Sharing", "Revocable Doctor Access"],
     color: "bg-indigo-500",
     textAccent: "text-indigo-600"
   }
 ];
 
 const modules = [
-    { title: "EMR / EHR", icon: <Activity size={24} /> },
-    { title: "OT Management", icon: <Monitor size={24} /> },
-    { title: "Blood Bank", icon: <HeartPulse size={24} /> },
-    { title: "Ambulance", icon: <Clock size={24} /> },
-    { title: "Telemedicine", icon: <Smartphone size={24} /> },
-    { title: "Insurance / TPA", icon: <Shield size={24} /> },
+    { title: "Health Records", icon: <FolderHeart size={24} /> },
+    { title: "Pill Reminders", icon: <Bell size={24} /> },
+    { title: "Care Search", icon: <Search size={24} /> },
+    { title: "Book Appointments", icon: <Calendar size={24} /> },
+    { title: "Family Vault", icon: <UsersIcon className="w-6 h-6" /> },
+    { title: "Data Security", icon: <Lock size={24} /> },
 ];
 
 const ESmartHealth: React.FC = () => {
@@ -110,14 +111,7 @@ const ESmartHealth: React.FC = () => {
                 <p className="text-lg lg:text-2xl text-slate-300 mb-10 max-w-3xl mx-auto leading-relaxed font-light">
                     A comprehensive, paperless solution for hospitals and clinics. Enhance patient care, optimize resources, and streamline administration.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-600/30 active:scale-95 flex items-center justify-center gap-2">
-                        Request Demo <ArrowRight size={20} />
-                    </button>
-                    <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 bg-transparent border border-white/20 text-white rounded-xl font-bold hover:bg-white/10 transition-colors">
-                        Explore Modules
-                    </button>
-                </div>
+
 
                 {/* App Store Badges */}
                 <div className="flex flex-wrap flex-row items-center justify-center gap-4 mt-8">
@@ -213,9 +207,9 @@ const ESmartHealth: React.FC = () => {
                                   {/* Glow behind phone */}
                                   <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 ${feature.color.replace('bg-', 'bg-')} opacity-20 blur-[60px] rounded-full`} />
                                   
-                                  {/* Phone Mockup with specific ID (Using 3 for Health view) */}
+                                  {/* Phone Mockup with dynamic feature ID */}
                                   <div className="transform scale-[0.85] lg:scale-100 origin-center transition-transform duration-500">
-                                      <PhoneMockup activeSlide={3} />
+                                      <PhoneMockup activeSlide={feature.id} />
                                   </div>
                               </div>
                           </motion.div>
@@ -232,7 +226,7 @@ const ESmartHealth: React.FC = () => {
               <div className="text-center mb-16">
                   <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Core Modules</h2>
                   <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                      A modular system designed to scale with your healthcare institution.
+                      A complete suit of tools designed to put you in control of your personal and family health.
                   </p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
@@ -260,16 +254,16 @@ const ESmartHealth: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-emerald-500/50 dark:divide-emerald-800">
                   <div className="p-6">
-                      <div className="text-4xl font-black text-white mb-2">40%</div>
-                      <div className="text-emerald-100 font-medium">Reduction in Wait Time</div>
+                      <div className="text-4xl font-black text-white mb-2">100%</div>
+                      <div className="text-emerald-100 font-medium">Secure & Encrypted Storage</div>
                   </div>
                   <div className="p-6">
-                      <div className="text-4xl font-black text-white mb-2">100%</div>
-                      <div className="text-emerald-100 font-medium">Paperless Operations</div>
+                      <div className="text-4xl font-black text-white mb-2">10+</div>
+                      <div className="text-emerald-100 font-medium">Healthcare Specialties</div>
                   </div>
                   <div className="p-6">
                       <div className="text-4xl font-black text-white mb-2">24/7</div>
-                      <div className="text-emerald-100 font-medium">Support & Uptime</div>
+                      <div className="text-emerald-100 font-medium">Instant Health Records Access</div>
                   </div>
               </div>
           </div>

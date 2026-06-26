@@ -8,6 +8,8 @@ import {
   Navigation,
   Clock,
   Utensils,
+  Search,
+  Lock,
   Bell,
   Wifi,
   Signal,
@@ -390,34 +392,245 @@ const PhoneMockup: React.FC<PhoneMockupProps> = ({ activeSlide }) => {
       </div>
     ),
 
-    // Screen 3: Health
+    // Screen 3: Health - Patient OPD/IPD Porta    // Screen 3: Health - Patient OPD/IPD Portal (Your Health Manager Records Vault)
     3: (
       <div
-        key="health"
-        className="h-full flex flex-col bg-emerald-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 relative"
+        key="health-records"
+        className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 relative font-sans"
       >
-        <div className="bg-emerald-600 p-5 pt-10 rounded-b-[2.5rem] shadow-lg relative z-10 text-white">
-          <h3 className="text-2xl font-bold mb-1">Hello, Sarah</h3>
-          <p className="text-xs opacity-90 mb-5">
-            Your daily vitals look good today!
-          </p>
+        <div className="bg-emerald-600 p-5 pt-10 rounded-b-[2rem] shadow-lg relative z-10 text-white">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-[10px] bg-white/20 px-2.5 py-0.5 rounded-full font-medium">My Vault</span>
+            <span className="text-[10px] text-emerald-200">12 Files</span>
+          </div>
+          <h3 className="text-lg font-bold">Health Records</h3>
         </div>
-        <div className="p-4 -mt-2 flex-1 pb-20 flex flex-col gap-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">
-                Heart Rate
-              </p>
-              <p className="font-bold text-xl text-slate-900 dark:text-white">
-                72{" "}
-                <span className="text-[10px] font-normal text-slate-400">
-                  bpm
-                </span>
-              </p>
+        
+        <div className="flex-1 p-3.5 -mt-2 overflow-y-auto space-y-3 pb-20">
+          {/* Quick Upload Banner */}
+          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-3 rounded-xl text-white shadow-sm text-center">
+            <p className="text-[11px] font-bold">Upload New Record</p>
+            <p className="text-[8px] opacity-80 mt-0.5">Snap a picture of your prescription or report</p>
+          </div>
+
+          {/* Record Categories */}
+          <div className="grid grid-cols-3 gap-1.5">
+            <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-100 dark:border-slate-850 text-center">
+              <span className="text-[16px] block">📄</span>
+              <span className="text-[8px] font-medium text-slate-500 dark:text-slate-400 block mt-1">Prescriptions</span>
+            </div>
+            <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-100 dark:border-slate-850 text-center">
+              <span className="text-[16px] block">🧪</span>
+              <span className="text-[8px] font-medium text-slate-500 dark:text-slate-400 block mt-1">Lab Reports</span>
+            </div>
+            <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-100 dark:border-slate-850 text-center">
+              <span className="text-[16px] block">💉</span>
+              <span className="text-[8px] font-medium text-slate-500 dark:text-slate-400 block mt-1">Vaccines</span>
+            </div>
+          </div>
+
+          {/* Recent Records */}
+          <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-100 dark:border-slate-850 shadow-sm space-y-2">
+            <h4 className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Recent Documents</h4>
+            <div className="flex justify-between items-center text-[10px] border-b border-slate-50 dark:border-slate-800 pb-1.5">
+              <div>
+                <p className="font-semibold text-slate-900 dark:text-white">Complete Blood Count</p>
+                <p className="text-[8px] text-slate-455">Dr. Lal PathLabs • 25 Jun 2026</p>
+              </div>
+              <span className="text-[8px] bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-350 px-1.5 py-0.5 rounded font-bold">PDF</span>
+            </div>
+            <div className="flex justify-between items-center text-[10px]">
+              <div>
+                <p className="font-semibold text-slate-900 dark:text-white">Dentist Prescription</p>
+                <p className="text-[8px] text-slate-455">Dr. Rahul Shah • 18 Jun 2026</p>
+              </div>
+              <span className="text-[8px] bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-350 px-1.5 py-0.5 rounded font-bold">IMG</span>
             </div>
           </div>
         </div>
         <BottomNav active={0} />
+      </div>
+    ),
+
+    // Screen 40: Health - Doctor's Workbench (Manage Health & Prescriptions)
+    40: (
+      <div
+        key="health-reminders"
+        className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 relative font-sans"
+      >
+        <div className="bg-teal-600 p-5 pt-10 rounded-b-[2rem] text-white shadow-md">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-[10px] bg-white/20 px-2.5 py-0.5 rounded-full font-medium">Daily Tracker</span>
+            <span className="text-[10px] text-teal-205">80% Done</span>
+          </div>
+          <h3 className="text-lg font-bold">Pill Reminders</h3>
+        </div>
+        
+        <div className="flex-1 p-3.5 -mt-2 overflow-y-auto space-y-3 pb-20">
+          {/* Upcoming Visit Card */}
+          <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-100 dark:border-slate-850 shadow-sm flex items-center justify-between">
+            <div>
+              <span className="text-[8px] bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-350 px-1.5 py-0.5 rounded font-bold">Upcoming Visit</span>
+              <p className="text-xs font-bold text-slate-950 dark:text-white mt-1">Dr. Anil Kumar (Cardio)</p>
+              <p className="text-[8px] text-slate-450 mt-0.5">Today • 2:30 PM • Apollo Clinic</p>
+            </div>
+            <span className="text-xl">🩺</span>
+          </div>
+
+          {/* Today's Medication Schedule */}
+          <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-100 dark:border-slate-850 shadow-sm space-y-3">
+            <h4 className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Today's Schedule</h4>
+            
+            <div className="flex justify-between items-center">
+              <div className="flex gap-2 items-center">
+                <span className="text-base">💊</span>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-950 dark:text-white">Amoxicillin 500mg</p>
+                  <p className="text-[8px] text-slate-400">Morning (After Food)</p>
+                </div>
+              </div>
+              <span className="text-[8px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold">Taken</span>
+            </div>
+
+            <div className="flex justify-between items-center border-t border-slate-50 dark:border-slate-800/80 pt-2.5">
+              <div className="flex gap-2 items-center">
+                <span className="text-base">💊</span>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-950 dark:text-white">Multivitamin Cap</p>
+                  <p className="text-[8px] text-slate-400">Night (After Food)</p>
+                </div>
+              </div>
+              <button className="text-[8px] bg-teal-600 text-white px-2 py-0.5 rounded font-bold">Mark Taken</button>
+            </div>
+          </div>
+        </div>
+        <BottomNav active={1} />
+      </div>
+    ),
+
+    // Screen 41: Health - Laboratory & Radiology Reports (Smart Care Locator / Smart Search)
+    41: (
+      <div
+        key="health-search"
+        className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 relative font-sans"
+      >
+        <div className="bg-blue-600 p-4 pt-10 rounded-b-[2rem] text-white shadow-md">
+          <p className="text-[9px] opacity-80">Smart Search Near Me</p>
+          <div className="mt-2 bg-white/20 rounded-xl flex items-center px-3 py-1.5 text-xs text-blue-105">
+            <span>🔍 Search doctors, clinics, labs...</span>
+          </div>
+        </div>
+
+        <div className="flex-grow p-3.5 -mt-2 overflow-y-auto space-y-3 pb-20">
+          {/* Quick Filters */}
+          <div className="flex gap-1.5 overflow-x-auto pb-1 text-[8px] font-bold uppercase tracking-wider text-slate-500">
+            <span className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 px-2 py-1 rounded-full whitespace-nowrap">Doctors</span>
+            <span className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-full whitespace-nowrap">Clinics</span>
+            <span className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-full whitespace-nowrap">Pharmacies</span>
+            <span className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-full whitespace-nowrap">Labs</span>
+          </div>
+
+          <h4 className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Nearby Providers</h4>
+
+          <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-100 dark:border-slate-850 shadow-sm flex justify-between items-center">
+            <div>
+              <p className="text-[10px] font-bold text-slate-950 dark:text-white">Apex Healthcare Clinic</p>
+              <p className="text-[8px] text-slate-400">General Practice • 0.8 km</p>
+              <p className="text-[8px] text-emerald-600 font-bold mt-0.5">Open Now</p>
+            </div>
+            <button className="text-[8px] bg-blue-600 text-white px-2 py-1 rounded font-bold">Directions</button>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-100 dark:border-slate-850 shadow-sm flex justify-between items-center">
+            <div>
+              <p className="text-[10px] font-bold text-slate-950 dark:text-white">City Diagnostics & Labs</p>
+              <p className="text-[8px] text-slate-400">Pathology & Scans • 1.2 km</p>
+              <p className="text-[8px] text-emerald-600 font-bold mt-0.5">Open Now</p>
+            </div>
+            <button className="text-[8px] bg-blue-600 text-white px-2 py-1 rounded font-bold">Directions</button>
+          </div>
+        </div>
+        <BottomNav active={2} />
+      </div>
+    ),
+
+    // Screen 42: Health - Pharmacy Management (Online Booking Selector)
+    42: (
+      <div
+        key="health-booking"
+        className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 relative font-sans"
+      >
+        <div className="bg-cyan-600 p-5 pt-10 rounded-b-[2rem] text-white shadow-md">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-[10px] bg-white/20 px-2.5 py-0.5 rounded-full font-medium">Book Consult</span>
+          </div>
+          <h3 className="text-lg font-bold">Select Date & Time</h3>
+        </div>
+
+        <div className="flex-grow p-3.5 -mt-2 overflow-y-auto space-y-3 pb-20">
+          {/* Selected Doctor Summary */}
+          <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-100 dark:border-slate-850 shadow-sm flex gap-3 items-center">
+            <div className="w-10 h-10 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold text-sm">DK</div>
+            <div>
+              <p className="text-xs font-bold text-slate-950 dark:text-white">Dr. Anil Kumar</p>
+              <p className="text-[8px] text-slate-400">Cardiologist • MBBS, MD</p>
+              <p className="text-[8px] text-slate-500 mt-0.5">⭐ 4.9 (120+ reviews)</p>
+            </div>
+          </div>
+
+          {/* Calendar Picker (Mini) */}
+          <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-100 dark:border-slate-850 shadow-sm">
+            <h4 className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-2">Available Slots</h4>
+            <div className="grid grid-cols-3 gap-1.5">
+              <span className="bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 text-[9px] font-bold p-2 rounded text-center border border-cyan-300">10:00 AM</span>
+              <span className="bg-slate-50 dark:bg-slate-800 text-[9px] p-2 rounded text-center">11:30 AM</span>
+              <span className="bg-slate-50 dark:bg-slate-800 text-[9px] p-2 rounded text-center">02:30 PM</span>
+            </div>
+            
+            <button className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 rounded-xl text-xs mt-3.5 transition-colors shadow-sm">
+              Confirm Appointment
+            </button>
+          </div>
+        </div>
+        <BottomNav active={0} />
+      </div>
+    ),
+
+    // Screen 43: Health - Billing & Insurance/TPA (Encrypted Family Health Vault & Sharing)
+    43: (
+      <div
+        key="health-security"
+        className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 relative font-sans"
+      >
+        <div className="bg-indigo-600 p-5 pt-10 rounded-b-[2rem] text-white shadow-md">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-[10px] bg-white/20 px-2.5 py-0.5 rounded-full font-medium">Vault Privacy</span>
+          </div>
+          <h3 className="text-lg font-bold">Secure Family Vault</h3>
+        </div>
+
+        <div className="flex-grow p-3.5 -mt-2 overflow-y-auto space-y-3 pb-20">
+          {/* Security status */}
+          <div className="bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-900 p-3 rounded-xl text-center">
+            <span className="text-2xl block">🔒</span>
+            <p className="text-[10px] font-bold text-indigo-700 dark:text-indigo-350 mt-1">End-to-End Encrypted</p>
+            <p className="text-[8px] text-slate-450 mt-0.5">Your files are encrypted before leaving your phone.</p>
+          </div>
+
+          {/* Share Access Log */}
+          <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-100 dark:border-slate-850 shadow-sm space-y-2">
+            <h4 className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Active Sharing</h4>
+            
+            <div className="flex justify-between items-center text-[10px]">
+              <div>
+                <p className="font-semibold text-slate-900 dark:text-white">Dr. Anil Kumar</p>
+                <p className="text-[8px] text-slate-400">All Lab Reports • Expires in 23h</p>
+              </div>
+              <button className="text-[8px] text-red-500 font-bold px-2 py-1 rounded bg-red-50 dark:bg-red-950/30">Revoke</button>
+            </div>
+          </div>
+        </div>
+        <BottomNav active={3} />
       </div>
     ),
 
