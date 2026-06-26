@@ -35,16 +35,16 @@ const SoftwareHero: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-brand-600 dark:text-brand-400 text-xs font-bold uppercase tracking-wider mb-6 backdrop-blur-sm">
-              <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
-              #1 Software Development Company
-            </div>
+  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-[#E48100] text-xs font-bold uppercase tracking-wider mb-6 backdrop-blur-sm">
+  <span className="w-2 h-2 rounded-full bg-[#66A634] animate-pulse" />
+  #1 Software Development Company
+</div>
             
             <h1 className="text-5xl lg:text-7xl font-extrabold mb-6 tracking-tight leading-[1.1]">
               India's Leading <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 via-blue-600 to-purple-600 dark:from-brand-400 dark:via-blue-400 dark:to-purple-400">
-                Software Developer.
-              </span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E48100] via-[#F43F5E] to-[#EF4444] dark:from-[#E48100] dark:via-[#FB7185] dark:to-[#F43F5E]">
+  Software Developer.
+</span>
             </h1>
             
             <p className="text-xl text-slate-600 dark:text-slate-400 mb-8 leading-relaxed max-w-xl">
@@ -52,9 +52,15 @@ const SoftwareHero: React.FC = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/contact" className="px-8 py-4 bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-brand-600/25 hover:shadow-brand-600/40 flex items-center justify-center gap-2 group">
-                Start Your Project <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
+<div className="flex flex-col sm:flex-row gap-4">
+  <Link 
+    to="/contact" 
+    className="px-8 py-4 bg-gradient-to-br from-[#E48100] to-[#EF4444] hover:from-[#EF4444] hover:to-[#E48100] text-white rounded-xl font-bold transition-all duration-500 shadow-lg shadow-[#E48100]/30 hover:shadow-[#EF4444]/40 flex items-center justify-center gap-2 group"
+  >
+    <span className="relative z-10">Start Your Project</span>
+    <ArrowRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform" />
+  </Link>
+</div>
               <Link to="/services" className="px-8 py-4 bg-white dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-bold transition-all flex items-center justify-center">
                 Explore Services
               </Link>
@@ -89,9 +95,9 @@ const SoftwareHero: React.FC = () => {
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
               className="relative z-20 w-64 h-64 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl flex flex-col items-center justify-center p-6"
             >
-              <div className="w-20 h-20 bg-gradient-to-br from-brand-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                <Code2 size={40} className="text-white" />
-              </div>
+<div className="w-20 h-20 bg-gradient-to-br from-[#E48100] to-[#EF4444] rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-[#EF4444]/20">
+  <Code2 size={40} className="text-white" />
+</div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">Custom Dev</h3>
               <p className="text-slate-500 dark:text-slate-400 text-center text-sm mt-2">Tailored solutions for complex needs.</p>
               

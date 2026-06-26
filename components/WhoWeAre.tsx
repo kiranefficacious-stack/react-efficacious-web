@@ -9,7 +9,7 @@ const WhoWeAre: React.FC = () => {
   const { whoWeAre } = data.about;
 
   return (
-    <section className="py-24 bg-white dark:bg-dark-bg relative overflow-hidden transition-colors duration-300">
+    <section className="py-24 bg-white dark:bg-slate-900 relative overflow-hidden transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
                 <motion.div 
@@ -28,9 +28,9 @@ const WhoWeAre: React.FC = () => {
                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60" />
                     </div>
                     
-                    {/* Decorative Elements */}
-                    <div className="absolute -top-10 -left-10 w-40 h-40 bg-brand-500/10 rounded-full blur-3xl -z-0" />
-                    <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl -z-0" />
+                    {/* Decorative Elements: Swapped to Orange and Red glows */}
+                    <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#E48100]/10 rounded-full blur-3xl -z-0" />
+                    <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#EF4444]/10 rounded-full blur-3xl -z-0" />
                     
                     <motion.div 
                         className="absolute -bottom-6 -right-6 bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 max-w-xs hidden md:block z-20"
@@ -39,7 +39,8 @@ const WhoWeAre: React.FC = () => {
                         viewport={{ once: true }}
                         transition={{ delay: 0.3 }}
                     >
-                        <p className="text-3xl font-bold text-brand-600 dark:text-brand-400 mb-1">{whoWeAre.yearsExperience}</p>
+                        {/* Years Experience: Primary Orange */}
+                        <p className="text-3xl font-bold text-[#E48100] mb-1">{whoWeAre.yearsExperience}</p>
                         <p className="text-sm font-medium text-slate-600 dark:text-slate-300">Years of delivering excellence in ERP solutions.</p>
                     </motion.div>
                 </motion.div>
@@ -50,7 +51,8 @@ const WhoWeAre: React.FC = () => {
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}
                 >
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 dark:bg-brand-900/30 border border-brand-100 dark:border-brand-800 text-brand-600 dark:text-brand-300 text-xs font-semibold uppercase tracking-wider mb-6">
+                    {/* Badge: Soft Orange Tint */}
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E48100]/10 dark:bg-[#E48100]/20 border border-[#E48100]/20 dark:border-[#E48100]/30 text-[#E48100] text-xs font-semibold uppercase tracking-wider mb-6">
                         <span>Since 2012</span>
                     </div>
                     <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white mb-6 leading-tight">
@@ -58,7 +60,10 @@ const WhoWeAre: React.FC = () => {
                     </h2>
                     <div className="space-y-6 text-slate-600 dark:text-slate-300 text-lg leading-relaxed">
                         {whoWeAre.content.map((p: string, i: number) => (
-                            <p key={i} dangerouslySetInnerHTML={{ __html: p.replace(/Mr\. Kamal Agrawal|ERP solutions for schools and education institutes/g, match => `<span class="${match === 'Mr. Kamal Agrawal' ? 'font-semibold text-slate-900 dark:text-white' : 'text-brand-600 dark:text-brand-400 font-semibold'}">${match}</span>`) }} />
+                            <p key={i} dangerouslySetInnerHTML={{ 
+                                __html: p.replace(/Mr\. Kamal Agrawal|ERP solutions for schools and education institutes/g, 
+                                match => `<span class="${match === 'Mr. Kamal Agrawal' ? 'font-semibold text-slate-900 dark:text-white' : 'text-[#E48100] font-semibold'}">${match}</span>`) 
+                            }} />
                         ))}
                     </div>
                 </motion.div>

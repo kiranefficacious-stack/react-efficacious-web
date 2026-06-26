@@ -203,7 +203,7 @@ const ChatWidget: React.FC = () => {
         } else if (text.includes('contact') || text.includes('phone') || text.includes('email') || text.includes('call')) {
             matchedAnswer = `We'd love to chat more! You can reach us via email at ${siteData?.contact?.email || 'info@efficacious.co.in'} or give us a call at ${siteData?.contact?.phone || '+91 8454943806'}. Also, I can connect you to someone right here if you'd like?`;
         } else if (text.includes('location') || text.includes('address') || text.includes('where') || text.includes('office') || text.includes('visit')) {
-            matchedAnswer = `Our main office is located at ${siteData?.contact?.office || 'Sushma Niwas Plot no 7, Road no 6 Sector 1, New Panvel, Navi Mumbai 410206'}. Let us know if you plan to stop by!`;
+            matchedAnswer = `Our main office is located at ${siteData?.contact?.office || 'Ground Floor, Plot No. 7, Sushma Niwas, Road No. 6, Sector-1, New Panvel, Raigad, Maharashtra - 410206.'}. Let us know if you plan to stop by!`;
         } else if (text.includes('job') || text.includes('hiring') || text.includes('career') || text.includes('vacancy')) {
             matchedAnswer = "That's exciting! We are always looking for passionate IT professionals to join the Efficacious family. You can find our current job openings on the Careers page. What kind of role are you mostly interested in?";
         } else if (text.includes('partner') || text.includes('reseller') || text.includes('franchise')) {
@@ -536,25 +536,26 @@ const ChatWidget: React.FC = () => {
       </AnimatePresence>
 
       <div className="relative group">
-        <motion.button
-            onClick={() => setIsOpen(!isOpen)}
-            className="group relative flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-brand-500 to-brand-600 text-white rounded-full shadow-[0_8px_30px_rgba(14,165,233,0.4)] hover:shadow-[0_8px_40px_rgba(14,165,233,0.6)] transition-all duration-300 z-50 border-2 border-white/20 overflow-hidden"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            aria-label="Toggle Chat"
-        >
-            <AnimatePresence mode="wait">
-                {isOpen ? (
-                    <motion.div key="close" initial={{ rotate: -90, opacity: 0, scale: 0.5 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: 90, opacity: 0, scale: 0.5 }} transition={{ duration: 0.2 }}>
-                        <X size={28} />
-                    </motion.div>
-                ) : (
-                    <motion.div key="chat" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="relative">
-                        <MessageCircle size={28} className="fill-white/20" />
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </motion.button>
+ <motion.button
+    onClick={() => setIsOpen(!isOpen)}
+    className="group relative flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-[#E48100] to-[#EF4444] text-white rounded-full shadow-[0_8px_30px_rgba(228,129,0,0.4)] hover:shadow-[0_8px_40px_rgba(239,68,68,0.5)] transition-all duration-300 z-50 border-2 border-white/20 overflow-hidden"
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    aria-label="Toggle Chat"
+>
+    <AnimatePresence mode="wait">
+        {isOpen ? (
+            <motion.div key="close" initial={{ rotate: -90, opacity: 0, scale: 0.5 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: 90, opacity: 0, scale: 0.5 }} transition={{ duration: 0.2 }}>
+                <X size={28} />
+            </motion.div>
+        ) : (
+            <motion.div key="chat" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="relative">
+                {/* Kept the subtle white fill for that premium "Big Tech" depth */}
+                <MessageCircle size={28} className="fill-white/20" />
+            </motion.div>
+        )}
+    </AnimatePresence>
+</motion.button>
       </div>
     </div>
   );

@@ -26,8 +26,6 @@ const serviceItems = [
   { name: 'PVC Card Printing', href: '/services/pvc-card-printing', icon: <CreditCard size={18} /> },
 ];
 
-
-
 const partnerItems = [
   { name: 'Channel Partners', href: '/channel-partners', icon: <Users size={18} /> },
   { name: 'Become Partners', href: '/partners', icon: <Briefcase size={18} /> },
@@ -142,12 +140,12 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                 // Determine text color based on state and context
                 let textColorClass = '';
                 if (active || isDropdownOpen) {
-                    textColorClass = 'text-[#E99400] dark:text-white';
+                    textColorClass = 'text-[#E48100] dark:text-white';
                     if (useDarkThemeNav) textColorClass = 'text-white font-bold';
                 } else {
                     textColorClass = useDarkThemeNav 
                         ? 'text-slate-200 hover:text-white' 
-                        : 'text-slate-600 dark:text-slate-400 hover:text-[#E99400] dark:hover:text-slate-200';
+                        : 'text-slate-600 dark:text-slate-400 hover:text-[#E48100] dark:hover:text-slate-200';
                 }
 
                 return (
@@ -167,7 +165,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                             className={`absolute inset-0 shadow-sm rounded-full border ${
                                 useDarkThemeNav 
                                 ? 'bg-white/20 border-white/20' 
-                                : 'bg-white dark:bg-brand-600 border-slate-100 dark:border-brand-500'
+                                : 'bg-white dark:bg-[#E48100] border-slate-100 dark:border-[#E48100]'
                             }`}
                             initial={false}
                             transition={{ type: "spring", stiffness: 500, damping: 30 }}
@@ -196,12 +194,12 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                                         key={idx}
                                         to={item.href}
                                         onClick={() => setActiveDropdown(null)}
-                                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-50 dark:hover:bg-slate-800 transition-colors group"
+                                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#E48100]/10 dark:hover:bg-slate-800 transition-colors group"
                                       >
-                                          <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-[#E99400] group-hover:scale-110 transition-transform shadow-sm">
+                                          <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-[#E48100] group-hover:scale-110 transition-transform shadow-sm">
                                             {item.icon}
                                           </div>
-                                          <span className="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-[#E99400] dark:group-hover:text-[#E99400]">
+                                          <span className="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-[#E48100] dark:group-hover:text-[#E48100]">
                                             {item.name}
                                           </span>
                                       </Link>
@@ -220,7 +218,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
               className={`p-2.5 rounded-full transition-all hover:scale-110 active:scale-95 shadow-sm border ${
                   useDarkThemeNav 
                   ? 'bg-white/10 border-white/20 text-white hover:bg-white/20' 
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-brand-400 hover:bg-slate-200 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-[#E48100] hover:bg-slate-200 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700'
               }`}
               aria-label="Toggle Dark Mode"
           >
@@ -235,7 +233,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
             className={`p-2 rounded-full ${
                 useDarkThemeNav 
                 ? 'bg-slate-800/50 text-white' 
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-brand-400'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-[#E48100]'
             }`}
           >
             {isDark ? <Sun size={20} /> : <Moon size={20} />}
@@ -244,8 +242,8 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className={`p-1 transition-colors ${
                 useDarkThemeNav && !isMobileMenuOpen
-                ? 'text-white hover:text-[#E99400]' 
-                : 'text-slate-700 dark:text-white hover:text-[#E99400]'
+                ? 'text-white hover:text-[#E48100]' 
+                : 'text-slate-700 dark:text-white hover:text-[#E48100]'
             }`}
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -271,7 +269,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                         onClick={handleLinkClick}
                         className={`text-xl font-medium ${
                             isActive(link.href)
-                            ? 'text-[#E99400]'
+                            ? 'text-[#E48100] dark:text-[#E48100]'
                             : 'text-slate-800 dark:text-slate-200'
                         }`}
                         >
@@ -307,9 +305,9 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                                         key={idx}
                                         to={item.href}
                                         onClick={handleLinkClick}
-                                        className="flex items-center gap-3 py-2 text-slate-600 dark:text-slate-400 hover:text-[#E99400] dark:hover:text-[#E99400]"
+                                        className="flex items-center gap-3 py-2 text-slate-600 dark:text-slate-400 hover:text-[#E48100] dark:hover:text-[#E48100]"
                                     >
-                                        <div className="text-[#E99400]">{item.icon}</div>
+                                        <div className="text-[#E48100]">{item.icon}</div>
                                         <span className="text-sm font-medium">{item.name}</span>
                                     </Link>
                                 ))}

@@ -23,9 +23,9 @@ const About: React.FC = () => {
             transition={{ duration: 0.6 }}
           >
             <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 dark:bg-brand-900/30 border border-brand-100 dark:border-brand-800 text-brand-600 dark:text-brand-300 text-xs font-semibold uppercase tracking-wider mb-6">
-                    <span>About Us</span>
-                </div>
+           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E48100]/10 dark:bg-[#E48100]/20 border border-[#E48100]/20 dark:border-[#E48100]/30 text-[#E48100] dark:text-[#E48100] text-xs font-semibold uppercase tracking-wider mb-6 backdrop-blur-sm">
+    <span>About Us</span>
+</div>
                 <h2 className="text-3xl lg:text-5xl font-extrabold text-slate-900 dark:text-white mb-6 leading-tight">
                     Driving Efficiency, <br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-purple-600 dark:from-brand-400 dark:to-purple-400">Securing Futures.</span>
@@ -45,9 +45,16 @@ const About: React.FC = () => {
                 </p>
             </div>
 
-            <Link to="/about" className="inline-flex items-center gap-2 text-brand-600 dark:text-brand-400 font-bold hover:gap-4 transition-all group">
-                Read Our Story <ArrowRight size={20} className="group-hover:text-brand-700 dark:group-hover:text-brand-300" />
-            </Link>
+<Link 
+  to="/about" 
+  className="inline-flex items-center gap-2 text-[#E48100] font-bold hover:gap-4 transition-all group"
+>
+  Read Our Story 
+  <ArrowRight 
+    size={20} 
+    className="transition-colors group-hover:text-[#EF4444]" 
+  />
+</Link>
           </motion.div>
 
           {/* Right: Cards */}

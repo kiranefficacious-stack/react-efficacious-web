@@ -22,10 +22,11 @@ const NewsEvents: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
             >
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 dark:bg-brand-900/30 border border-brand-100 dark:border-brand-800 text-brand-600 dark:text-brand-300 text-xs font-semibold uppercase tracking-wider mb-4">
+                {/* Updated Badge: Orange glow with pinging status */}
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E48100]/10 dark:bg-[#E48100]/20 border border-[#E48100]/20 dark:border-[#E48100]/30 text-[#E48100] text-xs font-semibold uppercase tracking-wider mb-4">
                     <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#EF4444] opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E48100]"></span>
                     </span>
                     <span>What's New</span>
                 </div>
@@ -34,13 +35,13 @@ const NewsEvents: React.FC = () => {
             
             <motion.button 
                 onClick={() => navigate('/news')}
-                className="hidden md:flex items-center gap-2 text-brand-600 dark:text-brand-400 font-semibold hover:text-brand-700 dark:hover:text-brand-300 transition-colors"
+                className="hidden md:flex items-center gap-2 text-[#E48100] font-semibold hover:text-[#EF4444] transition-colors group"
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
             >
-                View All Updates <ArrowRight size={20} />
+                View All Updates <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </motion.button>
         </div>
 
@@ -59,11 +60,12 @@ const NewsEvents: React.FC = () => {
                         <img 
                             src={item.image} 
                             alt={item.title} 
-                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        {/* Orange-to-Red gradient overlay on hover */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#E48100]/60 via-[#EF4444]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         <div className="absolute top-4 left-4">
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${item.color} backdrop-blur-md shadow-sm`}>
+                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#E48100] text-white backdrop-blur-md shadow-sm">
                                 {item.category}
                             </span>
                         </div>
@@ -72,10 +74,10 @@ const NewsEvents: React.FC = () => {
                     {/* Content */}
                     <div className="p-6">
                         <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs font-medium mb-3">
-                            <Calendar size={14} />
+                            <Calendar size={14} className="text-[#E48100]" />
                             <span>{item.date}</span>
                         </div>
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3 leading-tight group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3 leading-tight group-hover:text-[#E48100] transition-colors">
                             {item.title}
                         </h3>
                         <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4 line-clamp-3">
@@ -83,7 +85,7 @@ const NewsEvents: React.FC = () => {
                         </p>
                         <button 
                             onClick={() => navigate(`/news/${item.id}`)}
-                            className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 dark:text-brand-400 hover:gap-2 transition-all mt-auto"
+                            className="inline-flex items-center gap-1 text-sm font-semibold text-[#E48100] hover:text-[#EF4444] hover:gap-2 transition-all mt-auto"
                         >
                             Read Full Story <ArrowRight size={16} />
                         </button>
@@ -95,7 +97,7 @@ const NewsEvents: React.FC = () => {
         <div className="mt-8 md:hidden text-center">
              <button 
                 onClick={() => navigate('/news')}
-                className="inline-flex items-center gap-2 text-brand-600 dark:text-brand-400 font-semibold hover:text-brand-700 dark:hover:text-brand-300 transition-colors"
+                className="inline-flex items-center gap-2 text-[#E48100] font-semibold hover:text-[#EF4444] transition-colors"
              >
                 View All Updates <ArrowRight size={20} />
             </button>

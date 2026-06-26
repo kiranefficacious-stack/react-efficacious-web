@@ -14,7 +14,7 @@ const TechExcellence: React.FC = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white mb-4">
-              Engineering <span className="text-brand-600 dark:text-brand-400">Digital Excellence</span>
+              Engineering <span className="text-[#E48100] dark:text-[#E48100">Digital Excellence</span>
             </h2>
             <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
               We leverage the latest technologies to build robust, scalable, and future-proof software solutions for businesses worldwide.
@@ -52,22 +52,31 @@ const TechExcellence: React.FC = () => {
           </motion.div>
 
           {/* Card 2: Mobile Apps */}
-          <motion.div 
-            className="bg-gradient-to-br from-brand-600 to-brand-700 rounded-3xl p-8 text-white shadow-lg relative overflow-hidden group"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-          >
-             <div className="absolute -bottom-4 -right-4 bg-white/10 rounded-full w-32 h-32 blur-2xl group-hover:scale-150 transition-transform duration-500" />
-             <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
-                <Smartphone size={24} />
-             </div>
-             <h3 className="text-xl font-bold mb-3">Mobile App Development</h3>
-             <p className="text-brand-100 text-sm mb-6 leading-relaxed">
-                 Native and cross-platform mobile experiences that engage users and drive growth. iOS, Android, and Flutter experts.
-             </p>
-          </motion.div>
+<motion.div 
+  className="bg-gradient-to-br from-[#E48100] to-[#B91C1C] rounded-3xl p-8 text-white shadow-xl shadow-[#E48100]/20 relative overflow-hidden group"
+  initial={{ opacity: 0, y: 20 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ delay: 0.1 }}
+>
+   {/* Animated decorative glow - turns a light orange on hover */}
+   <div className="absolute -bottom-4 -right-4 bg-white/20 rounded-full w-32 h-32 blur-3xl group-hover:bg-[#E48100]/40 group-hover:scale-150 transition-all duration-700" />
+   
+   {/* Icon Container: Glass effect that lets the orange/red shine through */}
+   <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6 border border-white/20">
+      <Smartphone size={24} className="text-white" />
+   </div>
+   
+   <h3 className="text-xl font-bold mb-3">Mobile App Development</h3>
+   
+   {/* Clean white text with slight transparency for a modern look */}
+   <p className="text-white/90 text-sm mb-6 leading-relaxed">
+       Native and cross-platform mobile experiences that engage users and drive growth. iOS, Android, and Flutter experts.
+   </p>
+
+   {/* Optional: Subtle accent line at the bottom that appears on hover */}
+   <div className="absolute bottom-0 left-0 h-1 bg-white/30 w-0 group-hover:w-full transition-all duration-500" />
+</motion.div>
 
           {/* Card 3: Cloud */}
           <motion.div 

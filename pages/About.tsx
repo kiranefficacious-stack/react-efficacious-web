@@ -41,7 +41,7 @@ const About: React.FC = () => {
              animate={{ opacity: 1, y: 0 }}
              transition={{ duration: 0.8 }}
            >
-             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-brand-300 text-xs font-bold uppercase tracking-wider mb-6">
+             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#E48100] text-xs font-bold uppercase tracking-wider mb-6">
                 Since 2012
              </div>
              <h1 className="text-5xl lg:text-7xl font-extrabold mb-6 tracking-tight">

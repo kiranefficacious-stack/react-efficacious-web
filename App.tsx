@@ -45,6 +45,7 @@ import ChannelPartners from './pages/ChannelPartners';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 function App() {
   const { isDark, toggleTheme } = useTheme();
@@ -124,6 +125,7 @@ function App() {
                       <Route path="/channel-partners" element={<ChannelPartners />} />
                       <Route path="/careers" element={<Careers />} />
                       <Route path="/contact" element={<Contact />} />
+                      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                     </Routes>
                   </ErrorBoundary>
                 </main>

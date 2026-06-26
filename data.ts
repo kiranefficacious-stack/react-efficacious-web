@@ -30,7 +30,7 @@ export const initialData = {
     }
   ],
   contact: {
-    office: "Sushma Niwas Plot no 7, Road no 6 Sector 1, New Panvel, Navi Mumbai 410206",
+    office: "Ground Floor, Plot No. 7, Sushma Niwas, Road No. 6, Sector-1, New Panvel, Raigad, Maharashtra - 410206.",
     email: "info@efficacious.co.in",
     phone: "+91 8454943806",
     website: "https://efficacious.co.in",
@@ -468,10 +468,10 @@ export const initialData = {
         },
         {
           id: 13,
-          title: "Live Bus Tracking",
-          description: "GPS-enabled transport management ensures child safety. Parents can track the school bus in real-time and receive proximity alerts.",
-          iconName: "Bus",
-          details: ["Real-time Map View", "ETA Notifications", "Driver Details"],
+          title: "Homework & Assignments",
+          description: "Easy creation and submission of assignments. Teachers can post homework, study materials, and assignments directly, and students can submit their work online.",
+          iconName: "BookOpen",
+          details: ["Digital Homework Submissions", "Attachment Uploads (PDFs/Images)", "Teacher Grading & Feedback"],
           color: "bg-purple-500",
           textAccent: "text-purple-600"
         },
@@ -499,83 +499,9 @@ export const initialData = {
         { label: "Uptime Guaranteed", value: "99.9%" }
       ]
     },
+
     {
       id: 2,
-      title: "eSmart Track",
-      enabled: true,
-      href: "/products/esmart-track",
-      iconName: "Truck",
-      appStoreLink: "#",
-      playStoreLink: "#",
-      gradient: "from-orange-400 via-amber-500 to-yellow-600",
-      bgAccent: "bg-orange-500/10",
-      textAccent: "text-orange-600 dark:text-orange-400",
-      description: "Advanced fleet management and logistics tracking.",
-      heroTitle: "Total Control Over Your Fleet",
-      heroSubtitle: "Optimize routes, reduce fuel costs, and ensure vehicle security with our advanced GPS tracking and fleet management ERP.",
-      features: [
-        {
-          id: 1,
-          title: "Real-time Fleet Tracking",
-          description: "Monitor your entire fleet's location live on a map. Get instant updates on vehicle status, speed, and direction with pinpoint accuracy.",
-          iconName: "MapPin",
-          details: ["Live GPS Coordinates", "Route Playback", "Traffic Overlays"],
-          color: "bg-blue-600",
-          textAccent: "text-blue-600"
-        },
-        {
-          id: 20,
-          title: "Fuel Management",
-          description: "Drastically reduce operational costs by monitoring fuel consumption patterns. Detect fuel theft and abnormal drops instantly.",
-          iconName: "Fuel",
-          details: ["Consumption Reports", "Theft Alerts", "Refill Logs"],
-          color: "bg-amber-600",
-          textAccent: "text-amber-600"
-        },
-        {
-          id: 21,
-          title: "Driver Behavior Analysis",
-          description: "Ensure safety and reduce wear and tear. Our system scores drivers based on harsh braking, rapid acceleration, and over-speeding.",
-          iconName: "Users",
-          details: ["Driver Scorecards", "Safety Violations", "Training Needs"],
-          color: "bg-emerald-600",
-          textAccent: "text-emerald-600"
-        },
-        {
-          id: 22,
-          title: "Geofencing & Alerts",
-          description: "Create virtual boundaries for your vehicles. Receive instant push notifications when a vehicle enters or leaves a designated zone.",
-          iconName: "Navigation",
-          details: ["Zone Entry/Exit", "Route Deviation", "Unauthorized Usage"],
-          color: "bg-indigo-600",
-          textAccent: "text-indigo-600"
-        },
-        {
-          id: 23,
-          title: "Smart Reporting",
-          description: "Comprehensive analytics at your fingertips. Generate detailed trip reports, idle time summaries, and distance traveled logs.",
-          iconName: "BarChart3",
-          details: ["Daily Trip Summary", "Idle Time Reports", "Export to PDF/Excel"],
-          color: "bg-violet-600",
-          textAccent: "text-violet-600"
-        }
-      ],
-      modules: [
-        { title: "Trip Management", iconName: "Route" },
-        { title: "Vehicle Maintenance", iconName: "Settings" },
-        { title: "Expense Manager", iconName: "Activity" },
-        { title: "Document Wallet", iconName: "ShieldCheck" },
-        { title: "Driver App", iconName: "Smartphone" },
-        { title: "SOS & Emergency", iconName: "AlertTriangle" }
-      ],
-      stats: [
-        { label: "Average Fuel Savings", value: "20%" },
-        { label: "Vehicles Tracked", value: "15k+" },
-        { label: "Increased Efficiency", value: "30%" }
-      ]
-    },
-    {
-      id: 3,
       title: "eSmart Health",
       enabled: true,
       href: "/products/esmart-health",
@@ -618,7 +544,7 @@ export const initialData = {
       ]
     },
     {
-      id: 4,
+      id: 3,
       title: "eSmart Restaurant",
       enabled: true,
       href: "/products/esmart-restaurant",
@@ -661,7 +587,7 @@ export const initialData = {
       ]
     },
     {
-      id: 5,
+      id: 4,
       title: "emart Queue",
       enabled: true,
       href: "/products/emart-queue",
@@ -706,96 +632,6 @@ export const initialData = {
         { label: "Wait Time Reduction", value: "70%" },
         { label: "Service Categories", value: "50+" },
         { label: "Physical Queues", value: "Zero" }
-      ]
-    },
-    {
-      id: 6,
-      title: "eSmart Team",
-      enabled: true,
-      href: "/products/esmart-team",
-      iconName: "Briefcase",
-      appStoreLink: "#",
-      playStoreLink: "#",
-      gradient: "from-violet-500 via-purple-600 to-fuchsia-700",
-      bgAccent: "bg-violet-500/10",
-      textAccent: "text-violet-600 dark:text-violet-400",
-      description: "Empower your team with a unified platform for attendance, tasks, and collaboration.",
-      heroTitle: "Maximize Productivity, Minimize Chaos",
-      heroSubtitle: "Empower your team with a unified platform for attendance, tasks, and collaboration. Built for both office and remote workforce.",
-      features: [
-        {
-          id: 60,
-          title: "Task Management",
-          description: "Assign tasks, track progress, and collaborate in real-time. Ensure your team stays aligned.",
-          iconName: "CheckSquare",
-          details: ["Kanban Boards", "Task Reminders", "File Sharing"],
-          color: "bg-violet-500",
-          textAccent: "text-violet-600"
-        },
-        {
-          id: 61,
-          title: "Smart Attendance",
-          description: "Geo-fenced and biometric attendance systems tailored for office and field staff.",
-          iconName: "Calendar",
-          details: ["Geo-Tagging", "Selfie Attendance", "Shift Management"],
-          color: "bg-purple-500",
-          textAccent: "text-purple-600"
-        }
-      ],
-      modules: [
-        { title: "HRIS Core", iconName: "Users" },
-        { title: "Payroll Processing", iconName: "DollarSign" },
-        { title: "Recruitment", iconName: "Briefcase" }
-      ],
-      stats: [
-        { label: "Productivity Boost", value: "25%" },
-        { label: "Time Saved/Week", value: "10hrs" },
-        { label: "Transparency", value: "100%" }
-      ]
-    },
-    {
-      id: 7,
-      title: "eSmart Society",
-      enabled: true,
-      href: "/products/esmart-society",
-      iconName: "Building2",
-      appStoreLink: "#",
-      playStoreLink: "#",
-      gradient: "from-indigo-500 via-blue-600 to-cyan-700",
-      bgAccent: "bg-indigo-500/10",
-      textAccent: "text-indigo-600 dark:text-indigo-400",
-      description: "A comprehensive platform to manage housing societies and gated communities.",
-      heroTitle: "Smart Living, Secure Community",
-      heroSubtitle: "A comprehensive platform to manage housing societies, apartments, and gated communities. Connect residents effortlessly.",
-      features: [
-        {
-          id: 70,
-          title: "Visitor Management",
-          description: "Secure your premises with a digital gate pass system. Pre-approve guests instantly.",
-          iconName: "Users",
-          details: ["Digital Gate Pass", "IVR Notifications", "Staff Attendance"],
-          color: "bg-indigo-500",
-          textAccent: "text-indigo-600"
-        },
-        {
-          id: 71,
-          title: "Billing & Accounting",
-          description: "Automate society maintenance bills and payments. Residents can pay online via the app.",
-          iconName: "CreditCard",
-          details: ["Auto-Invoicing", "Payment Gateway", "Expense Tracking"],
-          color: "bg-blue-500",
-          textAccent: "text-blue-600"
-        }
-      ],
-      modules: [
-        { title: "Admin Dashboard", iconName: "Building2" },
-        { title: "Guard App", iconName: "ShieldCheck" },
-        { title: "Resident App", iconName: "Smartphone" }
-      ],
-      stats: [
-        { label: "Unauth. Entries", value: "Zero" },
-        { label: "Digital Payments", value: "100%" },
-        { label: "Complaint Res.", value: "24h" }
       ]
     }
   ],

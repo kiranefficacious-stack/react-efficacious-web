@@ -825,91 +825,76 @@ const PhoneMockup: React.FC<PhoneMockupProps> = ({ activeSlide }) => {
 
     13: (
       <div
-        key="school-transport"
-        className="h-full flex flex-col bg-slate-900 text-white relative"
+        key="school-assignments"
+        className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 relative"
       >
-        <div className="absolute inset-0 bg-[#1e293b]">
-          <svg
-            className="absolute inset-0 w-full h-full opacity-20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <pattern
-              id="map-grid"
-              width="40"
-              height="40"
-              patternUnits="userSpaceOnUse"
-            >
-              <path
-                d="M 40 0 L 0 0 0 40"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1"
-              />
-            </pattern>
-            <rect width="100%" height="100%" fill="url(#map-grid)" />
-          </svg>
-          <svg
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox="0 0 300 600"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M 150 550 C 50 450, 250 350, 150 250"
-              stroke="#3b82f6"
-              strokeWidth="4"
-              fill="none"
-              strokeLinecap="round"
-              strokeDasharray="8 4"
-            />
-            <circle cx="150" cy="550" r="4" fill="#3b82f6" />
-            <circle cx="150" cy="250" r="4" fill="#ef4444" />
-          </svg>
-          <motion.div
-            className="absolute"
-            animate={{ top: ["85%", "40%"], left: ["50%", "50%"] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-          >
-            <div className="w-10 h-10 -ml-5 -mt-5 bg-yellow-400 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-slate-900">
-              <Bus size={18} />
-            </div>
-            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-slate-900 text-[8px] font-bold px-2 py-1 rounded shadow-md whitespace-nowrap">
-              Speed: 40km/h
-            </div>
-          </motion.div>
+        {/* App Header */}
+        <div className="bg-brand-600 p-5 pb-6 text-white flex items-center justify-between shadow-md">
+          <div className="flex items-center gap-2">
+            <BookOpen size={20} />
+            <span className="font-bold text-base tracking-wide">Assignments</span>
+          </div>
+          <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-bold">3 Active</span>
         </div>
 
-        <div className="relative z-10 mt-auto m-3 p-4 bg-white dark:bg-slate-800 rounded-2xl shadow-xl">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
-                <User size={20} />
-              </div>
-              <div>
-                <h4 className="font-bold text-sm text-slate-900 dark:text-white">
-                  Ramesh Driver
-                </h4>
-                <p className="text-[10px] text-slate-500">Bus No: MH-04-1234</p>
-              </div>
+        {/* Assignments List */}
+        <div className="flex-grow p-3 overflow-y-auto space-y-3 pb-20">
+          {/* Assignment Card 1 */}
+          <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm space-y-2.5">
+            <div className="flex justify-between items-start">
+              <span className="text-[9px] bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400 px-2 py-0.5 rounded-full font-bold">
+                Pending
+              </span>
+              <span className="text-[9px] text-slate-400 dark:text-slate-500 font-medium">Due: Tomorrow</span>
             </div>
-            <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white shadow-lg">
-              <Phone size={18} className="fill-current" />
+            <div>
+              <h4 className="font-bold text-xs text-slate-900 dark:text-white">Mathematics Homework</h4>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Solve exercises on Quadratic Equations (Page 45-48).</p>
+            </div>
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80">
+              <span className="text-[9px] text-slate-400">Class 5-B</span>
+              <button className="text-[10px] text-brand-600 dark:text-brand-400 font-bold hover:underline">Submit &rarr;</button>
             </div>
           </div>
-          <div className="flex gap-2">
-            <div className="flex-1 bg-slate-50 dark:bg-slate-700/50 p-2 rounded-lg text-center">
-              <p className="text-[8px] text-slate-400 uppercase font-bold">
-                ETA
-              </p>
-              <p className="font-bold text-slate-900 dark:text-white">10 min</p>
+
+          {/* Assignment Card 2 */}
+          <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm space-y-2.5">
+            <div className="flex justify-between items-start">
+              <span className="text-[9px] bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 px-2 py-0.5 rounded-full font-bold">
+                Submitted
+              </span>
+              <span className="text-[9px] text-slate-400 dark:text-slate-500 font-medium">June 30, 2026</span>
             </div>
-            <div className="flex-1 bg-slate-50 dark:bg-slate-700/50 p-2 rounded-lg text-center">
-              <p className="text-[8px] text-slate-400 uppercase font-bold">
-                Distance
-              </p>
-              <p className="font-bold text-slate-900 dark:text-white">2.5 km</p>
+            <div>
+              <h4 className="font-bold text-xs text-slate-900 dark:text-white">Science Lab Report</h4>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Upload document detailing findings of the Solar System simulation.</p>
+            </div>
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80">
+              <span className="text-[9px] text-slate-400">Class 5-B</span>
+              <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold">Grading...</span>
+            </div>
+          </div>
+
+          {/* Assignment Card 3 */}
+          <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm space-y-2.5 opacity-80">
+            <div className="flex justify-between items-start">
+              <span className="text-[9px] bg-purple-100 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400 px-2 py-0.5 rounded-full font-bold">
+                Graded: A+
+              </span>
+              <span className="text-[9px] text-slate-400 dark:text-slate-500 font-medium">June 24, 2026</span>
+            </div>
+            <div>
+              <h4 className="font-bold text-xs text-slate-900 dark:text-white">English Creative Essay</h4>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Write a 500-word essay about your summer vacation adventures.</p>
+            </div>
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80">
+              <span className="text-[9px] text-slate-400">Class 5-B</span>
+              <span className="text-[9px] text-purple-600 dark:text-purple-400 font-semibold">Feedback: Great!</span>
             </div>
           </div>
         </div>
+
+        <BottomNav active={1} />
       </div>
     ),
 

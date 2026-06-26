@@ -15,10 +15,10 @@ const Contact: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="py-24 bg-white dark:bg-dark-bg relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+    <section id="contact" className="py-24 bg-white dark:bg-slate-900 relative overflow-hidden">
+      {/* Background Decor: Swapped Purple for warm Red/Orange glows */}
+      <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-[#E48100]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 bg-[#EF4444]/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16">
@@ -29,7 +29,7 @@ const Contact: React.FC = () => {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white mb-4">Get In Touch</h2>
-            <div className="h-1 w-20 bg-brand-500 mx-auto rounded-full mb-6" />
+            <div className="h-1.5 w-20 bg-gradient-to-r from-[#E48100] to-[#EF4444] mx-auto rounded-full mb-6" />
             <p className="text-lg text-slate-600 dark:text-slate-400">
               Have a question or want to learn more about our solutions? We'd love to hear from you.
             </p>
@@ -46,12 +46,13 @@ const Contact: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="space-y-8"
           >
-             <div className="bg-slate-50 dark:bg-slate-800/50 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm relative overflow-hidden group hover:border-brand-200 dark:hover:border-brand-800 transition-colors">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <MapPin size={120} className="text-brand-500" />
+             <div className="bg-slate-50 dark:bg-slate-800/50 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm relative overflow-hidden group hover:border-[#E48100]/30 transition-colors">
+                {/* Large Background Icon: Subtle Orange */}
+                <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
+                    <MapPin size={120} className="text-[#E48100]" />
                 </div>
                 <div className="relative z-10">
-                    <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center text-brand-600 mb-6 shadow-sm">
+                    <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center text-[#E48100] mb-6 shadow-sm border border-[#E48100]/10">
                         <MapPin className="w-6 h-6" />
                     </div>
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Our Office</h3>
@@ -63,22 +64,22 @@ const Contact: React.FC = () => {
              </div>
 
              <div className="grid sm:grid-cols-2 gap-6">
-                <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm hover:border-brand-200 dark:hover:border-brand-800 transition-colors">
-                    <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-brand-600 mb-4 shadow-sm">
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm hover:border-[#E48100]/30 transition-colors group">
+                    <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-[#E48100] mb-4 shadow-sm border border-[#E48100]/10 group-hover:bg-[#E48100] group-hover:text-white transition-all">
                         <Mail className="w-5 h-5" />
                     </div>
                     <h3 className="font-bold text-slate-900 dark:text-white mb-1">Email Us</h3>
-                    <a href={`mailto:${contact.email}`} className="text-sm text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+                    <a href={`mailto:${contact.email}`} className="text-sm text-slate-600 dark:text-slate-400 hover:text-[#EF4444] transition-colors">
                         {contact.email}
                     </a>
                 </div>
                 
-                <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm hover:border-brand-200 dark:hover:border-brand-800 transition-colors">
-                    <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-brand-600 mb-4 shadow-sm">
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm hover:border-[#E48100]/30 transition-colors group">
+                    <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-[#E48100] mb-4 shadow-sm border border-[#E48100]/10 group-hover:bg-[#E48100] group-hover:text-white transition-all">
                         <Phone className="w-5 h-5" />
                     </div>
                     <h3 className="font-bold text-slate-900 dark:text-white mb-1">Call Us</h3>
-                    <a href={`tel:${contact.phone.replace(/\s/g, '')}`} className="text-sm text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+                    <a href={`tel:${contact.phone.replace(/\s/g, '')}`} className="text-sm text-slate-600 dark:text-slate-400 hover:text-[#EF4444] transition-colors">
                         {contact.phone}
                     </a>
                 </div>
@@ -98,26 +99,26 @@ const Contact: React.FC = () => {
                 <div className="grid md:grid-cols-2 gap-5">
                     <div className="space-y-2">
                         <label htmlFor="name" className="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Full Name</label>
-                        <div className="relative">
-                            <User className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
+                        <div className="relative group">
+                            <User className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-[#E48100] transition-colors" />
                             <input 
                                 type="text" 
                                 id="name" 
                                 placeholder="Amol Tyagi"
-                                className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
+                                className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#E48100]/20 focus:border-[#E48100] transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
                                 required 
                             />
                         </div>
                     </div>
                     <div className="space-y-2">
                         <label htmlFor="mobile" className="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Mobile Number</label>
-                        <div className="relative">
-                            <Smartphone className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
+                        <div className="relative group">
+                            <Smartphone className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-[#E48100] transition-colors" />
                             <input 
                                 type="tel" 
                                 id="mobile" 
                                 placeholder="+91 98765 43210"
-                                className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
+                                className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#E48100]/20 focus:border-[#E48100] transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
                                 required
                             />
                         </div>
@@ -126,13 +127,13 @@ const Contact: React.FC = () => {
 
                 <div className="space-y-2">
                     <label htmlFor="email" className="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Email Address</label>
-                    <div className="relative">
-                        <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
+                    <div className="relative group">
+                        <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-[#E48100] transition-colors" />
                         <input 
                             type="email" 
                             id="email" 
                             placeholder="Amol@example.com"
-                            className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
+                            className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#E48100]/20 focus:border-[#E48100] transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
                             required
                         />
                     </div>
@@ -140,26 +141,26 @@ const Contact: React.FC = () => {
 
                 <div className="space-y-2">
                     <label htmlFor="address" className="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Address</label>
-                    <div className="relative">
-                        <Home className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
+                    <div className="relative group">
+                        <Home className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-[#E48100] transition-colors" />
                         <input 
                             type="text" 
                             id="address" 
                             placeholder="Your City / Location"
-                            className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
+                            className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#E48100]/20 focus:border-[#E48100] transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
                         />
                     </div>
                 </div>
 
                 <div className="space-y-2">
                     <label htmlFor="subject" className="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Subject</label>
-                    <div className="relative">
-                        <FileText className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
+                    <div className="relative group">
+                        <FileText className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-[#E48100] transition-colors" />
                         <input 
                             type="text" 
                             id="subject" 
                             placeholder="Enquiry about..."
-                            className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
+                            className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#E48100]/20 focus:border-[#E48100] transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
                             required
                         />
                     </div>
@@ -167,13 +168,13 @@ const Contact: React.FC = () => {
 
                 <div className="space-y-2">
                     <label htmlFor="message" className="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Message</label>
-                    <div className="relative">
-                        <MessageSquare className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
+                    <div className="relative group">
+                        <MessageSquare className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-[#E48100] transition-colors" />
                         <textarea 
                             id="message" 
                             rows={4}
                             placeholder="How can we help you?"
-                            className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 resize-none"
+                            className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#E48100]/20 focus:border-[#E48100] transition-all text-slate-900 dark:text-white placeholder:text-slate-400 resize-none"
                             required
                         ></textarea>
                     </div>
@@ -181,9 +182,9 @@ const Contact: React.FC = () => {
 
                 <button 
                     type="submit"
-                    className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-500/30 flex items-center justify-center gap-2 transition-all hover:-translate-y-1 active:scale-95"
+                    className="w-full bg-gradient-to-r from-[#E48100] to-[#EF4444] hover:to-[#E48100] text-white font-bold py-4 rounded-xl shadow-lg shadow-[#E48100]/30 flex items-center justify-center gap-2 transition-all hover:-translate-y-1 active:scale-95 group"
                 >
-                    <Send size={20} />
+                    <Send size={20} className="group-hover:translate-x-1 transition-transform" />
                     Send Message
                 </button>
             </form>

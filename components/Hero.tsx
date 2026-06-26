@@ -186,11 +186,20 @@ const Hero: React.FC = () => {
             <div className="flex flex-col items-center lg:items-start gap-8">
                 {/* Main Action Buttons */}
                 <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5 w-full">
-                  <Link to={activeContent.href} className="group w-full sm:w-auto px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold shadow-lg shadow-brand-600/30 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 overflow-hidden relative">
-                    <span className="relative z-10">{activeContent.btnText}</span>
-                    <ArrowRight size={20} className="relative z-10 transition-transform group-hover:translate-x-1" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-brand-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </Link>
+ <Link 
+  to={activeContent.href} 
+  className="group w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#E48100] to-[#EF4444] text-white rounded-xl font-bold shadow-lg shadow-[#E48100]/30 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 overflow-hidden relative"
+>
+  {/* Content remains z-10 to sit above the hover effect */}
+  <span className="relative z-10">{activeContent.btnText}</span>
+  <ArrowRight size={20} className="relative z-10 transition-transform group-hover:translate-x-1" />
+  
+  {/* Hover Layer: Reverses the gradient for a "shimmer" effect on hover */}
+  <div className="absolute inset-0 bg-gradient-to-r from-[#EF4444] to-[#E48100] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+  
+  {/* Premium highlight line at the top */}
+  <div className="absolute inset-x-0 top-0 h-px bg-white/30 z-20" />
+</Link>
                   
                   {/* Navigation Pills */}
                   <div className="flex items-center gap-4 bg-white/50 dark:bg-slate-800/50 p-2 rounded-full backdrop-blur-sm border border-slate-200 dark:border-slate-700">
@@ -201,16 +210,20 @@ const Hero: React.FC = () => {
                       >
                           <ChevronLeft size={20} />
                       </button>
-                      <div className="flex gap-2 px-2">
-                          {slides.map((_, i) => (
-                              <button 
-                                key={i}
-                                onClick={() => setCurrentSlide(i)}
-                                className={`h-2 rounded-full transition-all duration-300 ${i === currentSlide ? 'bg-brand-600 w-8' : 'bg-slate-300 dark:bg-slate-600 w-2 hover:bg-brand-400'}`}
-                                aria-label={`Go to slide ${i + 1}`}
-                              />
-                          ))}
-                      </div>
+<div className="flex gap-2 px-2">
+    {slides.map((_, i) => (
+        <button 
+            key={i}
+            onClick={() => setCurrentSlide(i)}
+            className={`h-2 rounded-full transition-all duration-300 ${
+                i === currentSlide 
+                ? 'bg-[#E48100] w-8 shadow-sm shadow-[#E48100]/20' // Active: Primary Orange
+                : 'bg-slate-300 dark:bg-slate-600 w-2 hover:bg-[#EF4444] hover:bg-opacity-70' // Inactive: Slate to Red hover
+            }`}
+            aria-label={`Go to slide ${i + 1}`}
+        />
+    ))}
+</div>
                       <button 
                         onClick={nextSlide}
                         className="p-3 rounded-full hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all active:scale-95"

@@ -50,14 +50,7 @@ const ESmartSchool: React.FC = () => {
                 <p className="text-lg lg:text-2xl text-blue-100 mb-10 max-w-3xl mx-auto font-light leading-relaxed">
                     {product.heroSubtitle || product.description}
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 bg-white text-brand-700 rounded-xl font-bold hover:bg-blue-50 transition-colors shadow-lg active:scale-95 flex items-center justify-center gap-2">
-                        Explore Features <ArrowRight size={20} />
-                    </button>
-                    <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 bg-transparent border border-white/30 text-white rounded-xl font-bold hover:bg-white/10 transition-colors">
-                        Download Brochure
-                    </button>
-                </div>
+
 
                 {/* App Store Badges */}
                 {(product.appStoreLink || product.playStoreLink) && (
