@@ -47,6 +47,13 @@ import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 
+const ESmartSchoolRedirect = () => {
+  useEffect(() => {
+    window.location.replace('/products/esmart-school/');
+  }, []);
+  return null;
+};
+
 function App() {
   const { isDark, toggleTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
@@ -108,7 +115,7 @@ function App() {
                       <Route path="/services/kpo" element={<KnowledgeProcessOptimization />} />
                       <Route path="/services/pvc-card-printing" element={<PVCCardPrinting />} />
                       <Route path="/products" element={<Products />} />
-                      <Route path="/products/esmart-school" element={<ESmartSchool />} />
+                      <Route path="/products/esmart-school" element={<ESmartSchoolRedirect />} />
                       <Route path="/products/esmart-track" element={<ESmartTrack />} />
                       <Route path="/products/esmart-restaurant" element={<ESmartRestaurant />} />
                       <Route path="/products/esmart-health" element={<ESmartHealth />} />

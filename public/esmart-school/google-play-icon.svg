@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Blue left triangle -->
+  <path d="M 48 30 L 48 482 L 280 256 Z" fill="#4FC3F7"/>
+  <!-- Green top triangle -->
+  <path d="M 48 30 L 280 256 L 430 172 Z" fill="#66BB6A"/>
+  <!-- Red bottom triangle -->
+  <path d="M 48 482 L 430 340 L 280 256 Z" fill="#EF5350"/>
+  <!-- Yellow right triangle -->
+  <path d="M 280 256 L 430 172 L 430 340 Z" fill="#FFCA28"/>
+</svg>

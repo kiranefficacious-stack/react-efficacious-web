@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-primary-50: #edfbf3;
+  --color-primary-100: #d2f6e0;
+  --color-primary-200: #a9eec4;
+  --color-primary-300: #74e1a0;
+  --color-primary-400: #37cc7a;
+  --color-primary-500: #1ba95e;
+  --color-primary-600: #108748;
+  --color-primary-700: #0f6a3a;
+  --color-primary-800: #115431;
+  --color-primary-900: #0f4529;
+  --color-primary-950: #072716;
+
+  --color-secondary-50: #eef4ff;
+  --color-secondary-100: #d9e6ff;
+  --color-secondary-200: #bcd3ff;
+  --color-secondary-300: #8eb9ff;
+  --color-secondary-400: #5b96ff;
+  --color-secondary-500: #3672ff;
+  --color-secondary-600: #1a73e8;
+  --color-secondary-700: #114cbe;
+  --color-secondary-800: #133f99;
+  --color-secondary-900: #14377a;
+  --color-secondary-950: #0d224d;
+
+  --color-app-present: #4ade80;
+  --color-app-absent: #f87171;
+  --color-app-leave: #a8a29e;
+  --color-app-holiday: #fbbf24;
+  --color-app-vacation: #818cf8;
+  --color-app-today: #60a5fa;
+
+  --color-card-1: #00BA92;
+  --color-card-2: #00A073;
+  --color-card-3: #FF4E00;
+  --color-card-4: #EA3900;
+  --color-card-5: #5D2669;
+  --color-card-6: #360C45;
+  --color-card-7: #FFC600;
+  --color-card-8: #F8A20A;
+}
+
+body {
+  @apply bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300;
+}

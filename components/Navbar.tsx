@@ -48,6 +48,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
       return {
         name: p.title,
         href: p.href,
+        newTab: p.newTab || false,
         icon: IconComp ? <IconComp size={18} /> : null,
       };
     });
@@ -193,6 +194,8 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                                       <Link
                                         key={idx}
                                         to={item.href}
+                                        target={(item as any).newTab ? "_blank" : undefined}
+                                        rel={(item as any).newTab ? "noopener noreferrer" : undefined}
                                         onClick={() => setActiveDropdown(null)}
                                         className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#E48100]/10 dark:hover:bg-slate-800 transition-colors group"
                                       >
@@ -304,6 +307,8 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                                     <Link
                                         key={idx}
                                         to={item.href}
+                                        target={(item as any).newTab ? "_blank" : undefined}
+                                        rel={(item as any).newTab ? "noopener noreferrer" : undefined}
                                         onClick={handleLinkClick}
                                         className="flex items-center gap-3 py-2 text-slate-600 dark:text-slate-400 hover:text-[#E48100] dark:hover:text-[#E48100]"
                                     >
