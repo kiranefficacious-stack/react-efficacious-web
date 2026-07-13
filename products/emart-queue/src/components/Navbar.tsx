@@ -36,6 +36,14 @@ export function Navbar() {
                 {link.name}
               </a>
             ))}
+            <a 
+              href="https://esmartqueue.com/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-sm font-semibold text-slate-500 hover:text-primary-600 transition-colors"
+            >
+              Login
+            </a>
             <a href="#contact" className="inline-flex items-center justify-center px-5 py-2 text-sm font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-800 transition-colors">
               Partner with Us
             </a>
@@ -68,6 +76,15 @@ export function Navbar() {
                   {link.name}
                 </a>
               ))}
+              <a 
+                href="https://esmartqueue.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block w-full text-center mt-2 px-4 py-3 text-base font-semibold text-slate-700 border border-slate-200 hover:bg-slate-50 rounded-lg"
+              >
+                Login
+              </a>
               <a 
                 href="#contact"
                 onClick={() => setMobileMenuOpen(false)}

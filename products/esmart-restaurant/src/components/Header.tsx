@@ -203,6 +203,14 @@ export default function Header() {
 
           {/* Desktop CTAs */}
           <div className="hidden lg:flex items-center gap-3 shrink-0">
+            <a
+              href="https://e-smartrestaurant.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 text-sm font-semibold text-charcoal hover:text-primary transition-colors"
+            >
+              Login
+            </a>
             <Link
               to="/contact"
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-orange-50 transition-colors"
@@ -228,7 +236,7 @@ export default function Header() {
           </button>
         </div>
       </header>
-
+ 
       {/* ── Mobile Menu ─────────────────────────────── */}
       <div
         className={`fixed inset-0 z-40 bg-white transition-transform duration-300 ${
@@ -283,6 +291,14 @@ export default function Header() {
             )
           )}
           <div className="pt-6 space-y-3">
+            <a
+              href="https://e-smartrestaurant.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full py-3 text-center text-charcoal border border-gray-200 rounded-xl font-semibold text-base"
+            >
+              Login
+            </a>
             <Link
               to="/contact"
               className="block w-full py-3 text-center text-primary border border-primary rounded-xl font-semibold text-base"
