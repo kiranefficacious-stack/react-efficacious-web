@@ -54,6 +54,13 @@ const ESmartSchoolRedirect = () => {
   return null;
 };
 
+const ESmartRestaurantRedirect = () => {
+  useEffect(() => {
+    window.location.replace('/products/esmart-restaurant/');
+  }, []);
+  return null;
+};
+
 function App() {
   const { isDark, toggleTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
@@ -117,7 +124,7 @@ function App() {
                       <Route path="/products" element={<Products />} />
                       <Route path="/products/esmart-school" element={<ESmartSchoolRedirect />} />
                       <Route path="/products/esmart-track" element={<ESmartTrack />} />
-                      <Route path="/products/esmart-restaurant" element={<ESmartRestaurant />} />
+                      <Route path="/products/esmart-restaurant" element={<ESmartRestaurantRedirect />} />
                       <Route path="/products/esmart-health" element={<ESmartHealth />} />
                       <Route path="/products/emart-queue" element={<ESmartQueue />} />
                       <Route path="/products/esmart-team" element={<ESmartTeam />} />

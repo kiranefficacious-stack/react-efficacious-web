@@ -10,7 +10,21 @@ export default defineConfig(({ mode }) => {
         port: 3000,
         host: '0.0.0.0',
       },
-      plugins: [react(), tailwindcss()],
+      plugins: [
+        react(),
+        tailwindcss(),
+        {
+          name: 'restaurant-spa-fallback',
+          configureServer(server) {
+            server.middlewares.use((req, res, next) => {
+              if (req.url && req.url.startsWith('/products/esmart-restaurant') && !req.url.includes('.')) {
+                req.url = '/products/esmart-restaurant/index.html';
+              }
+              next();
+            });
+          }
+        }
+      ],
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
         'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
@@ -26,6 +40,7 @@ export default defineConfig(({ mode }) => {
           input: {
             main: path.resolve(__dirname, 'index.html'),
             esmart: path.resolve(__dirname, 'products/esmart-school/index.html'),
+            restaurant: path.resolve(__dirname, 'products/esmart-restaurant/index.html'),
           }
         }
       }
