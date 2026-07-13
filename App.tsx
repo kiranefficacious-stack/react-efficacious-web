@@ -61,6 +61,13 @@ const ESmartRestaurantRedirect = () => {
   return null;
 };
 
+const EMartQueueRedirect = () => {
+  useEffect(() => {
+    window.location.replace('/products/emart-queue/');
+  }, []);
+  return null;
+};
+
 function App() {
   const { isDark, toggleTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
@@ -126,7 +133,7 @@ function App() {
                       <Route path="/products/esmart-track" element={<ESmartTrack />} />
                       <Route path="/products/esmart-restaurant" element={<ESmartRestaurantRedirect />} />
                       <Route path="/products/esmart-health" element={<ESmartHealth />} />
-                      <Route path="/products/emart-queue" element={<ESmartQueue />} />
+                      <Route path="/products/emart-queue" element={<EMartQueueRedirect />} />
                       <Route path="/products/esmart-team" element={<ESmartTeam />} />
                       <Route path="/products/esmart-society" element={<ESmartSociety />} />
                       <Route path="/portfolio" element={<Portfolio />} />

@@ -4,6 +4,7 @@ import { ArrowRight, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useContent } from '../hooks/useContent';
 import * as LucideIcons from 'lucide-react';
+import { initialData } from '../data';
 
 const motion = m as any;
 
@@ -57,53 +58,76 @@ const Products: React.FC = () => {
 
         {/* Products Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {products.map((product, index) => (
-            <motion.div
-              key={index}
-              className="group relative h-full"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-            >
-              {/* Card Container with Gradient Border Effect */}
-              <div className="absolute -inset-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700 rounded-[2rem] opacity-70 blur-sm group-hover:opacity-100 transition-opacity duration-500" />
-              <div className={`absolute -inset-[1px] bg-gradient-to-r ${product.gradient} rounded-[2rem] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500`} />
-              
-              <div className="relative h-full bg-white dark:bg-slate-900/90 backdrop-blur-xl rounded-[1.9rem] p-8 flex flex-col transition-transform duration-300">
-                
-                {/* Icon Header */}
-                <div className="flex items-start justify-between mb-6">
-                    <div className={`w-14 h-14 rounded-2xl ${product.bgAccent} ${product.textAccent} flex items-center justify-center shadow-inner`}>
-                        {(() => {
-                          const IconComp = (LucideIcons as any)[product.iconName];
-                          return IconComp ? <IconComp className="w-8 h-8" /> : null;
-                        })()}
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-brand-500 group-hover:text-white transition-colors duration-300">
-                        <ArrowRight size={16} className="text-slate-400 group-hover:text-white -rotate-45 group-hover:rotate-0 transition-all duration-300" />
-                    </div>
-                </div>
+          {products.map((product, index) => {
+            const localProduct = (initialData.products as any[]).find(
+              (lp: any) => String(lp.id) === String(product.id) || lp.title.toLowerCase() === product.title.toLowerCase()
+            );
+            const href = localProduct ? localProduct.href : product.href;
+            const newTab = localProduct ? localProduct.newTab : (product.newTab || false);
 
-                {/* Content */}
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-slate-900 group-hover:to-slate-700 dark:group-hover:from-white dark:group-hover:to-slate-300 transition-colors">
-                  {product.title}
-                </h3>
+            return (
+              <motion.div
+                key={index}
+                className="group relative h-full"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+              >
+                {/* Card Container with Gradient Border Effect */}
+                <div className="absolute -inset-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700 rounded-[2rem] opacity-70 blur-sm group-hover:opacity-100 transition-opacity duration-500" />
+                <div className={`absolute -inset-[1px] bg-gradient-to-r ${product.gradient} rounded-[2rem] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500`} />
                 
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6 flex-grow">
-                  {product.description}
-                </p>
+                <div className="relative h-full bg-white dark:bg-slate-900/90 backdrop-blur-xl rounded-[1.9rem] p-8 flex flex-col transition-transform duration-300">
+                  
+                  {/* Icon Header */}
+                  <div className="flex items-start justify-between mb-6">
+                      <div className={`w-14 h-14 rounded-2xl ${product.bgAccent} ${product.textAccent} flex items-center justify-center shadow-inner`}>
+                          {(() => {
+                            const IconComp = (LucideIcons as any)[product.iconName];
+                            return IconComp ? <IconComp className="w-8 h-8" /> : null;
+                          })()}
+                      </div>
+                      <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-brand-500 group-hover:text-white transition-colors duration-300">
+                          <ArrowRight size={16} className="text-slate-400 group-hover:text-white -rotate-45 group-hover:rotate-0 transition-all duration-300" />
+                      </div>
+                  </div>
 
-                {/* Action */}
-                <div className="pt-6 border-t border-slate-100 dark:border-slate-800/50">
-                    <Link to={product.href} className={`text-sm font-semibold ${product.textAccent} flex items-center gap-1 hover:gap-2 transition-all`}>
-                        Explore Features
-                        <ArrowRight size={14} />
-                    </Link>
+                  {/* Content */}
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-slate-900 group-hover:to-slate-700 dark:group-hover:from-white dark:group-hover:to-slate-300 transition-colors">
+                    {product.title}
+                  </h3>
+                  
+                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6 flex-grow">
+                    {product.description}
+                  </p>
+
+                  {/* Action */}
+                  <div className="pt-6 border-t border-slate-100 dark:border-slate-800/50">
+                      {newTab ? (
+                        <a 
+                          href={href} 
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`text-sm font-semibold ${product.textAccent} flex items-center gap-1 hover:gap-2 transition-all`}
+                        >
+                            Explore Features
+                            <ArrowRight size={14} />
+                        </a>
+                      ) : (
+                        <Link 
+                          to={href} 
+                          className={`text-sm font-semibold ${product.textAccent} flex items-center gap-1 hover:gap-2 transition-all`}
+                        >
+                            Explore Features
+                            <ArrowRight size={14} />
+                        </Link>
+                      )}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
 
       </div>

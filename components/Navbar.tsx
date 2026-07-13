@@ -8,6 +8,7 @@ import {
   Users, Briefcase
 } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
+import { initialData } from '../data';
 
 const motion = m as any;
 
@@ -44,11 +45,14 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
   const productItems = (data.products as any[])
     .filter((p: any) => p.enabled)
     .map((p: any) => {
+      const localProduct = (initialData.products as any[]).find((lp: any) => String(lp.id) === String(p.id) || lp.title.toLowerCase() === p.title.toLowerCase());
+      const href = localProduct ? localProduct.href : p.href;
+      const newTab = localProduct ? localProduct.newTab : (p.newTab || false);
       const IconComp = (LucideIcons as any)[p.iconName];
       return {
         name: p.title,
-        href: p.href,
-        newTab: p.newTab || false,
+        href: href,
+        newTab: newTab,
         icon: IconComp ? <IconComp size={18} /> : null,
       };
     });
@@ -190,23 +194,39 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                               className="absolute top-full left-0 mt-4 w-72 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden"
                             >
                                 <div className="p-2 space-y-1">
-                                    {link.dropdownItems.map((item, idx) => (
-                                      <Link
-                                        key={idx}
-                                        to={item.href}
-                                        target={(item as any).newTab ? "_blank" : undefined}
-                                        rel={(item as any).newTab ? "noopener noreferrer" : undefined}
-                                        onClick={() => setActiveDropdown(null)}
-                                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#E48100]/10 dark:hover:bg-slate-800 transition-colors group"
-                                      >
-                                          <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-[#E48100] group-hover:scale-110 transition-transform shadow-sm">
-                                            {item.icon}
-                                          </div>
-                                          <span className="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-[#E48100] dark:group-hover:text-[#E48100]">
-                                            {item.name}
-                                          </span>
-                                      </Link>
-                                    ))}
+                                    {link.dropdownItems.map((item: any, idx: number) => {
+                                      return item.newTab ? (
+                                        <a
+                                          key={idx}
+                                          href={item.href}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          onClick={() => setActiveDropdown(null)}
+                                          className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#E48100]/10 dark:hover:bg-slate-800 transition-colors group"
+                                        >
+                                            <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-[#E48100] group-hover:scale-110 transition-transform shadow-sm">
+                                              {item.icon}
+                                            </div>
+                                            <span className="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-[#E48100] dark:group-hover:text-[#E48100]">
+                                              {item.name}
+                                            </span>
+                                        </a>
+                                      ) : (
+                                        <Link
+                                          key={idx}
+                                          to={item.href}
+                                          onClick={() => setActiveDropdown(null)}
+                                          className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#E48100]/10 dark:hover:bg-slate-800 transition-colors group"
+                                        >
+                                            <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-[#E48100] group-hover:scale-110 transition-transform shadow-sm">
+                                              {item.icon}
+                                            </div>
+                                            <span className="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-[#E48100] dark:group-hover:text-[#E48100]">
+                                              {item.name}
+                                            </span>
+                                        </Link>
+                                      );
+                                    })}
                                 </div>
                             </motion.div>
                           )}

@@ -14,11 +14,15 @@ export default defineConfig(({ mode }) => {
         react(),
         tailwindcss(),
         {
-          name: 'restaurant-spa-fallback',
+          name: 'multi-spa-fallback',
           configureServer(server) {
             server.middlewares.use((req, res, next) => {
-              if (req.url && req.url.startsWith('/products/esmart-restaurant') && !req.url.includes('.')) {
-                req.url = '/products/esmart-restaurant/index.html';
+              if (req.url && !req.url.includes('.')) {
+                if (req.url.startsWith('/products/esmart-restaurant')) {
+                  req.url = '/products/esmart-restaurant/index.html';
+                } else if (req.url.startsWith('/products/emart-queue')) {
+                  req.url = '/products/emart-queue/index.html';
+                }
               }
               next();
             });
@@ -41,6 +45,7 @@ export default defineConfig(({ mode }) => {
             main: path.resolve(__dirname, 'index.html'),
             esmart: path.resolve(__dirname, 'products/esmart-school/index.html'),
             restaurant: path.resolve(__dirname, 'products/esmart-restaurant/index.html'),
+            queue: path.resolve(__dirname, 'products/emart-queue/index.html'),
           }
         }
       }
