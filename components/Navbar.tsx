@@ -70,7 +70,8 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
     '/partners',
     '/careers',
     '/contact',
-    '/about'
+    '/about',
+    '/blogs'
   ];
   const isDarkHero = darkHeroRoutes.includes(location.pathname);
   
@@ -115,8 +116,8 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
     <nav
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-white/80 dark:bg-dark-bg/80 backdrop-blur-lg shadow-sm py-3 border-b border-slate-200/50 dark:border-slate-800/50'
-          : 'bg-transparent py-5'
+          ? 'bg-white/80 dark:bg-dark-bg/80 backdrop-blur-lg shadow-sm py-0 border-b border-slate-200/50 dark:border-slate-800/50'
+          : 'bg-transparent py-0'
       }`}
       onMouseLeave={() => setActiveDropdown(null)}
     >

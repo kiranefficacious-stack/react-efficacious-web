@@ -37,7 +37,7 @@ const SoftwareHero: React.FC = () => {
           >
   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-[#E48100] text-xs font-bold uppercase tracking-wider mb-6 backdrop-blur-sm">
   <span className="w-2 h-2 rounded-full bg-[#66A634] animate-pulse" />
-  #1 Software Development Company
+  Software Development Company
 </div>
             
             <h1 className="text-5xl lg:text-7xl font-extrabold mb-6 tracking-tight leading-[1.1]">
@@ -72,7 +72,7 @@ const SoftwareHero: React.FC = () => {
                 <p className="text-sm text-slate-500 dark:text-slate-500">Years Experience</p>
               </div>
               <div>
-                <p className="text-3xl font-bold text-slate-900 dark:text-white">500+</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white">300+</p>
                 <p className="text-sm text-slate-500 dark:text-slate-500">Projects Delivered</p>
               </div>
               <div>
