@@ -48,7 +48,7 @@ export function Hero() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <a
-                href="https://play.google.com/store/apps/details?id=com.efficacious.esmarthealth&hl=en_IN"
+                href="https://play.google.com/store/apps/details?id=com.efficacious.esmartqueue"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-primary-600 rounded-xl shadow-lg shadow-primary-200 transition-transform hover:scale-105"

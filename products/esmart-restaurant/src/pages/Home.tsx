@@ -204,7 +204,7 @@ export default function Home() {
             <div className="lg:w-[45%] text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-100 text-primary text-xs font-semibold mb-6">
                 <Zap className="w-3.5 h-3.5" />
-                Trusted by 10,000+ restaurants across India {/* SAMPLE — replace with real stat */}
+                Trusted by 100+ restaurants across India {/* SAMPLE — replace with real stat */}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-bold text-charcoal leading-[1.12] mb-6 font-sora">
                 Bill faster than your{' '}
@@ -244,10 +244,10 @@ export default function Home() {
       {/* SAMPLE STATS — replace all numbers with real data before going live */}
       <section className="border-y border-gray-200 bg-white py-10">
         <div className="max-w-5xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-8 divide-x divide-gray-100">
-          <StatCard target={10000} suffix="+" label="Restaurants served" />
-          <StatCard target={1} suffix="M+" label="Bills processed daily" />
+          <StatCard target={100} suffix="+" label="Restaurants served" />
+          <StatCard target={7} suffix="K+" label="Bills processed daily" />
           <StatCard target={24} suffix="h" label="Average go-live time" />
-          <StatCard target={200} suffix="+" label="Hardware integrations" />
+          <StatCard target={50} suffix="+" label="Hardware integrations" />
         </div>
       </section>
 
@@ -522,7 +522,7 @@ export default function Home() {
       {/* ── 11. FINAL CTA BAND ──────────────────────── */}
       <CTABand
         headline="Ready to speed up your billing?"
-        subtext="Join 10,000+ restaurants already running smarter. Setup takes less than a day."
+        subtext="Join 100+ restaurants already running smarter. Setup takes less than a day."
         ctaLabel="Book a Free Demo"
         ctaTo="/contact"
       />

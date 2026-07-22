@@ -36,8 +36,8 @@ const config: ProductPageConfig = {
     'A complete cloud-based billing and POS solution for restaurants. Works offline, handles GST automatically, routes kitchen tickets instantly, and goes live in under a day.',
   illustration: <BillingIllustration />,
   stats: [
-    { value: '10,000+', label: 'Restaurants served' },
-    { value: '1M+', label: 'Bills processed daily' },
+    { value: '100+', label: 'Restaurants served' },
+    { value: '7K+', label: 'Bills processed daily' },
     { value: '<30 sec', label: 'Average bill generation' },
   ],
   features: [
@@ -78,7 +78,7 @@ const config: ProductPageConfig = {
     { q: 'Can one cashier handle multiple tables simultaneously?', a: 'Yes. A single billing terminal can manage unlimited open tables or counters in parallel — switching between them with one tap.' },
   ],
   ctaHeadline: 'Ready to speed up every bill?',
-  ctaSubtext: 'Join 10,000+ restaurants already billing smarter with e-Smart Restaurant.',
+  ctaSubtext: 'Join 100+ restaurants already billing smarter with e-Smart Restaurant.',
 };
 
 export default function BillingPOS() {

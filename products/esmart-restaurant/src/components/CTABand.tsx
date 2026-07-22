@@ -12,7 +12,7 @@ interface CTABandProps {
 
 export default function CTABand({
   headline = 'Ready to speed up your billing?',
-  subtext = 'Join 10,000+ restaurants already running smarter with e-Smart Restaurant.',
+  subtext = 'Join 100+ restaurants already running smarter with e-Smart Restaurant.',
   ctaLabel = 'Book a Free Demo',
   ctaTo = '/contact',
   variant = 'primary',

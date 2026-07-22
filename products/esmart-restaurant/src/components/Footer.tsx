@@ -51,7 +51,7 @@ export default function Footer() {
             <p className="text-sm text-gray-400 leading-relaxed mb-5">
               Cloud-based billing & POS software for restaurants, cafés, cloud kitchens, and multi-outlet chains across India.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-3 mb-8">
               {SOCIAL.map(({ icon: Icon, href, label }) => (
                 <a
                   key={label}
@@ -62,6 +62,37 @@ export default function Footer() {
                   <Icon className="w-4 h-4" />
                 </a>
               ))}
+            </div>
+
+            {/* Download App badges */}
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Download the App</p>
+              <div className="flex flex-col xl:flex-row gap-2">
+                <a
+                  href="https://apps.apple.com/co/app/e-smart-restaurant/id6762969059?l=en-GB"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg transition-colors w-max"
+                >
+                  <span className="text-lg leading-none">🍎</span>
+                  <div>
+                    <p className="text-[9px] text-gray-400 leading-none">Download on the</p>
+                    <p className="text-xs font-bold text-white leading-tight">App Store</p>
+                  </div>
+                </a>
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.efficacious.new_esmartrestaurant"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg transition-colors w-max"
+                >
+                  <span className="text-lg leading-none">▶</span>
+                  <div>
+                    <p className="text-[9px] text-gray-400 leading-none">Get it on</p>
+                    <p className="text-xs font-bold text-white leading-tight">Google Play</p>
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
 

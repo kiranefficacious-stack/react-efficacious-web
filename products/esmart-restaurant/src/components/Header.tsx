@@ -211,13 +211,18 @@ export default function Header() {
             >
               Login
             </a>
-            <Link
-              to="/contact"
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-orange-50 transition-colors"
-            >
-              <Smartphone className="w-4 h-4" />
-              Download App
-            </Link>
+            <div className="relative group">
+              <button
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-orange-50 transition-colors"
+              >
+                <Smartphone className="w-4 h-4" />
+                Download App
+              </button>
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
+                <a href="https://play.google.com/store/apps/details?id=com.efficacious.new_esmartrestaurant" target="_blank" rel="noopener noreferrer" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-primary">Android / Google Play</a>
+                <a href="https://apps.apple.com/co/app/e-smart-restaurant/id6762969059?l=en-GB" target="_blank" rel="noopener noreferrer" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-primary">iOS / App Store</a>
+              </div>
+            </div>
             <Link
               to="/contact"
               className="px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary-dark transition-colors shadow-sm shadow-orange-200"
@@ -299,12 +304,24 @@ export default function Header() {
             >
               Login
             </a>
-            <Link
-              to="/contact"
-              className="block w-full py-3 text-center text-primary border border-primary rounded-xl font-semibold text-base"
-            >
-              Download App
-            </Link>
+            <div className="flex gap-3">
+              <a
+                href="https://play.google.com/store/apps/details?id=com.efficacious.new_esmartrestaurant"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block flex-1 py-3 text-center text-primary border border-primary rounded-xl font-semibold text-sm"
+              >
+                Android App
+              </a>
+              <a
+                href="https://apps.apple.com/co/app/e-smart-restaurant/id6762969059?l=en-GB"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block flex-1 py-3 text-center text-primary border border-primary rounded-xl font-semibold text-sm"
+              >
+                iOS App
+              </a>
+            </div>
             <Link
               to="/contact"
               className="block w-full py-3 text-center bg-primary text-white rounded-xl font-semibold text-base"

@@ -7,7 +7,7 @@ const MILESTONES = [
   { year: '2019', title: 'First 100 restaurants', desc: 'Launched the first version of e-Smart Restaurant POS, onboarding cafés and QSR outlets across Mumbai & Pune.' },
   { year: '2021', title: 'Cloud & multi-outlet launch', desc: 'Rebuilt the platform as a cloud-native product with support for multi-outlet chains and real-time admin dashboards.' },
   { year: '2023', title: '5,000+ restaurants go live', desc: 'Expanded to Tier 2 and Tier 3 cities. Launched CRM, loyalty, and online ordering modules.' },
-  { year: '2025', title: '10,000+ restaurants & growing', desc: 'Serving restaurants across 200+ cities. Processing over 1 million bills every day across India.' },
+  { year: '2025', title: '100+ restaurants & growing', desc: 'Serving restaurants across 200+ cities. Processing over 1 million bills every day across India.' },
 ];
 
 const VALUES = [
@@ -46,9 +46,9 @@ export default function About() {
       <section className="bg-white py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
           {[
-            { value: '10,000+', label: 'Restaurants' },
-            { value: '1M+', label: 'Bills/day' },
-            { value: '200+', label: 'Cities' },
+            { value: '100+', label: 'Restaurants' },
+            { value: '7k+', label: 'Bills/day' },
+            { value: '50+', label: 'Cities' },
             { value: '2018', label: 'Founded' },
           ].map(({ value, label }) => (
             <div key={label}>

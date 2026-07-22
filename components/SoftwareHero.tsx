@@ -72,11 +72,11 @@ const SoftwareHero: React.FC = () => {
                 <p className="text-sm text-slate-500 dark:text-slate-500">Years Experience</p>
               </div>
               <div>
-                <p className="text-3xl font-bold text-slate-900 dark:text-white">300+</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white">50+</p>
                 <p className="text-sm text-slate-500 dark:text-slate-500">Projects Delivered</p>
               </div>
               <div>
-                <p className="text-3xl font-bold text-slate-900 dark:text-white">100%</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white">99%</p>
                 <p className="text-sm text-slate-500 dark:text-slate-500">Client Satisfaction</p>
               </div>
             </div>
