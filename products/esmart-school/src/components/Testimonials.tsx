@@ -5,26 +5,26 @@ const testimonials = [
   {
     id: 1,
     quote: "eSMARTs has completely transformed how we manage our daily operations. The automated attendance and real-time GPS tracking for transport give our parents immense peace of mind.",
-    name: "Sarah Jenkins",
+    name: "Mrs. Sunita Sen",
     role: "Principal",
-    school: "Lincoln High School",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150&h=150"
+    school: "Delhi Public School, Sector 45",
+    avatar: "https://media.istockphoto.com/id/2171382633/vector/user-profile-icon-anonymous-person-symbol-blank-avatar-graphic-vector-illustration.jpg?s=612x612&w=0&k=20&c=ZwOF6NfOR0zhYC44xOX06ryIPAUhDvAajrPsaZ6v1-w="
   },
   {
     id: 2,
     quote: "The dashboards provide incredible visibility into student performance and financials. It's an all-in-one platform that saves our administrative staff hours of work every single day.",
-    name: "Dr. Michael Chen",
+    name: "Dr. Anil Deshmukh",
     role: "School Administrator",
-    school: "Westside Academy",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150&h=150"
+    school: "St. Xavier's High School, Mumbai",
+    avatar: "https://media.istockphoto.com/id/2171382633/vector/user-profile-icon-anonymous-person-symbol-blank-avatar-graphic-vector-illustration.jpg?s=612x612&w=0&k=20&c=ZwOF6NfOR0zhYC44xOX06ryIPAUhDvAajrPsaZ6v1-w="
   },
   {
     id: 3,
     quote: "Implementation was seamless, and the mobile app is a game-changer. Our teachers can now communicate with parents instantly, fostering a much stronger school community.",
-    name: "Emily Rodriguez",
+    name: "Mrs. Priya Iyer",
     role: "Head of Operations",
-    school: "Pinnacle International",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=150&h=150"
+    school: "Pinnacle International School, Bengaluru",
+    avatar: "https://media.istockphoto.com/id/2171382633/vector/user-profile-icon-anonymous-person-symbol-blank-avatar-graphic-vector-illustration.jpg?s=612x612&w=0&k=20&c=ZwOF6NfOR0zhYC44xOX06ryIPAUhDvAajrPsaZ6v1-w="
   }
 ];
 
