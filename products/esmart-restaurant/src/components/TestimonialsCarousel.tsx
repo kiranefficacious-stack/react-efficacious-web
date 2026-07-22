@@ -172,12 +172,13 @@ export default function TestimonialsCarousel() {
             Verified Customer Stories
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold text-charcoal mb-4 font-sora">
-            Loved by 1000+ restaurant owners
+            Loved by 100+ restaurant owners
           </h2>
           <p className="text-gray-500 text-lg">
             See how e-Smart drives daily speed, accuracy, and operational clarity across India.
           </p>
         </div>
+        
 
         {/* Tab Filters */}
         <div className="flex flex-wrap justify-center gap-2.5 mb-12">

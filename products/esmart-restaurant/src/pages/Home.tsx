@@ -360,10 +360,67 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 6. SOCIAL PROOF ─────────────────────────── */}
+      {/* ── 8. ADD-ON ECOSYSTEM ─────────────────────── */}
+      <section className="bg-white py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <FadeIn className="text-center mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-charcoal mb-3 font-sora">Powerful add-on ecosystem</h2>
+            <p className="text-gray-500">Extend your POS with plug-and-play modules — no technical setup required.</p>
+          </FadeIn>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {ADDONS.map(({ heading, items }) => (
+              <div key={heading} className="bg-warm rounded-xl p-6 border border-gray-100">
+                <h4 className="font-bold text-charcoal mb-4 font-sora text-sm tracking-wide uppercase text-primary">{heading}</h4>
+                <ul className="space-y-2.5">
+                  {items.map(item => (
+                    <li key={item} className="text-sm text-gray-600 flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/50 shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+
+      {/* ── 10. FAQ ACCORDION ───────────────────────── */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <FadeIn className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-charcoal mb-3 font-sora">Frequently asked questions</h2>
+            <p className="text-gray-500">Answers to the questions we hear most from restaurant owners.</p>
+          </FadeIn>
+          <div className="space-y-3">
+            {FAQS.map((faq, i) => (
+              <div key={i} className="border border-gray-200 rounded-xl overflow-hidden">
+                <button
+                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                  onClick={() => setActiveFaq(activeFaq === i ? null : i)}
+                  aria-expanded={activeFaq === i}
+                >
+                  <span className="font-semibold text-charcoal text-sm sm:text-base pr-4">{faq.q}</span>
+                  <ChevronDown className={`w-5 h-5 text-primary shrink-0 transition-transform duration-200 ${activeFaq === i ? 'rotate-180' : ''}`} />
+                </button>
+                <div
+                  className="overflow-hidden transition-all duration-300"
+                  style={{ maxHeight: activeFaq === i ? '400px' : '0' }}
+                >
+                  <p className="px-6 pb-5 pt-1 text-gray-500 text-sm leading-relaxed border-t border-gray-100">{faq.a}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 11. SOCIAL PROOF ────────────────────────── */}
       <TestimonialsCarousel />
 
-      {/* ── 7. DEMO REQUEST BAND ────────────────────── */}
+      {/* ── 12. DEMO REQUEST BAND (MOVED TO BOTTOM) ──── */}
       <section id="demo" className="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left: Form */}
@@ -461,71 +518,6 @@ export default function Home() {
           </FadeIn>
         </div>
       </section>
-
-      {/* ── 8. ADD-ON ECOSYSTEM ─────────────────────── */}
-      <section className="bg-white py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <FadeIn className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-charcoal mb-3 font-sora">Powerful add-on ecosystem</h2>
-            <p className="text-gray-500">Extend your POS with plug-and-play modules — no technical setup required.</p>
-          </FadeIn>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {ADDONS.map(({ heading, items }) => (
-              <div key={heading} className="bg-warm rounded-xl p-6 border border-gray-100">
-                <h4 className="font-bold text-charcoal mb-4 font-sora text-sm tracking-wide uppercase text-primary">{heading}</h4>
-                <ul className="space-y-2.5">
-                  {items.map(item => (
-                    <li key={item} className="text-sm text-gray-600 flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/50 shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-
-      {/* ── 10. FAQ ACCORDION ───────────────────────── */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-3xl mx-auto">
-          <FadeIn className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-charcoal mb-3 font-sora">Frequently asked questions</h2>
-            <p className="text-gray-500">Answers to the questions we hear most from restaurant owners.</p>
-          </FadeIn>
-          <div className="space-y-3">
-            {FAQS.map((faq, i) => (
-              <div key={i} className="border border-gray-200 rounded-xl overflow-hidden">
-                <button
-                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
-                  onClick={() => setActiveFaq(activeFaq === i ? null : i)}
-                  aria-expanded={activeFaq === i}
-                >
-                  <span className="font-semibold text-charcoal text-sm sm:text-base pr-4">{faq.q}</span>
-                  <ChevronDown className={`w-5 h-5 text-primary shrink-0 transition-transform duration-200 ${activeFaq === i ? 'rotate-180' : ''}`} />
-                </button>
-                <div
-                  className="overflow-hidden transition-all duration-300"
-                  style={{ maxHeight: activeFaq === i ? '400px' : '0' }}
-                >
-                  <p className="px-6 pb-5 pt-1 text-gray-500 text-sm leading-relaxed border-t border-gray-100">{faq.a}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 11. FINAL CTA BAND ──────────────────────── */}
-      <CTABand
-        headline="Ready to speed up your billing?"
-        subtext="Join 100+ restaurants already running smarter. Setup takes less than a day."
-        ctaLabel="Book a Free Demo"
-        ctaTo="/contact"
-      />
     </main>
   );
 }
