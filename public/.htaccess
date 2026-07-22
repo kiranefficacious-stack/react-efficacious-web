@@ -2,11 +2,20 @@
   RewriteEngine On
   RewriteBase /
   Options -MultiViews
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_FILENAME} !-l
-  RewriteRule . /index.html [L]
+  
+  # Ignore files and directories
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d [OR]
+  RewriteCond %{REQUEST_FILENAME} -l
+  RewriteRule ^ - [L]
+
+  # Sub-apps SPA routing
+  RewriteRule ^products/esmart-restaurant/ /products/esmart-restaurant/index.html [L]
+  RewriteRule ^products/esmart-school/ /products/esmart-school/index.html [L]
+  RewriteRule ^products/emart-queue/ /products/emart-queue/index.html [L]
+
+  # Main React App SPA routing
+  RewriteRule ^ /index.html [L]
 </IfModule>
 
 # Fallback for servers where mod_rewrite is disabled
