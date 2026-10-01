@@ -56,10 +56,14 @@ const Contact: React.FC = () => {
                         <MapPin className="w-6 h-6" />
                     </div>
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Our Office</h3>
-                    <p 
-                        className="text-slate-600 dark:text-slate-300 leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: contact.office.replace(/, /g, ', <br />') }}
-                    />
+                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {(contact.office || '').split(', ').map((segment, idx, arr) => (
+                            <React.Fragment key={idx}>
+                                {segment}
+                                {idx < arr.length - 1 && <>, <br /></>}
+                            </React.Fragment>
+                        ))}
+                    </p>
                 </div>
              </div>
 

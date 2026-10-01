@@ -124,7 +124,14 @@ function App() {
                           </ProtectedRoute>
                         } 
                       />
-                      <Route path="/direct-chat/:sessionId" element={<DirectChat />} />
+                      <Route 
+                        path="/direct-chat/:sessionId" 
+                        element={
+                          <ProtectedRoute>
+                            <DirectChat />
+                          </ProtectedRoute>
+                        } 
+                      />
                       <Route path="/" element={<Home />} />
                       <Route path="/about" element={<About />} />
                       <Route path="/services" element={<Services />} />

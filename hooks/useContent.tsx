@@ -15,13 +15,19 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     // Check if DB is empty and seed it if needed
     getDocs(collRef).then((snapshot) => {
       if (snapshot.empty) {
-        console.log("Firestore empty, seeding initial data...");
+        if (import.meta.env.DEV) {
+          console.log("Firestore empty, seeding initial data...");
+        }
         for (const [key, value] of Object.entries(initialData)) {
-            setDoc(doc(db, 'websiteContent', key), { data: value }).catch(e => console.error("Could not seed doc:", e));
+            setDoc(doc(db, 'websiteContent', key), { data: value }).catch(e => {
+              if (import.meta.env.DEV) console.error("Could not seed doc:", e);
+            });
         }
       }
     }).catch((error) => {
-      console.warn("Firestore getDocs permission issue or network error:", error);
+      if (import.meta.env.DEV) {
+        console.warn("Firestore getDocs permission issue or network error:", error);
+      }
     });
 
     const unsubscribe = onSnapshot(collRef, (snapshot) => {

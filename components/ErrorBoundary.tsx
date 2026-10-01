@@ -11,17 +11,17 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
-  }
+  public props!: Props;
+  public state: State = { hasError: false };
 
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
+    if (import.meta.env.DEV) {
+      console.error("Uncaught error:", error, errorInfo);
+    }
   }
 
   public render() {
@@ -33,11 +33,13 @@ class ErrorBoundary extends Component<Props, State> {
             </div>
             <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Something went wrong</h2>
             <p className="text-slate-600 dark:text-slate-400 mb-4 max-w-md mx-auto">
-                We encountered an error while rendering this section.
+                We encountered an unexpected error while loading this content. Please try refreshing the page.
             </p>
-            <code className="bg-slate-100 dark:bg-black p-3 rounded text-xs text-red-600 dark:text-red-400 font-mono block max-w-full overflow-auto">
-                {this.state.error?.message}
-            </code>
+            {import.meta.env.DEV && this.state.error?.message && (
+              <code className="bg-slate-100 dark:bg-black p-3 rounded text-xs text-red-600 dark:text-red-400 font-mono block max-w-full overflow-auto">
+                  {this.state.error?.message}
+              </code>
+            )}
             <button 
                 onClick={() => window.location.reload()}
                 className="mt-6 px-6 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg font-medium hover:opacity-90 transition-opacity"

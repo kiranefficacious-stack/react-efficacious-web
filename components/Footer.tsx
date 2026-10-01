@@ -65,6 +65,8 @@ const Footer: React.FC = () => {
               <li><Link to="/products/esmart-school" className="hover:text-[#E99400]">eSmart School</Link></li>
               <li><Link to="/products/esmart-health" className="hover:text-[#E99400]">eSmart Health</Link></li>
               <li><Link to="/products/esmart-restaurant" className="hover:text-[#E99400]">eSmart Restaurant</Link></li>
+              <li><Link to="/products/emart-queue" className="hover:text-[#E99400]">eSmart Queue</Link></li>
+              <li><Link to="/products/esmart-track" className="hover:text-[#E99400]">eSmart Track</Link></li>
               <li><Link to="/services" className="hover:text-[#E99400]">All Services</Link></li>
             </ul>
           </div>
@@ -94,9 +96,9 @@ const Footer: React.FC = () => {
             © {new Date().getFullYear()} Efficacious India Limited. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-slate-400 hover:text-[#E99400] transition-colors"><Linkedin size={20} /></a>
-            <a href="#" className="text-slate-400 hover:text-[#E99400] transition-colors"><Twitter size={20} /></a>
-            <a href="#" className="text-slate-400 hover:text-[#E99400] transition-colors"><Facebook size={20} /></a>
+            <a href={contact.socials.linkedin || "#"} className="text-slate-400 hover:text-[#E99400] transition-colors" target="_blank" rel="noopener noreferrer"><Linkedin size={20} /></a>
+            <a href={contact.socials.twitter || "#"} className="text-slate-400 hover:text-[#E99400] transition-colors" target="_blank" rel="noopener noreferrer"><Twitter size={20} /></a>
+            <a href={contact.socials.facebook || "#"} className="text-slate-400 hover:text-[#E99400] transition-colors" target="_blank" rel="noopener noreferrer"><Facebook size={20} /></a>
           </div>
         </div>
       </div>

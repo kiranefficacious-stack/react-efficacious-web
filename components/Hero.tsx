@@ -18,7 +18,8 @@ const slides = [
     color: "from-brand-500 via-brand-600 to-purple-600",
     icon: <Shield className="w-5 h-5" />,
     btnText: "Explore Schools",
-    href: "/products/esmart-school",
+    href: "/products/esmart-school/",
+    isExternal: false,
     blobColor: "rgba(14,165,233,0.4)",
     appStoreLink: "#",
     playStoreLink: "#",
@@ -32,7 +33,8 @@ const slides = [
     color: "from-rose-500 via-pink-600 to-orange-500",
     icon: <Utensils className="w-5 h-5" />,
     btnText: "See Features",
-    href: "/products/esmart-restaurant",
+    href: "/products/esmart-restaurant/",
+    isExternal: false,
     blobColor: "rgba(244,63,94,0.4)",
     appStoreLink: "#",
     playStoreLink: "#",
@@ -46,21 +48,23 @@ const slides = [
     color: "from-emerald-500 via-teal-600 to-cyan-500",
     icon: <Activity className="w-5 h-5" />,
     btnText: "Learn More",
-    href: "/products/esmart-health",
+    href: "https://www.e-smarthealth.co.in/",
+    isExternal: true,
     blobColor: "rgba(16,185,129,0.4)",
     appStoreLink: "#",
-    playStoreLink: "#",
+    playStoreLink: "https://play.google.com/store/apps/details?id=com.efficacious.esmarthealth&hl=en",
   },
   {
     id: 3,
     tag: "Queue Management",
-    title: "Semart Queue",
+    title: "eSmart Queue",
     highlight: "End Queues. Start Living.",
     description: "Book time slots at banks, hospitals, post offices, temples & more from your phone. Enter with a QR code — zero waiting in line.",
     color: "from-violet-500 via-fuchsia-600 to-pink-500",
     icon: <Timer className="w-5 h-5" />,
     btnText: "Explore App",
-    href: "/products/emart-queue",
+    href: "/products/emart-queue/",
+    isExternal: false,
     blobColor: "rgba(124,58,237,0.4)",
     appStoreLink: "#",
     playStoreLink: "#",
@@ -102,7 +106,10 @@ const Hero: React.FC = () => {
 
   // Find dynamic product data for the current slide
   const activeSlideData = slides[currentSlide];
-  const matchingProduct = data.products.find((p: any) => p.href === activeSlideData.href);
+  // Normalize trailing slash for matching
+  const matchingProduct = data.products.find((p: any) => 
+    p.href.replace(/\/$/, '') === activeSlideData.href.replace(/\/$/, '')
+  );
   
   const activeContent = {
     ...activeSlideData,
@@ -186,20 +193,29 @@ const Hero: React.FC = () => {
             <div className="flex flex-col items-center lg:items-start gap-8">
                 {/* Main Action Buttons */}
                 <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5 w-full">
- <Link 
-  to={activeContent.href} 
-  className="group w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#E48100] to-[#EF4444] text-white rounded-xl font-bold shadow-lg shadow-[#E48100]/30 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 overflow-hidden relative"
->
-  {/* Content remains z-10 to sit above the hover effect */}
-  <span className="relative z-10">{activeContent.btnText}</span>
-  <ArrowRight size={20} className="relative z-10 transition-transform group-hover:translate-x-1" />
-  
-  {/* Hover Layer: Reverses the gradient for a "shimmer" effect on hover */}
-  <div className="absolute inset-0 bg-gradient-to-r from-[#EF4444] to-[#E48100] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-  
-  {/* Premium highlight line at the top */}
-  <div className="absolute inset-x-0 top-0 h-px bg-white/30 z-20" />
-</Link>
+ {activeContent.isExternal ? (
+  <a 
+    href={activeContent.href}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="group w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#E48100] to-[#EF4444] text-white rounded-xl font-bold shadow-lg shadow-[#E48100]/30 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 overflow-hidden relative"
+  >
+    <span className="relative z-10">{activeContent.btnText}</span>
+    <ArrowRight size={20} className="relative z-10 transition-transform group-hover:translate-x-1" />
+    <div className="absolute inset-0 bg-gradient-to-r from-[#EF4444] to-[#E48100] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    <div className="absolute inset-x-0 top-0 h-px bg-white/30 z-20" />
+  </a>
+) : (
+  <Link 
+    to={activeContent.href} 
+    className="group w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#E48100] to-[#EF4444] text-white rounded-xl font-bold shadow-lg shadow-[#E48100]/30 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 overflow-hidden relative"
+  >
+    <span className="relative z-10">{activeContent.btnText}</span>
+    <ArrowRight size={20} className="relative z-10 transition-transform group-hover:translate-x-1" />
+    <div className="absolute inset-0 bg-gradient-to-r from-[#EF4444] to-[#E48100] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    <div className="absolute inset-x-0 top-0 h-px bg-white/30 z-20" />
+  </Link>
+)}
                   
                   {/* Navigation Pills */}
                   <div className="flex items-center gap-4 bg-white/50 dark:bg-slate-800/50 p-2 rounded-full backdrop-blur-sm border border-slate-200 dark:border-slate-700">
@@ -234,23 +250,29 @@ const Hero: React.FC = () => {
                   </div>
                 </div>
 
-                {/* App Store Buttons */}
-                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
-                    <a href={activeContent.appStoreLink || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2.5 rounded-xl hover:scale-105 transition-transform shadow-lg border border-transparent dark:border-slate-200">
-                        <AppleIcon className="w-6 h-6 fill-current mb-1" />
-                        <div className="flex flex-col items-start leading-none">
-                            <span className="text-[9px] font-medium opacity-80 mb-0.5">Download on the</span>
-                            <span className="text-sm font-bold tracking-tight">App Store</span>
-                        </div>
-                    </a>
-                    <a href={activeContent.playStoreLink || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2.5 rounded-xl hover:scale-105 transition-transform shadow-lg border border-transparent dark:border-slate-200">
-                        <PlayStoreIcon className="w-5 h-5 fill-current mb-0.5" />
-                        <div className="flex flex-col items-start leading-none">
-                            <span className="text-[9px] font-medium opacity-80 mb-0.5">GET IT ON</span>
-                            <span className="text-sm font-bold tracking-tight">Google Play</span>
-                        </div>
-                    </a>
-                </div>
+                {/* App Store Buttons — only render if real URL exists */}
+                {(activeContent.appStoreLink !== '#' || activeContent.playStoreLink !== '#') && (
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
+                    {activeContent.appStoreLink && activeContent.appStoreLink !== '#' && (
+                      <a href={activeContent.appStoreLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2.5 rounded-xl hover:scale-105 transition-transform shadow-lg border border-transparent dark:border-slate-200">
+                          <AppleIcon className="w-6 h-6 fill-current mb-1" />
+                          <div className="flex flex-col items-start leading-none">
+                              <span className="text-[9px] font-medium opacity-80 mb-0.5">Download on the</span>
+                              <span className="text-sm font-bold tracking-tight">App Store</span>
+                          </div>
+                      </a>
+                    )}
+                    {activeContent.playStoreLink && activeContent.playStoreLink !== '#' && (
+                      <a href={activeContent.playStoreLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2.5 rounded-xl hover:scale-105 transition-transform shadow-lg border border-transparent dark:border-slate-200">
+                          <PlayStoreIcon className="w-5 h-5 fill-current mb-0.5" />
+                          <div className="flex flex-col items-start leading-none">
+                              <span className="text-[9px] font-medium opacity-80 mb-0.5">GET IT ON</span>
+                              <span className="text-sm font-bold tracking-tight">Google Play</span>
+                          </div>
+                      </a>
+                    )}
+                  </div>
+                )}
             </div>
           </div>
 

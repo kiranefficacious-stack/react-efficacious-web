@@ -1,22 +1,48 @@
+# ==============================================================================
+# Security Headers
+# ==============================================================================
+<IfModule mod_headers.c>
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-XSS-Protection "1; mode=block"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(self)"
+  Header unset X-Powered-By
+</IfModule>
+
+# ==============================================================================
+# SPA Routing & Rewrites (Apache 2.2 / 2.4 & LiteSpeed Compatible)
+# ==============================================================================
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
-  Options -MultiViews
-  
-  # Ignore files and directories
+
+  # Allow real files and directories to pass through directly
   RewriteCond %{REQUEST_FILENAME} -f [OR]
-  RewriteCond %{REQUEST_FILENAME} -d [OR]
-  RewriteCond %{REQUEST_FILENAME} -l
+  RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Sub-apps SPA routing
-  RewriteRule ^products/esmart-restaurant/ /products/esmart-restaurant/index.html [L]
-  RewriteRule ^products/esmart-school/ /products/esmart-school/index.html [L]
-  RewriteRule ^products/emart-queue/ /products/emart-queue/index.html [L]
+  # Sub-app SPA routing (handles client-side routes like /products/esmart-restaurant/about)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^products/esmart-restaurant(/.*)?$ /products/esmart-restaurant/index.html [L]
 
-  # Main React App SPA routing
-  RewriteRule ^ /index.html [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^products/esmart-school(/.*)?$ /products/esmart-school/index.html [L]
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^products/emart-queue(/.*)?$ /products/emart-queue/index.html [L]
+
+  # Main React App SPA routing — redirect all virtual paths (/admin, /login, /about, etc.) to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^.*$ /index.html [L]
 </IfModule>
 
-# Fallback for servers where mod_rewrite is disabled
+# Ensure directory requests serve index.html
+DirectoryIndex index.html
+
+# Fallback for servers where mod_rewrite is not permitted
 ErrorDocument 404 /index.html

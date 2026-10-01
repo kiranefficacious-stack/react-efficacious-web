@@ -32,6 +32,7 @@ const NewsList: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               
               {/* Filters */}
+              {newsItems.length > 0 && categories.length > 1 && (
               <div className="flex flex-wrap justify-center gap-3 mb-16">
                   {categories.map((cat) => (
                       <button
@@ -47,6 +48,7 @@ const NewsList: React.FC = () => {
                       </button>
                   ))}
               </div>
+              )}
 
               {/* Grid */}
               <motion.div 
@@ -104,8 +106,12 @@ const NewsList: React.FC = () => {
                       ))}
                   </AnimatePresence>
               </motion.div>
-              {filteredNews.length === 0 && (
-                  <div className="text-center py-20 text-slate-500">
+              {newsItems.length === 0 ? (
+                  <div className="text-center py-20 text-slate-500 dark:text-slate-400">
+                      No news or announcements available at the moment.
+                  </div>
+              ) : filteredNews.length === 0 && (
+                  <div className="text-center py-20 text-slate-500 dark:text-slate-400">
                       No news available in this category.
                   </div>
               )}

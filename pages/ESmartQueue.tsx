@@ -326,33 +326,39 @@ const ESmartQueue: React.FC = () => {
                 <strong className="text-white font-semibold">emart Queue</strong> is a mobile app that lets users book time slots at banks, post offices, hospitals, temples & more — enter with a QR code, zero waiting in line.
               </p>
 
-              {/* App Store Badges */}
-              <div className="flex flex-wrap flex-row items-center justify-center lg:justify-start gap-4 mb-10">
-                <a 
-                  href={product?.appStoreLink || '#'} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-start gap-4 bg-white text-slate-900 px-6 py-3.5 rounded-xl hover:scale-105 active:scale-95 transition-transform shadow-xl w-[210px]"
-                >
-                  <svg className="w-7 h-7 fill-current mb-0.5 shrink-0" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 52.3-11.4 69.5-34.3z"/></svg>
-                  <div className="flex flex-col items-start leading-none text-left">
-                    <span className="text-[10px] font-semibold text-slate-500 mb-1">Download on the</span>
-                    <span className="text-base font-bold tracking-tight leading-none">App Store</span>
-                  </div>
-                </a>
-                <a 
-                  href={product?.playStoreLink || '#'} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-start gap-4 bg-white text-slate-900 px-6 py-3.5 rounded-xl hover:scale-105 active:scale-95 transition-transform shadow-xl w-[210px]"
-                >
-                  <svg className="w-6 h-6 fill-current mb-0.5 shrink-0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>
-                  <div className="flex flex-col items-start leading-none text-left">
-                    <span className="text-[10px] font-semibold text-slate-500 mb-1">GET IT ON</span>
-                    <span className="text-base font-bold tracking-tight leading-none">Google Play</span>
-                  </div>
-                </a>
-              </div>
+              {/* App Store Badges — only shown when real URL exists */}
+              {((product?.appStoreLink && product?.appStoreLink !== '#') || (product?.playStoreLink && product?.playStoreLink !== '#')) && (
+                <div className="flex flex-wrap flex-row items-center justify-center lg:justify-start gap-4 mb-10">
+                  {product?.appStoreLink && product.appStoreLink !== '#' && (
+                    <a 
+                      href={product.appStoreLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-start gap-4 bg-white text-slate-900 px-6 py-3.5 rounded-xl hover:scale-105 active:scale-95 transition-transform shadow-xl w-[210px]"
+                    >
+                      <svg className="w-7 h-7 fill-current mb-0.5 shrink-0" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 52.3-11.4 69.5-34.3z"/></svg>
+                      <div className="flex flex-col items-start leading-none text-left">
+                        <span className="text-[10px] font-semibold text-slate-500 mb-1">Download on the</span>
+                        <span className="text-base font-bold tracking-tight leading-none">App Store</span>
+                      </div>
+                    </a>
+                  )}
+                  {product?.playStoreLink && product.playStoreLink !== '#' && (
+                    <a 
+                      href={product.playStoreLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-start gap-4 bg-white text-slate-900 px-6 py-3.5 rounded-xl hover:scale-105 active:scale-95 transition-transform shadow-xl w-[210px]"
+                    >
+                      <svg className="w-6 h-6 fill-current mb-0.5 shrink-0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>
+                      <div className="flex flex-col items-start leading-none text-left">
+                        <span className="text-[10px] font-semibold text-slate-500 mb-1">GET IT ON</span>
+                        <span className="text-base font-bold tracking-tight leading-none">Google Play</span>
+                      </div>
+                    </a>
+                  )}
+                </div>
+              )}
 
               {/* Stats */}
               <div className="flex flex-wrap gap-6 justify-center lg:justify-start">
@@ -542,24 +548,30 @@ const ESmartQueue: React.FC = () => {
                   </div>
                 ))}
               </div>
-              <div className="flex gap-3 mt-7">
-                <a 
-                  href={product?.appStoreLink || '#'} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 bg-white text-violet-700 px-4 py-2.5 rounded-xl text-xs font-bold shadow-lg hover:scale-105 transition-transform"
-                >
-                  <Smartphone size={14} /> App Store
-                </a>
-                <a 
-                  href={product?.playStoreLink || '#'} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 bg-white text-violet-700 px-4 py-2.5 rounded-xl text-xs font-bold shadow-lg hover:scale-105 transition-transform"
-                >
-                  <Play size={14} className="fill-violet-700" /> Google Play
-                </a>
-              </div>
+              {((product?.appStoreLink && product?.appStoreLink !== '#') || (product?.playStoreLink && product?.playStoreLink !== '#')) && (
+                <div className="flex gap-3 mt-7">
+                  {product?.appStoreLink && product.appStoreLink !== '#' && (
+                    <a 
+                      href={product.appStoreLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 bg-white text-violet-700 px-4 py-2.5 rounded-xl text-xs font-bold shadow-lg hover:scale-105 transition-transform"
+                    >
+                      <Smartphone size={14} /> App Store
+                    </a>
+                  )}
+                  {product?.playStoreLink && product.playStoreLink !== '#' && (
+                    <a 
+                      href={product.playStoreLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 bg-white text-violet-700 px-4 py-2.5 rounded-xl text-xs font-bold shadow-lg hover:scale-105 transition-transform"
+                    >
+                      <Play size={14} className="fill-violet-700" /> Google Play
+                    </a>
+                  )}
+                </div>
+              )}
             </motion.div>
 
             {/* For Providers */}
@@ -722,32 +734,38 @@ const ESmartQueue: React.FC = () => {
             </div>
             <h2 className="text-4xl font-extrabold text-white mb-4">Ready to ditch the queue?</h2>
             <p className="text-slate-300 text-lg mb-8">Download emart Queue today and never waste another minute standing in line.</p>
-            <div className="flex flex-wrap flex-row items-center justify-center gap-4">
-              <a 
-                href={product?.appStoreLink || '#'} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center justify-start gap-4 bg-white text-slate-900 px-6 py-3.5 rounded-xl hover:scale-105 active:scale-95 transition-transform shadow-xl w-[210px]"
-              >
-                <svg className="w-7 h-7 fill-current mb-0.5 shrink-0" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 52.3-11.4 69.5-34.3z"/></svg>
-                <div className="flex flex-col items-start leading-none text-left">
-                  <span className="text-[10px] font-semibold text-slate-500 mb-1">Download on the</span>
-                  <span className="text-base font-bold tracking-tight leading-none">App Store</span>
-                </div>
-              </a>
-              <a 
-                href={product?.playStoreLink || '#'} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center justify-start gap-4 bg-white text-slate-900 px-6 py-3.5 rounded-xl hover:scale-105 active:scale-95 transition-transform shadow-xl w-[210px]"
-              >
-                <svg className="w-6 h-6 fill-current mb-0.5 shrink-0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>
-                <div className="flex flex-col items-start leading-none text-left">
-                  <span className="text-[10px] font-semibold text-slate-500 mb-1">GET IT ON</span>
-                  <span className="text-base font-bold tracking-tight leading-none">Google Play</span>
-                </div>
-              </a>
-            </div>
+            {((product?.appStoreLink && product?.appStoreLink !== '#') || (product?.playStoreLink && product?.playStoreLink !== '#')) && (
+              <div className="flex flex-wrap flex-row items-center justify-center gap-4">
+                {product?.appStoreLink && product.appStoreLink !== '#' && (
+                  <a 
+                    href={product.appStoreLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-start gap-4 bg-white text-slate-900 px-6 py-3.5 rounded-xl hover:scale-105 active:scale-95 transition-transform shadow-xl w-[210px]"
+                  >
+                    <svg className="w-7 h-7 fill-current mb-0.5 shrink-0" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 52.3-11.4 69.5-34.3z"/></svg>
+                    <div className="flex flex-col items-start leading-none text-left">
+                      <span className="text-[10px] font-semibold text-slate-500 mb-1">Download on the</span>
+                      <span className="text-base font-bold tracking-tight leading-none">App Store</span>
+                    </div>
+                  </a>
+                )}
+                {product?.playStoreLink && product.playStoreLink !== '#' && (
+                  <a 
+                    href={product.playStoreLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-start gap-4 bg-white text-slate-900 px-6 py-3.5 rounded-xl hover:scale-105 active:scale-95 transition-transform shadow-xl w-[210px]"
+                  >
+                    <svg className="w-6 h-6 fill-current mb-0.5 shrink-0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>
+                    <div className="flex flex-col items-start leading-none text-left">
+                      <span className="text-[10px] font-semibold text-slate-500 mb-1">GET IT ON</span>
+                      <span className="text-base font-bold tracking-tight leading-none">Google Play</span>
+                    </div>
+                  </a>
+                )}
+              </div>
+            )}
           </motion.div>
         </div>
       </section>

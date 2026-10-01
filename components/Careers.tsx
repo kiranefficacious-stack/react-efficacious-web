@@ -85,7 +85,9 @@ const Careers: React.FC = () => {
                 'YOUR_PUBLIC_KEY'.includes('YOUR_PUBLIC_KEY');
 
             if (hasPlaceholders) {
-                console.log("EmailJS Simulation Mode ACTIVE: Replace placeholders in Careers.tsx to send real emails.");
+                if (import.meta.env.DEV) {
+                    console.log("EmailJS Simulation Mode ACTIVE: Replace placeholders in Careers.tsx to send real emails.");
+                }
                 await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
                 setSubmitStatus('success');
                 setFormData({ name: '', email: '', mobile: '', address: '', position: '', message: '' });

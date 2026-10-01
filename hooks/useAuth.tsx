@@ -38,9 +38,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await signInWithEmailAndPassword(auth, email, password);
       return { success: true };
     } catch (error: any) {
+      const code = error?.code;
+      let userFriendlyMessage = 'Invalid email or password. Please verify your credentials.';
+      if (code === 'auth/too-many-requests') {
+        userFriendlyMessage = 'Too many failed attempts. Please wait a few minutes before trying again.';
+      } else if (code === 'auth/network-request-failed') {
+        userFriendlyMessage = 'Network connection error. Please check your internet connection.';
+      } else if (code === 'auth/user-disabled') {
+        userFriendlyMessage = 'This account has been disabled. Please contact the administrator.';
+      }
       return {
         success: false,
-        error: error.message || 'Invalid email or password'
+        error: userFriendlyMessage
       };
     }
   };
@@ -49,7 +58,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
         await signOut(auth);
     } catch(e) {
-        console.error("Error signing out", e);
+        if (import.meta.env.DEV) {
+            console.error("Error signing out", e);
+        }
     }
   };
 

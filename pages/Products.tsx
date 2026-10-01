@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import PageHero from '../components/PageHero';
 import ProductsComponent from '../components/Products';
 import KeyBenefits from '../components/KeyBenefits';

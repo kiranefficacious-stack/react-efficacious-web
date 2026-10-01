@@ -20,6 +20,8 @@ export default defineConfig(({ mode }) => {
               if (req.url && !req.url.includes('.')) {
                 if (req.url.startsWith('/products/esmart-restaurant')) {
                   req.url = '/products/esmart-restaurant/index.html';
+                } else if (req.url.startsWith('/products/esmart-school')) {
+                  req.url = '/products/esmart-school/index.html';
                 } else if (req.url.startsWith('/products/emart-queue')) {
                   req.url = '/products/emart-queue/index.html';
                 }

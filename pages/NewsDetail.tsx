@@ -31,10 +31,10 @@ const NewsDetail: React.FC = () => {
       <section className="pt-32 pb-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <button 
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/news')}
                 className="mb-8 flex items-center text-slate-500 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400 transition-colors text-sm font-semibold"
             >
-                <ArrowLeft size={16} className="mr-2" /> Back to Home
+                <ArrowLeft size={16} className="mr-2" /> Back to News
             </button>
 
             <motion.div

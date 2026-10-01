@@ -59,7 +59,9 @@ const ChatWidget: React.FC = () => {
         // Setup KB
         getDocs(collection(db, 'chatbot_qa')).then(snap => {
             setQaDb(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        }).catch(e => console.log('Could not load QA'));
+        }).catch(e => {
+            if (import.meta.env.DEV) console.log('Could not load QA', e);
+        });
     }
   }, [isOpen, phase]);
 
@@ -358,7 +360,9 @@ const ChatWidget: React.FC = () => {
                    })
                });
             } catch (e) {
-               console.log("EmailJS check failed", e);
+               if (import.meta.env.DEV) {
+                   console.log("EmailJS check failed", e);
+               }
             }
 
             setPhase('live_support');

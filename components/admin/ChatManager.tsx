@@ -31,7 +31,9 @@ const ChatManager: React.FC = () => {
   const playNotificationSound = () => {
     try {
         const audio = new Audio('/notification.mp3'); 
-        audio.play().catch(e => console.log('Audio disabled by browser policy'));
+        audio.play().catch(e => {
+          if (import.meta.env.DEV) console.log('Audio disabled by browser policy', e);
+        });
     } catch (e) {}
   };
   const prevSessionsLengthRef = useRef(0);

@@ -59,12 +59,22 @@ const WhoWeAre: React.FC = () => {
                         {whoWeAre.title}
                     </h2>
                     <div className="space-y-6 text-slate-600 dark:text-slate-300 text-lg leading-relaxed">
-                        {whoWeAre.content.map((p: string, i: number) => (
-                            <p key={i} dangerouslySetInnerHTML={{ 
-                                __html: p.replace(/Mr\. Kamal Agrawal|ERP solutions for schools and education institutes/g, 
-                                match => `<span class="${match === 'Mr. Kamal Agrawal' ? 'font-semibold text-slate-900 dark:text-white' : 'text-[#E48100] font-semibold'}">${match}</span>`) 
-                            }} />
-                        ))}
+                        {whoWeAre.content.map((p: string, i: number) => {
+                            const parts = (p || '').split(/(Mr\. Kamal Agrawal|ERP solutions for schools and education institutes)/g);
+                            return (
+                                <p key={i}>
+                                    {parts.map((part, index) => {
+                                        if (part === 'Mr. Kamal Agrawal') {
+                                            return <span key={index} className="font-semibold text-slate-900 dark:text-white">{part}</span>;
+                                        }
+                                        if (part === 'ERP solutions for schools and education institutes') {
+                                            return <span key={index} className="text-[#E48100] font-semibold">{part}</span>;
+                                        }
+                                        return part;
+                                    })}
+                                </p>
+                            );
+                        })}
                     </div>
                 </motion.div>
             </div>

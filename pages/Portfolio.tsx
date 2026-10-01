@@ -87,6 +87,23 @@ const Portfolio: React.FC = () => {
                 className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
               >
                   <AnimatePresence>
+                      {filteredProjects.length === 0 && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="col-span-full text-center py-24"
+                        >
+                          <p className="text-5xl mb-4">🔍</p>
+                          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No projects found</h3>
+                          <p className="text-slate-500 dark:text-slate-400 mb-6">No projects match the selected category.</p>
+                          <button
+                            onClick={() => setActiveFilter('All')}
+                            className="px-6 py-2.5 rounded-full bg-brand-600 text-white text-sm font-bold hover:bg-brand-500 transition-colors"
+                          >
+                            Show All Projects
+                          </button>
+                        </motion.div>
+                      )}
                       {filteredProjects.map((project) => (
                           <motion.div
                             layout

@@ -10,7 +10,11 @@ import { useNavigate } from 'react-router-dom';
 const NewsEvents: React.FC = () => {
   const { data } = useContent();
   const navigate = useNavigate();
-  const newsItems = data.news;
+  const newsItems = data?.news || [];
+
+  if (!newsItems || newsItems.length === 0) {
+    return null;
+  }
 
   return (
     <section id="news" className="py-24 bg-slate-50 dark:bg-slate-900/50 relative border-b border-slate-200 dark:border-slate-800">

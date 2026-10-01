@@ -8,30 +8,7 @@ export interface User {
 const AUTH_STORAGE_KEY = 'efficacious_admin_auth';
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-// Default credentials for development
-const DEFAULT_CREDENTIALS = {
-  email: 'admin@efficacious.co.in',
-  password: 'Admin@123'
-};
 
-// Simple hash function for password (development only - NOT for production!)
-const simpleHash = (str: string): string => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash;
-  }
-  return hash.toString(36);
-};
-
-// Validate credentials
-export const validateCredentials = (email: string, password: string): boolean => {
-  return (
-    email === DEFAULT_CREDENTIALS.email &&
-    simpleHash(password) === simpleHash(DEFAULT_CREDENTIALS.password)
-  );
-};
 
 // Login user and store session
 export const loginUser = (email: string): User => {

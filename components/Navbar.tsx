@@ -325,17 +325,29 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                                 className="overflow-hidden pl-4 mt-2 space-y-3 border-l-2 border-slate-100 dark:border-slate-800 ml-1"
                             >
                                 {link.dropdownItems.map((item, idx) => (
-                                    <Link
+                                    item.newTab ? (
+                                      <a
                                         key={idx}
-                                        to={item.href}
-                                        target={(item as any).newTab ? "_blank" : undefined}
-                                        rel={(item as any).newTab ? "noopener noreferrer" : undefined}
+                                        href={item.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         onClick={handleLinkClick}
                                         className="flex items-center gap-3 py-2 text-slate-600 dark:text-slate-400 hover:text-[#E48100] dark:hover:text-[#E48100]"
-                                    >
+                                      >
                                         <div className="text-[#E48100]">{item.icon}</div>
                                         <span className="text-sm font-medium">{item.name}</span>
-                                    </Link>
+                                      </a>
+                                    ) : (
+                                      <Link
+                                        key={idx}
+                                        to={item.href}
+                                        onClick={handleLinkClick}
+                                        className="flex items-center gap-3 py-2 text-slate-600 dark:text-slate-400 hover:text-[#E48100] dark:hover:text-[#E48100]"
+                                      >
+                                        <div className="text-[#E48100]">{item.icon}</div>
+                                        <span className="text-sm font-medium">{item.name}</span>
+                                      </Link>
+                                    )
                                 ))}
                             </motion.div>
                         )}

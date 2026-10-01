@@ -8,17 +8,8 @@ import { useContent } from '../hooks/useContent';
 const Blogs: React.FC = () => {
   const { data } = useContent();
   const navigate = useNavigate();
-  const blogs: any[] = data.blogs || [];
-  const featuredPost = blogs[0] || {
-    id: 1,
-    title: "The Future of AI in Education",
-    excerpt: "Discover how AI-driven analytics...",
-    category: "EdTech",
-    author: "Kamal Agrawal",
-    date: "Mar 20, 2024",
-    readTime: "8 min read",
-    image: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=1200",
-  };
+  const blogs: any[] = data?.blogs || [];
+  const featuredPost = blogs.length > 0 ? blogs[0] : null;
 
   const [searchQuery, setSearchQuery]   = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
@@ -75,6 +66,7 @@ const Blogs: React.FC = () => {
                   </p>
 
                   {/* Search Bar */}
+                  {blogs.length > 0 && (
                   <div className="relative max-w-xl mx-auto group">
                       <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition-opacity duration-300" />
                       <div className="relative flex items-center bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-2 transition-all group-focus-within:bg-white/20 group-focus-within:border-white/40 shadow-xl">
@@ -91,6 +83,7 @@ const Blogs: React.FC = () => {
                           </button>
                       </div>
                   </div>
+                  )}
               </motion.div>
           </div>
       </section>
@@ -98,6 +91,7 @@ const Blogs: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 -mt-24 relative z-20">
           
           {/* Featured Article */}
+          {featuredPost && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -146,8 +140,10 @@ const Blogs: React.FC = () => {
                   </div>
               </div>
           </motion.div>
+          )}
 
           {/* Filters / Categories */}
+          {blogs.length > 0 && categories.length > 1 && (
           <div className="flex flex-wrap gap-2 mb-12">
               {categories.map((cat, i) => (
                   <button
@@ -163,9 +159,16 @@ const Blogs: React.FC = () => {
                   </button>
               ))}
           </div>
+          )}
 
           {/* Blog Grid */}
-          {filtered.length === 0 ? (
+          {blogs.length === 0 ? (
+              <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 p-8 shadow-sm">
+                  <p className="text-4xl mb-3">📝</p>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No articles available</h3>
+                  <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">We haven't published any articles yet. Please check back later for fresh updates and insights.</p>
+              </div>
+          ) : filtered.length === 0 ? (
               <div className="text-center py-24">
                   <p className="text-5xl mb-4">🔍</p>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No articles found</h3>
