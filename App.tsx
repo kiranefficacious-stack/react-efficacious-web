@@ -46,6 +46,7 @@ import Admin from './pages/Admin';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 
 const ESmartSchoolRedirect = () => {
   useEffect(() => {
@@ -161,6 +162,9 @@ function App() {
                       <Route path="/careers" element={<Careers />} />
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                      <Route path="/terms-of-service" element={<TermsOfService />} />
+                      <Route path="/terms-and-conditions" element={<TermsOfService />} />
+                      <Route path="/terms" element={<TermsOfService />} />
                     </Routes>
                   </ErrorBoundary>
                 </main>

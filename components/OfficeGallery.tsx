@@ -69,7 +69,7 @@ const FounderCard: React.FC<{ member: any; index: number }> = ({ member, index }
 
           {/* LinkedIn CTA */}
           <a
-            href="https://www.linkedin.com/in/kamalagrawal"
+            href={member.linkedin || "https://www.linkedin.com/in/kamal-agrawal-9414182a/"}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full
@@ -170,6 +170,17 @@ const MemberCard: React.FC<{ member: any; index: number }> = ({ member, index })
                   border-slate-100 dark:border-slate-700/50 pt-4 w-full">
       {member.description}
     </p>
+    {member.linkedin && (
+      <a
+        href={member.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#0A66C2] hover:text-[#0854a5] hover:underline transition-colors"
+      >
+        <Linkedin size={13} />
+        LinkedIn Profile
+      </a>
+    )}
   </motion.div>
 );
 

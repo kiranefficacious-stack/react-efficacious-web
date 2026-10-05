@@ -11,6 +11,7 @@ interface TeamForm {
   role: string;
   image: string;
   description: string;
+  linkedin?: string;
 }
 
 const TeamManager: React.FC = () => {
@@ -23,7 +24,8 @@ const TeamManager: React.FC = () => {
     name: '',
     role: '',
     image: '',
-    description: ''
+    description: '',
+    linkedin: ''
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [deleteDialog, setDeleteDialog] = useState<{
@@ -61,7 +63,8 @@ const TeamManager: React.FC = () => {
         name: member.name,
         role: member.role,
         image: member.image,
-        description: member.description
+        description: member.description,
+        linkedin: member.linkedin || ''
       });
     } else {
       setEditingId(null);
@@ -69,7 +72,8 @@ const TeamManager: React.FC = () => {
         name: '',
         role: '',
         image: '',
-        description: ''
+        description: '',
+        linkedin: ''
       });
     }
     setErrors({});
@@ -83,7 +87,8 @@ const TeamManager: React.FC = () => {
       name: '',
       role: '',
       image: '',
-      description: ''
+      description: '',
+      linkedin: ''
     });
     setErrors({});
   };
@@ -248,6 +253,14 @@ const TeamManager: React.FC = () => {
                 error={errors.image}
                 required
                 placeholder="https://images.unsplash.com/... or /images/..."
+              />
+              
+              <FormField
+                label="LinkedIn Profile URL (Optional)"
+                name="linkedin"
+                value={formData.linkedin || ''}
+                onChange={(value) => setFormData({ ...formData, linkedin: value })}
+                placeholder="https://www.linkedin.com/in/username"
               />
               
               {formData.image && (

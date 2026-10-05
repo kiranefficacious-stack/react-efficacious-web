@@ -125,7 +125,8 @@ export const initialData = {
       name: "Kamal Agrawal", 
       role: "Founder & CEO", 
       image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=250",
-      description: "Visionary leader and core finance professional with a passion for innovative IT solutions."
+      description: "Visionary leader and core finance professional with a passion for innovative IT solutions.",
+      linkedin: "https://www.linkedin.com/in/kamal-agrawal-9414182a/"
     },
     { 
       id: 2,

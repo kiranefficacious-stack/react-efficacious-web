@@ -192,10 +192,11 @@ const ChatWidget: React.FC = () => {
             matchedAnswer = `We've developed some powerful industry-specific products and projects like ${products}. You can find download links and feature lists on our Products page. Are you interested in an ERP solution?`;
         } else if (text.includes('ceo') || text.includes('founder') || text.includes('director') || text.includes('owner') || text.includes('kamal')) {
             const founder = siteData?.team?.find((m:any) => m.role.toLowerCase().includes('founder') || m.role.toLowerCase().includes('ceo'));
+            const linkedinUrl = founder?.linkedin || "https://www.linkedin.com/in/kamal-agrawal-9414182a/";
             if (founder) {
-                matchedAnswer = `Our Founder & CEO is ${founder.name}. ${founder.description} Is there anything specific you’d like to know about our team's background?`;
+                matchedAnswer = `Our Founder & CEO is ${founder.name}. ${founder.description} You can connect with him on LinkedIn at ${linkedinUrl}. Is there anything specific you’d like to know about our leadership?`;
             } else {
-                matchedAnswer = "Efficacious India Limited was founded by Kamal Agrawal. He's a visionary leader with a huge passion for innovative IT solutions. Can I help you with anything else about our leadership?";
+                matchedAnswer = `Efficacious India Limited was founded by Kamal Agrawal. He's a visionary leader with a huge passion for innovative IT solutions. You can connect with him on LinkedIn at ${linkedinUrl}. Can I help you with anything else?`;
             }
         } else if (text.includes('team') || text.includes('employee') || text.includes('developer')) {
             matchedAnswer = `Our fantastic team is made up of expert Developers (handling Flutter, .NET, iOS/Android), creative UI/UX specialists, and dedicated project managers. We work together to ensure smooth digital transformations for our clients! What kind of technical expertise are you looking for?`;

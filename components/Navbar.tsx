@@ -71,7 +71,11 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
     '/careers',
     '/contact',
     '/about',
-    '/blogs'
+    '/blogs',
+    '/privacy-policy',
+    '/terms-of-service',
+    '/terms-and-conditions',
+    '/terms'
   ];
   const isDarkHero = darkHeroRoutes.includes(location.pathname);
   
