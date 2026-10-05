@@ -56,13 +56,19 @@ const Contact: React.FC = () => {
                         <MapPin className="w-6 h-6" />
                     </div>
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Our Office</h3>
-                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                        {(contact.office || '').split(', ').map((segment, idx, arr) => (
-                            <React.Fragment key={idx}>
-                                {segment}
-                                {idx < arr.length - 1 && <>, <br /></>}
-                            </React.Fragment>
-                        ))}
+                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-sm sm:text-base whitespace-pre-line">
+                        {(() => {
+                            const addr = contact.office || '';
+                            if (addr.includes('\n')) return addr;
+                            const parts = addr.split(', ');
+                            if (parts.length > 4) {
+                                const line1 = parts.slice(0, 3).join(', ');
+                                const line2 = parts.slice(3, 6).join(', ');
+                                const line3 = parts.slice(6).join(', ');
+                                return [line1, line2, line3].filter(Boolean).join(',\n');
+                            }
+                            return addr;
+                        })()}
                     </p>
                 </div>
              </div>
