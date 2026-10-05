@@ -839,6 +839,60 @@ const PhoneMockup: React.FC<PhoneMockupProps> = ({ activeSlide }) => {
       </div>
     ),
 
+    // Screen 6: eSmart Queue
+    6: (
+      <div
+        key="queue-screen"
+        className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 relative font-sans"
+      >
+        <div className="bg-gradient-to-r from-violet-600 to-fuchsia-600 p-5 pt-10 rounded-b-[2rem] shadow-lg relative z-10 text-white">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-[10px] bg-white/20 px-2.5 py-0.5 rounded-full font-medium">Smart Queue Pass</span>
+            <span className="text-[10px] bg-emerald-400 text-slate-900 font-bold px-2 py-0.5 rounded-full">ACTIVE</span>
+          </div>
+          <h3 className="text-lg font-bold">Panvel City Bank</h3>
+          <p className="text-[11px] text-violet-100">Counter 3 • Cash &amp; Forex</p>
+        </div>
+
+        <div className="flex-1 p-3.5 -mt-2 overflow-y-auto space-y-3 pb-20">
+          {/* Active Token Card */}
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm text-center">
+            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Your Token Number</p>
+            <div className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600 my-1">
+              #B-42
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Est. Wait: 4 Mins (2 Ahead)
+            </div>
+          </div>
+
+          {/* QR Code Pass */}
+          <div className="bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-950/30 dark:to-fuchsia-950/30 p-3.5 rounded-2xl border border-violet-100 dark:border-violet-900/40 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-bold text-slate-900 dark:text-white">Express Entry QR</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">Scan at entrance scanner</p>
+            </div>
+            <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl p-1.5 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+              <QrCode size={32} className="text-violet-600 dark:text-violet-400" />
+            </div>
+          </div>
+
+          {/* Live Progress Bar */}
+          <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-100 dark:border-slate-800 space-y-2">
+            <div className="flex justify-between text-[11px] font-semibold">
+              <span className="text-slate-600 dark:text-slate-400">Current Serving</span>
+              <span className="text-violet-600 dark:text-violet-400 font-bold">#B-40</span>
+            </div>
+            <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div className="bg-gradient-to-r from-violet-500 to-fuchsia-500 h-full w-[85%] rounded-full" />
+            </div>
+          </div>
+        </div>
+        <BottomNav active={0} />
+      </div>
+    ),
+
     // --- E-SMART SCHOOL DEEP DIVE SCREENS (10-14) ---
     // (Previous screens remain unchanged, truncated for brevity in this response but kept in file)
     10: (
@@ -1202,18 +1256,15 @@ const PhoneMockup: React.FC<PhoneMockupProps> = ({ activeSlide }) => {
 
         {/* Screen Content */}
         <div className="w-full h-full bg-white dark:bg-slate-950 overflow-hidden relative">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeSlide}
-              className="w-full h-full"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.05 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-            >
-              {screens[activeSlide] || screens[0]}
-            </motion.div>
-          </AnimatePresence>
+          <motion.div
+            key={activeSlide}
+            className="w-full h-full"
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          >
+            {screens[activeSlide] || screens[0]}
+          </motion.div>
         </div>
 
         {/* Home Indicator */}

@@ -19,7 +19,7 @@ const LucideIcons: any = {
 
 const ESmartSchool: React.FC = () => {
   const { data } = useContent();
-  const product = data.products.find((p: any) => p.id === 1);
+  const product = data?.products?.find((p: any) => p.id === 1 || p.href?.includes('esmart-school'));
 
   if (!product) return null;
 

@@ -68,7 +68,7 @@ const modules = [
 
 const ESmartRestaurant: React.FC = () => {
   const { data } = useContent();
-  const product = data.products.find((p: any) => p.href === '/products/esmart-restaurant');
+  const product = data?.products?.find((p: any) => p.id === 3 || p.href?.replace(/\/$/, '') === '/products/esmart-restaurant');
 
   return (
     <div className="w-full bg-slate-50 dark:bg-dark-bg transition-colors duration-300">

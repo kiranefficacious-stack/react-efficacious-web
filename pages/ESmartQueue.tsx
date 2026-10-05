@@ -279,7 +279,7 @@ const ESmartQueue: React.FC = () => {
   const [activeScreen, setActiveScreen] = useState(0);
   const screens = [<ScreenHome />, <ScreenBooking />, <ScreenQR />];
   const { data } = useContent();
-  const product = data.products.find((p: any) => p.href === '/products/emart-queue');
+  const product = data?.products?.find((p: any) => p.id === 4 || p.href?.replace(/\/$/, '') === '/products/emart-queue');
 
   return (
     <div className="w-full bg-slate-50 dark:bg-dark-bg transition-colors duration-300">

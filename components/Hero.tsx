@@ -11,6 +11,7 @@ const motion = m as any;
 const slides = [
   {
     id: 0,
+    mockupId: 0,
     tag: "Education ERP",
     title: "eSmart School",
     highlight: "Safe, Secure & Easy",
@@ -21,11 +22,12 @@ const slides = [
     href: "/products/esmart-school/",
     isExternal: false,
     blobColor: "rgba(14,165,233,0.4)",
-    appStoreLink: "#",
-    playStoreLink: "#",
+    appStoreLink: "https://apps.apple.com/in/app/e-smart-school/id6448924052",
+    playStoreLink: "https://play.google.com/store/apps/details?id=net.esmarts.app.esmart&hl=en_IN",
   },
   {
     id: 1,
+    mockupId: 2,
     tag: "Hospitality",
     title: "eSmart Restaurant",
     highlight: "Smart Dining",
@@ -36,11 +38,12 @@ const slides = [
     href: "/products/esmart-restaurant/",
     isExternal: false,
     blobColor: "rgba(244,63,94,0.4)",
-    appStoreLink: "#",
-    playStoreLink: "#",
+    appStoreLink: "https://apps.apple.com/co/app/e-smart-restaurant/id6762969059?l=en-GB",
+    playStoreLink: "https://play.google.com/store/apps/details?id=com.efficacious.new_esmartrestaurant",
   },
   {
     id: 2,
+    mockupId: 3,
     tag: "Healthcare",
     title: "eSmart Health",
     highlight: "Patient Care First",
@@ -56,6 +59,7 @@ const slides = [
   },
   {
     id: 3,
+    mockupId: 6,
     tag: "Queue Management",
     title: "eSmart Queue",
     highlight: "End Queues. Start Living.",
@@ -67,7 +71,7 @@ const slides = [
     isExternal: false,
     blobColor: "rgba(124,58,237,0.4)",
     appStoreLink: "#",
-    playStoreLink: "#",
+    playStoreLink: "https://play.google.com/store/apps/details?id=com.efficacious.esmartqueue",
   },
 ];
 
@@ -86,15 +90,20 @@ const PlayStoreIcon = ({ className }: { className?: string }) => (
 
 const Hero: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const { data } = useContent();
 
-  // Auto-play slider with reset on interaction
+  // Auto-play slider with reset on interaction, pausing when backgrounded or hovered
   useEffect(() => {
+    if (isPaused) return;
+
     const timer = setInterval(() => {
+      if (document.hidden) return; // Prevent background tab animation desync
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 4000); // Reduced to 4 seconds
+    }, 4500);
+
     return () => clearInterval(timer);
-  }, [currentSlide]);
+  }, [isPaused, currentSlide]);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -107,20 +116,29 @@ const Hero: React.FC = () => {
   // Find dynamic product data for the current slide
   const activeSlideData = slides[currentSlide];
   // Normalize trailing slash for matching
-  const matchingProduct = data.products.find((p: any) => 
-    p.href.replace(/\/$/, '') === activeSlideData.href.replace(/\/$/, '')
+  const matchingProduct = data?.products?.find((p: any) => 
+    p.href?.replace(/\/$/, '') === activeSlideData.href.replace(/\/$/, '')
   );
   
   const activeContent = {
     ...activeSlideData,
-    appStoreLink: matchingProduct?.appStoreLink || activeSlideData.appStoreLink,
-    playStoreLink: matchingProduct?.playStoreLink || activeSlideData.playStoreLink
+    appStoreLink: (matchingProduct?.appStoreLink && matchingProduct.appStoreLink !== '#')
+      ? matchingProduct.appStoreLink
+      : activeSlideData.appStoreLink,
+    playStoreLink: (matchingProduct?.playStoreLink && matchingProduct.playStoreLink !== '#')
+      ? matchingProduct.playStoreLink
+      : activeSlideData.playStoreLink
   };
 
   const nextColor = slides[(currentSlide + 1) % slides.length]?.blobColor || slides[0].blobColor;
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center pt-28 pb-20 overflow-hidden bg-white dark:bg-dark-bg transition-colors duration-300">
+    <section 
+      id="home" 
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      className="relative min-h-screen flex items-center pt-28 pb-20 overflow-hidden bg-white dark:bg-dark-bg transition-colors duration-300"
+    >
       
       {/* Background Decor */}
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -156,38 +174,35 @@ const Hero: React.FC = () => {
           
           {/* Text Content Slider */}
           <div className="flex-1 text-center lg:text-left z-20 w-full min-h-[450px] flex flex-col justify-center">
-            <AnimatePresence mode="wait">
-                <motion.div 
-                    key={activeContent.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }} // Faster transition
-                    className="w-full"
+            <motion.div 
+                key={activeContent.id}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
+                className="w-full"
+            >
+                <div 
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-sm mb-8 mx-auto lg:mx-0"
                 >
-                    <motion.div 
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-sm mb-8 mx-auto lg:mx-0"
-                    >
-                        <span className="p-1 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-white">
-                            {activeContent.icon}
-                        </span>
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                            {activeContent.tag}
-                        </span>
-                    </motion.div>
-
-                    <h1 className="text-5xl lg:text-7xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.1] mb-6">
-                    {activeContent.title} <br className="hidden lg:block"/>
-                    <span className={`text-transparent bg-clip-text bg-gradient-to-r ${activeContent.color}`}>
-                        {activeContent.highlight}
+                    <span className="p-1 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-white">
+                        {activeContent.icon}
                     </span>
-                    </h1>
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                        {activeContent.tag}
+                    </span>
+                </div>
 
-                    <p className="text-lg lg:text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light">
-                        {activeContent.description}
-                    </p>
-                </motion.div>
-            </AnimatePresence>
+                <h1 className="text-5xl lg:text-7xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.1] mb-6">
+                {activeContent.title} <br className="hidden lg:block"/>
+                <span className={`text-transparent bg-clip-text bg-gradient-to-r ${activeContent.color}`}>
+                    {activeContent.highlight}
+                </span>
+                </h1>
+
+                <p className="text-lg lg:text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light">
+                    {activeContent.description}
+                </p>
+            </motion.div>
 
             {/* Controls */}
             <div className="flex flex-col items-center lg:items-start gap-8">
@@ -294,7 +309,7 @@ const Hero: React.FC = () => {
                 />
                 
                 {/* Render Phone Mockup */}
-                <PhoneMockup activeSlide={currentSlide} />
+                <PhoneMockup activeSlide={activeContent.mockupId ?? currentSlide} />
 
                 {/* Floating Status Badge */}
                 <motion.div 

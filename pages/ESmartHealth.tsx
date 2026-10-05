@@ -78,7 +78,7 @@ const modules = [
 
 const ESmartHealth: React.FC = () => {
   const { data } = useContent();
-  const product = data.products.find((p: any) => p.href === '/products/esmart-health');
+  const product = data?.products?.find((p: any) => p.id === 2 || p.href?.replace(/\/$/, '') === '/products/esmart-health' || p.href?.includes('e-smarthealth'));
 
   return (
     <div className="w-full bg-slate-50 dark:bg-dark-bg transition-colors duration-300">
