@@ -67,7 +67,6 @@ const Footer: React.FC = () => {
               <li><Link to="/products/esmart-health" className="hover:text-[#E99400]">eSmart Health</Link></li>
               <li><Link to="/products/esmart-restaurant" className="hover:text-[#E99400]">eSmart Restaurant</Link></li>
               <li><Link to="/products/emart-queue" className="hover:text-[#E99400]">eSmart Queue</Link></li>
-              <li><Link to="/products/esmart-track" className="hover:text-[#E99400]">eSmart Track</Link></li>
               <li><Link to="/services" className="hover:text-[#E99400]">All Services</Link></li>
             </ul>
           </div>

@@ -199,7 +199,7 @@ const TermsOfService: React.FC = () => {
             Unless otherwise expressly stated, all rights, title, and interest in and to the Services are owned by or licensed to <strong>Efficacious India Limited</strong>.
           </p>
           <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-            This includes, without limitation, proprietary software, source code, user interfaces, system architectures, graphics, branding, logos, trademarks, documentation, and product designs (including eSmart School, eSmart Restaurant, eSmart Health, eSmart Queue, and eSmart Track).
+            This includes, without limitation, proprietary software, source code, user interfaces, system architectures, graphics, branding, logos, trademarks, documentation, and product designs (including eSmart School, eSmart Restaurant, eSmart Health, and eSmart Queue).
           </p>
           <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300">
             These Terms grant you a limited, non-exclusive, non-transferable, and revocable right to access and use the Services as authorized. They do not transfer any intellectual property rights or ownership to you.

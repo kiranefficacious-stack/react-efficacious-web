@@ -10,7 +10,14 @@ const motion = m as any;
 
 const Products: React.FC = () => {
   const { data } = useContent();
-  const products = data.products.filter((p: any) => p.enabled);
+  const excludedTitles = ['esmart track', 'esmart society'];
+  const allProducts = [...(data.products || [])].filter((p: any) => !excludedTitles.includes(p.title?.toLowerCase()));
+  (initialData.products || []).forEach((initP: any) => {
+    if (!excludedTitles.includes(initP.title?.toLowerCase()) && !allProducts.some((p: any) => String(p.id) === String(initP.id) || p.title?.toLowerCase() === initP.title?.toLowerCase())) {
+      allProducts.push(initP);
+    }
+  });
+  const products = allProducts.filter((p: any) => p.enabled && !excludedTitles.includes(p.title?.toLowerCase()));
 
   return (
     <section id="products" className="py-32 bg-slate-50 dark:bg-dark-bg relative overflow-hidden">
@@ -62,8 +69,9 @@ const Products: React.FC = () => {
             const localProduct = (initialData.products as any[]).find(
               (lp: any) => String(lp.id) === String(product.id) || lp.title.toLowerCase() === product.title.toLowerCase()
             );
-            const href = localProduct ? localProduct.href : product.href;
-            const newTab = localProduct ? localProduct.newTab : (product.newTab || false);
+            const href = (product.href && product.href !== '/products/' ? product.href : localProduct?.href) || product.href || '/products';
+            const newTab = product.newTab !== undefined ? product.newTab : (localProduct?.newTab || false);
+            const isComingSoon = Boolean(product.comingSoon !== undefined ? product.comingSoon : (localProduct?.comingSoon ?? false));
 
             return (
               <motion.div
@@ -78,7 +86,9 @@ const Products: React.FC = () => {
                 <div className="absolute -inset-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700 rounded-[2rem] opacity-70 blur-sm group-hover:opacity-100 transition-opacity duration-500" />
                 <div className={`absolute -inset-[1px] bg-gradient-to-r ${product.gradient} rounded-[2rem] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500`} />
                 
-                <div className="relative h-full bg-white dark:bg-slate-900/90 backdrop-blur-xl rounded-[1.9rem] p-8 flex flex-col transition-transform duration-300">
+                <div className={`relative h-full bg-white dark:bg-slate-900/90 backdrop-blur-xl rounded-[1.9rem] p-8 flex flex-col transition-all duration-300 ${
+                  isComingSoon ? 'opacity-75 hover:opacity-100' : ''
+                }`}>
                   
                   {/* Icon Header */}
                   <div className="flex items-start justify-between mb-6">
@@ -94,9 +104,16 @@ const Products: React.FC = () => {
                   </div>
 
                   {/* Content */}
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-slate-900 group-hover:to-slate-700 dark:group-hover:from-white dark:group-hover:to-slate-300 transition-colors">
-                    {product.title}
-                  </h3>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-slate-900 group-hover:to-slate-700 dark:group-hover:from-white dark:group-hover:to-slate-300 transition-colors">
+                      {product.title}
+                      {isComingSoon && (
+                        <span className="ml-2 text-base font-normal text-slate-400 dark:text-slate-500">
+                          (Coming Soon)
+                        </span>
+                      )}
+                    </h3>
+                  </div>
                   
                   <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6 flex-grow">
                     {product.description}
@@ -111,7 +128,7 @@ const Products: React.FC = () => {
                           rel="noopener noreferrer"
                           className={`text-sm font-semibold ${product.textAccent} flex items-center gap-1 hover:gap-2 transition-all`}
                         >
-                            Explore Features
+                            {isComingSoon ? 'Coming Soon — Preview' : 'Explore Features'}
                             <ArrowRight size={14} />
                         </a>
                       ) : (
@@ -119,7 +136,7 @@ const Products: React.FC = () => {
                           to={href} 
                           className={`text-sm font-semibold ${product.textAccent} flex items-center gap-1 hover:gap-2 transition-all`}
                         >
-                            Explore Features
+                            {isComingSoon ? 'Coming Soon — Preview' : 'Explore Features'}
                             <ArrowRight size={14} />
                         </Link>
                       )}

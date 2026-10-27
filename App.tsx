@@ -35,11 +35,9 @@ import ITOutsourcing from './pages/ITOutsourcing';
 import KnowledgeProcessOptimization from './pages/KnowledgeProcessOptimization';
 import PVCCardPrinting from './pages/PVCCardPrinting';
 import ESmartSchool from './pages/ESmartSchool';
-import ESmartTrack from './pages/ESmartTrack';
 import ESmartRestaurant from './pages/ESmartRestaurant';
 import ESmartHealth from './pages/ESmartHealth';
 import ESmartTeam from './pages/ESmartTeam';
-import ESmartSociety from './pages/ESmartSociety';
 import ESmartQueue from './pages/ESmartQueue';
 import ChannelPartners from './pages/ChannelPartners';
 import Admin from './pages/Admin';
@@ -145,12 +143,12 @@ function App() {
                       <Route path="/services/pvc-card-printing" element={<PVCCardPrinting />} />
                       <Route path="/products" element={<Products />} />
                       <Route path="/products/esmart-school" element={<ESmartSchoolRedirect />} />
-                      <Route path="/products/esmart-track" element={<ESmartTrack />} />
+                      <Route path="/products/esmart-track" element={<Navigate to="/products" replace />} />
                       <Route path="/products/esmart-restaurant" element={<ESmartRestaurantRedirect />} />
                       <Route path="/products/esmart-health" element={<ESmartHealthRedirect />} />
                       <Route path="/products/emart-queue" element={<EMartQueueRedirect />} />
                       <Route path="/products/esmart-team" element={<ESmartTeam />} />
-                      <Route path="/products/esmart-society" element={<ESmartSociety />} />
+                      <Route path="/products/esmart-society" element={<Navigate to="/products" replace />} />
                       <Route path="/portfolio" element={<Portfolio />} />
                       <Route path="/portfolio/:id" element={<PortfolioDetail />} />
                       <Route path="/news" element={<NewsList />} />

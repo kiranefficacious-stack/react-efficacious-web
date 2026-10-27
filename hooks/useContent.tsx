@@ -41,7 +41,25 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
           // Deep merge the fetched data over the initialData.
           // This ensures that if the database is only partially seeded or missing entire documents (like contact/about),
           // top-level components outside the ErrorBoundary (like Footer) won't fatally crash.
-          setData({ ...initialData, ...newParsedData });
+          const mergedData: any = { ...initialData, ...newParsedData };
+          if (newParsedData.products && Array.isArray(newParsedData.products)) {
+            mergedData.products = newParsedData.products.map((p: any) => {
+              const initP = (initialData.products as any[]).find(
+                (ip: any) => String(ip.id) === String(p.id) || ip.title?.toLowerCase() === p.title?.toLowerCase()
+              );
+              return {
+                ...initP,
+                ...p,
+                appStoreLink: (p.appStoreLink && p.appStoreLink !== '#') 
+                  ? p.appStoreLink 
+                  : (initP?.appStoreLink && initP?.appStoreLink !== '#' ? initP.appStoreLink : ''),
+                playStoreLink: (p.playStoreLink && p.playStoreLink !== '#') 
+                  ? p.playStoreLink 
+                  : (initP?.playStoreLink && initP?.playStoreLink !== '#' ? initP.playStoreLink : ''),
+              };
+            });
+          }
+          setData(mergedData);
       } else {
           setData(initialData);
       }
@@ -57,7 +75,12 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const updateContent = async (section: string, newValue: any) => {
-    await setDoc(doc(db, 'websiteContent', section), { data: newValue });
+    setData((prev: any) => ({ ...prev, [section]: newValue }));
+    try {
+      await setDoc(doc(db, 'websiteContent', section), { data: newValue });
+    } catch (e) {
+      console.error("Firestore updateContent error:", e);
+    }
   };
 
   const addItem = async (section: string, item: any) => {
@@ -122,7 +145,16 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
 export const useContent = () => {
   const context = useContext(ContentContext);
   if (!context) {
-    throw new Error('useContent must be used within a ContentProvider');
+    return {
+      data: initialData,
+      contentLoading: false,
+      updateContent: async () => {},
+      addItem: async () => {},
+      editItem: async () => {},
+      updateItem: async () => {},
+      deleteItem: async () => {},
+      toggleProduct: async () => {}
+    };
   }
   return context;
 };

@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import * as LucideIcons from 'lucide-react';
 import { 
   Menu, X, Sun, Moon, ChevronDown, 
-  Layout, Smartphone, Palette, Globe, TrendingUp, Brain, CreditCard,
+  Layout, Smartphone, Palette, Globe,
   Users, Briefcase
 } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
@@ -21,10 +21,7 @@ const serviceItems = [
   { name: 'Web Design & Development', href: '/services/web-development', icon: <Layout size={18} /> },
   { name: 'Mobile App Development', href: '/services/mobile-development', icon: <Smartphone size={18} /> },
   { name: 'Graphic Design', href: '/services/graphic-design', icon: <Palette size={18} /> },
-  { name: 'Management Consultant', href: '/services/management-consultant', icon: <TrendingUp size={18} /> },
   { name: 'IT Outsourcing Work', href: '/services/it-outsourcing', icon: <Globe size={18} /> },
-  { name: 'Knowledge Process Optimization', href: '/services/kpo', icon: <Brain size={18} /> },
-  { name: 'PVC Card Printing', href: '/services/pvc-card-printing', icon: <CreditCard size={18} /> },
 ];
 
 const partnerItems = [
@@ -42,17 +39,28 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
   const location = useLocation();
 
   // Build product dropdown dynamically from enabled products
-  const productItems = (data.products as any[])
-    .filter((p: any) => p.enabled)
+  const excludedTitles = ['esmart track', 'esmart society'];
+  const allProducts = [...(data.products || [])].filter((p: any) => !excludedTitles.includes(p.title?.toLowerCase()));
+  (initialData.products || []).forEach((initP: any) => {
+    if (!excludedTitles.includes(initP.title?.toLowerCase()) && !allProducts.some((p: any) => String(p.id) === String(initP.id) || p.title?.toLowerCase() === initP.title?.toLowerCase())) {
+      allProducts.push(initP);
+    }
+  });
+
+  const productItems = allProducts
+    .filter((p: any) => p.enabled && !excludedTitles.includes(p.title?.toLowerCase()))
     .map((p: any) => {
-      const localProduct = (initialData.products as any[]).find((lp: any) => String(lp.id) === String(p.id) || lp.title.toLowerCase() === p.title.toLowerCase());
-      const href = localProduct ? localProduct.href : p.href;
-      const newTab = localProduct ? localProduct.newTab : (p.newTab || false);
-      const IconComp = (LucideIcons as any)[p.iconName];
+      const localProduct = (initialData.products as any[]).find((lp: any) => String(lp.id) === String(p.id) || lp.title?.toLowerCase() === p.title?.toLowerCase());
+      const href = (p.href && p.href !== '/products/' ? p.href : localProduct?.href) || p.href || '/products';
+      const newTab = p.newTab !== undefined ? p.newTab : (localProduct?.newTab || false);
+      const isComingSoon = Boolean(p.comingSoon !== undefined ? p.comingSoon : (localProduct?.comingSoon ?? false));
+      const iconKey = p.iconName || localProduct?.iconName;
+      const IconComp = (LucideIcons as any)[iconKey];
       return {
         name: p.title,
         href: href,
         newTab: newTab,
+        comingSoon: isComingSoon,
         icon: IconComp ? <IconComp size={18} /> : null,
       };
     });
@@ -201,10 +209,32 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                               animate={{ opacity: 1, y: 0, scale: 1 }}
                               exit={{ opacity: 0, y: 15, scale: 0.95 }}
                               transition={{ duration: 0.2 }}
-                              className="absolute top-full left-0 mt-4 w-72 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+                              className="absolute top-full left-0 mt-2 before:absolute before:-top-2 before:left-0 before:w-full before:h-2 w-80 sm:w-96 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden"
                             >
                                 <div className="p-2 space-y-1">
                                     {link.dropdownItems.map((item: any, idx: number) => {
+                                      const itemClasses = `flex items-center gap-3 p-3 rounded-xl transition-all group border border-transparent hover:bg-[#E48100]/10 dark:hover:bg-slate-800 ${
+                                        item.comingSoon ? 'opacity-60 hover:opacity-100' : ''
+                                      }`;
+
+                                      const renderContent = () => (
+                                        <>
+                                          <div className="w-8 h-8 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm shrink-0 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-[#E48100]">
+                                            {item.icon}
+                                          </div>
+                                          <div className="flex items-center flex-1 min-w-0">
+                                            <span className="text-sm font-semibold truncate text-slate-700 dark:text-slate-200 group-hover:text-[#E48100] dark:group-hover:text-[#E48100]">
+                                              {item.name}
+                                              {item.comingSoon && (
+                                                <span className="ml-1.5 text-xs font-normal text-slate-400 dark:text-slate-500">
+                                                  (Coming Soon)
+                                                </span>
+                                              )}
+                                            </span>
+                                          </div>
+                                        </>
+                                      );
+
                                       return item.newTab ? (
                                         <a
                                           key={idx}
@@ -212,28 +242,18 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                                           target="_blank"
                                           rel="noopener noreferrer"
                                           onClick={() => setActiveDropdown(null)}
-                                          className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#E48100]/10 dark:hover:bg-slate-800 transition-colors group"
+                                          className={itemClasses}
                                         >
-                                            <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-[#E48100] group-hover:scale-110 transition-transform shadow-sm">
-                                              {item.icon}
-                                            </div>
-                                            <span className="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-[#E48100] dark:group-hover:text-[#E48100]">
-                                              {item.name}
-                                            </span>
+                                          {renderContent()}
                                         </a>
                                       ) : (
                                         <Link
                                           key={idx}
                                           to={item.href}
                                           onClick={() => setActiveDropdown(null)}
-                                          className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#E48100]/10 dark:hover:bg-slate-800 transition-colors group"
+                                          className={itemClasses}
                                         >
-                                            <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-[#E48100] group-hover:scale-110 transition-transform shadow-sm">
-                                              {item.icon}
-                                            </div>
-                                            <span className="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-[#E48100] dark:group-hover:text-[#E48100]">
-                                              {item.name}
-                                            </span>
+                                          {renderContent()}
                                         </Link>
                                       );
                                     })}
@@ -333,31 +353,47 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                                 exit={{ height: 0, opacity: 0 }}
                                 className="overflow-hidden pl-4 mt-2 space-y-3 border-l-2 border-slate-100 dark:border-slate-800 ml-1"
                             >
-                                {link.dropdownItems.map((item, idx) => (
-                                    item.newTab ? (
-                                      <a
-                                        key={idx}
-                                        href={item.href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        onClick={handleLinkClick}
-                                        className="flex items-center gap-3 py-2 text-slate-600 dark:text-slate-400 hover:text-[#E48100] dark:hover:text-[#E48100]"
-                                      >
-                                        <div className="text-[#E48100]">{item.icon}</div>
-                                        <span className="text-sm font-medium">{item.name}</span>
-                                      </a>
-                                    ) : (
-                                      <Link
-                                        key={idx}
-                                        to={item.href}
-                                        onClick={handleLinkClick}
-                                        className="flex items-center gap-3 py-2 text-slate-600 dark:text-slate-400 hover:text-[#E48100] dark:hover:text-[#E48100]"
-                                      >
-                                        <div className="text-[#E48100]">{item.icon}</div>
-                                        <span className="text-sm font-medium">{item.name}</span>
-                                      </Link>
-                                    )
-                                ))}
+                                {link.dropdownItems.map((item, idx) => {
+                                  const mobileContent = (
+                                    <div className="flex items-center gap-3 min-w-0">
+                                      <div className="text-[#E48100] shrink-0">{item.icon}</div>
+                                      <span className="text-sm font-medium truncate text-slate-700 dark:text-slate-300">
+                                        {item.name}
+                                        {item.comingSoon && (
+                                          <span className="ml-1.5 text-xs font-normal text-slate-400 dark:text-slate-500">
+                                            (Coming Soon)
+                                          </span>
+                                        )}
+                                      </span>
+                                    </div>
+                                  );
+
+                                  const mobileClasses = `flex items-center gap-3 py-2 text-slate-600 dark:text-slate-400 hover:text-[#E48100] dark:hover:text-[#E48100] transition-opacity ${
+                                    item.comingSoon ? "opacity-60 hover:opacity-100" : ""
+                                  }`;
+
+                                  return item.newTab ? (
+                                    <a
+                                      key={idx}
+                                      href={item.href}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      onClick={handleLinkClick}
+                                      className={mobileClasses}
+                                    >
+                                      {mobileContent}
+                                    </a>
+                                  ) : (
+                                    <Link
+                                      key={idx}
+                                      to={item.href}
+                                      onClick={handleLinkClick}
+                                      className={mobileClasses}
+                                    >
+                                      {mobileContent}
+                                    </Link>
+                                  );
+                                })}
                             </motion.div>
                         )}
                     </AnimatePresence>

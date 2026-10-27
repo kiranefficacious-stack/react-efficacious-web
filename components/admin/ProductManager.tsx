@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { useContent } from '../../hooks/useContent';
 import { useToast } from '../../hooks/useToast';
 import { validateForm, ValidationErrors } from '../../utils/validation';
+import { initialData } from '../../data';
 import FormField from './FormField';
 import ConfirmDialog from './ConfirmDialog';
-import { Eye, EyeOff, Edit2, X, Plus, Trash2, ExternalLink } from 'lucide-react';
+import { Eye, EyeOff, Edit2, X, Plus, Trash2, ExternalLink, Clock } from 'lucide-react';
 
 // Adjusted interface to allow for either strings or objects as described in your error
 interface ProductForm {
@@ -13,6 +14,7 @@ interface ProductForm {
   description: string;
   iconName: string;
   enabled: boolean;
+  comingSoon: boolean;
   href: string;
   appStoreLink: string;
   playStoreLink: string;
@@ -31,6 +33,7 @@ const ProductManager: React.FC = () => {
     description: '',
     iconName: 'Box',
     enabled: true,
+    comingSoon: false,
     href: '',
     appStoreLink: '',
     playStoreLink: '',
@@ -87,6 +90,18 @@ const ProductManager: React.FC = () => {
     setConfirmAction(null);
   };
 
+  const handleToggleComingSoon = (product: any) => {
+    const isNowComingSoon = !product.comingSoon;
+    const updatedProducts = (data.products || []).map((p: any) =>
+      String(p.id) === String(product.id) ? { ...p, comingSoon: isNowComingSoon } : p
+    );
+    updateContent('products', updatedProducts);
+    showToast(
+      'success',
+      `"${product.title}" is now ${isNowComingSoon ? 'marked as Coming Soon' : 'set to Active'}!`
+    );
+  };
+
   const handleAddProduct = () => {
     setEditingId(null);
     setFormData({
@@ -94,6 +109,7 @@ const ProductManager: React.FC = () => {
       description: '',
       iconName: 'Box',
       enabled: false,
+      comingSoon: false,
       href: '/products/',
       appStoreLink: '',
       playStoreLink: '',
@@ -107,17 +123,28 @@ const ProductManager: React.FC = () => {
   };
 
   const handleOpenForm = (product: any) => {
+    const localProduct = (initialData.products as any[]).find(
+      (lp: any) => String(lp.id) === String(product.id) || lp.title?.toLowerCase() === product.title?.toLowerCase()
+    );
+    const resolvedAppStoreLink = (product.appStoreLink && product.appStoreLink !== '#')
+      ? product.appStoreLink
+      : (localProduct?.appStoreLink && localProduct?.appStoreLink !== '#' ? localProduct.appStoreLink : '');
+    const resolvedPlayStoreLink = (product.playStoreLink && product.playStoreLink !== '#')
+      ? product.playStoreLink
+      : (localProduct?.playStoreLink && localProduct?.playStoreLink !== '#' ? localProduct.playStoreLink : '');
+
     setEditingId(product.id);
     setFormData({
       title: product.title,
       description: product.description,
-      iconName: product.iconName || 'Box',
+      iconName: product.iconName || localProduct?.iconName || 'Box',
       enabled: product.enabled,
-      href: product.href || '/products/',
-      appStoreLink: product.appStoreLink || '',
-      playStoreLink: product.playStoreLink || '',
-      features: product.features || [],
-      modules: product.modules || []
+      comingSoon: Boolean(product.comingSoon),
+      href: (product.href && product.href !== '/products/' ? product.href : localProduct?.href) || product.href || '/products/',
+      appStoreLink: resolvedAppStoreLink,
+      playStoreLink: resolvedPlayStoreLink,
+      features: product.features || localProduct?.features || [],
+      modules: product.modules || localProduct?.modules || []
     });
     setErrors({});
     setNewFeature('');
@@ -165,8 +192,8 @@ const ProductManager: React.FC = () => {
 
     if (editingId !== null) {
       // Edit existing product
-      const updatedProducts = data.products.map((p: any) =>
-        p.id === editingId ? { ...p, ...formData } : p
+      const updatedProducts = (data.products || []).map((p: any) =>
+        String(p.id) === String(editingId) ? { ...p, ...formData, comingSoon: Boolean(formData.comingSoon) } : p
       );
       updateContent('products', updatedProducts);
       showToast('success', 'Product updated successfully!');
@@ -233,8 +260,8 @@ const ProductManager: React.FC = () => {
               {product.description}
             </p>
 
-            {/* Status Badge */}
-            <div className="mb-4">
+            {/* Status & Coming Soon Badges */}
+            <div className="flex flex-wrap items-center gap-2 mb-4">
               <span
                 className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
                   product.enabled
@@ -244,6 +271,20 @@ const ProductManager: React.FC = () => {
               >
                 {product.enabled ? '● Active' : '○ Inactive'}
               </span>
+
+              <button
+                type="button"
+                onClick={() => handleToggleComingSoon(product)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all shadow-sm ${
+                  product.comingSoon
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-orange-500/20'
+                    : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-slate-600'
+                }`}
+                title="Click to toggle Coming Soon status"
+              >
+                <Clock size={12} />
+                {product.comingSoon ? 'Coming Soon: ON' : 'Coming Soon: OFF'}
+              </button>
             </div>
 
             {/* Features Preview */}
@@ -274,9 +315,9 @@ const ProductManager: React.FC = () => {
             )}
 
             {/* Store Link Badges */}
-            {(product.appStoreLink || product.playStoreLink) && (
+            {((product.appStoreLink && product.appStoreLink !== '#') || (product.playStoreLink && product.playStoreLink !== '#')) && (
               <div className="flex flex-wrap gap-2 mb-3">
-                {product.appStoreLink && (
+                {product.appStoreLink && product.appStoreLink !== '#' && (
                   <a
                     href={product.appStoreLink}
                     target="_blank"
@@ -287,7 +328,7 @@ const ProductManager: React.FC = () => {
                     App Store
                   </a>
                 )}
-                {product.playStoreLink && (
+                {product.playStoreLink && product.playStoreLink !== '#' && (
                   <a
                     href={product.playStoreLink}
                     target="_blank"
@@ -404,14 +445,25 @@ const ProductManager: React.FC = () => {
                 />
               </div>
 
-              <FormField
-                label="Enabled"
-                name="enabled"
-                type="checkbox"
-                value={formData.enabled}
-                onChange={(value) => setFormData({ ...formData, enabled: value })}
-                helpText="Toggle product visibility on the public site"
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  label="Enabled"
+                  name="enabled"
+                  type="checkbox"
+                  value={formData.enabled}
+                  onChange={(value) => setFormData({ ...formData, enabled: value })}
+                  helpText="Toggle product visibility on the public site"
+                />
+
+                <FormField
+                  label="Coming Soon"
+                  name="comingSoon"
+                  type="checkbox"
+                  value={formData.comingSoon}
+                  onChange={(value) => setFormData({ ...formData, comingSoon: value })}
+                  helpText="Highlight in popup with 'Coming Soon' button"
+                />
+              </div>
 
               {/* Features Management */}
               <div>
