@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useTheme } from './hooks/useTheme';
 
 import LoadingScreen from './components/LoadingScreen';
@@ -165,6 +165,7 @@ function App() {
                       <Route path="/terms-of-service" element={<TermsOfService />} />
                       <Route path="/terms-and-conditions" element={<TermsOfService />} />
                       <Route path="/terms" element={<TermsOfService />} />
+                      <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                   </ErrorBoundary>
                 </main>
