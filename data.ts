@@ -195,6 +195,82 @@ export const initialData = {
       tags: ["GPS Tracking", "Fleet Mgmt", "Logistics"]
     }
   ],
+  testimonials: [
+    {
+      id: 1,
+      name: "Rajesh Gupta",
+      role: "Principal",
+      company: "St. Xavier's International School",
+      text: "Efficacious transformed how we manage our school. The parent communication module and real-time attendance alone have saved us countless administrative hours.",
+      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400",
+      rating: 5
+    },
+    {
+      id: 2,
+      name: "Dr. Anjali Desai",
+      role: "Medical Director",
+      company: "City Care Super-Specialty Hospital",
+      text: "The eSmart Health system is intuitive and robust. It seamlessly scaled as our patient flow doubled. Billing, appointments, and medical records are all unified.",
+      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=400",
+      rating: 5
+    },
+    {
+      id: 3,
+      name: "Vikram Malhotra",
+      role: "Managing Director",
+      company: "Urban Spice Hospitality Group",
+      text: "eSmart Restaurant streamlined our kitchen operations and table billing. Order turnaround time reduced by 35% and customer satisfaction is at an all-time high.",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400",
+      rating: 5
+    },
+    {
+      id: 4,
+      name: "Pooja Sharma",
+      role: "Chief Operating Officer",
+      company: "Apex Citizen Services & Banking",
+      text: "eSmart Queue replaced chaotic physical waiting lines with smart mobile slot bookings and contactless QR entry. Our branches are calmer and far more productive.",
+      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400",
+      rating: 5
+    }
+  ],
+  clients: [
+    {
+      id: 1,
+      name: "St. Xavier's School",
+      category: "Education",
+      logo: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&q=80&w=300"
+    },
+    {
+      id: 2,
+      name: "City Care Hospital",
+      category: "Healthcare",
+      logo: "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=300"
+    },
+    {
+      id: 3,
+      name: "EuroSchool International",
+      category: "Education",
+      logo: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&q=80&w=300"
+    },
+    {
+      id: 4,
+      name: "Urban Spice Group",
+      category: "Hospitality",
+      logo: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=300"
+    },
+    {
+      id: 5,
+      name: "Apex Financial",
+      category: "Banking & Public Sector",
+      logo: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=300"
+    },
+    {
+      id: 6,
+      name: "Apollo Healthcare Network",
+      category: "Healthcare",
+      logo: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=300"
+    }
+  ],
   blogs: [
     {
       id: 1,

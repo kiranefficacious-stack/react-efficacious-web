@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageHero from '../components/PageHero';
 import Contact from '../components/Contact';
-import { ArrowRight, Quote } from 'lucide-react';
+import { ArrowRight, Quote, Star, Building2 } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
+import { initialData } from '../data';
 import { useNavigate } from 'react-router-dom';
 
 const Portfolio: React.FC = () => {
@@ -31,20 +32,13 @@ const Portfolio: React.FC = () => {
     { label: "Support", value: "24/7" },
   ];
 
-  const testimonials = [
-    {
-        name: "Rajesh Gupta",
-        role: "Principal, St. Xavier's School",
-        text: "Efficacious transformed how we manage our school. The parent communication module alone has saved us countless hours.",
-        image: "https://randomuser.me/api/portraits/men/32.jpg"
-    },
-    {
-        name: "Dr. Anjali Desai",
-        role: "Director, City Care Hospital",
-        text: "The HMS is intuitive and robust. It handled our patient load increase seamlessly. Support team is excellent.",
-        image: "https://randomuser.me/api/portraits/women/44.jpg"
-    }
-  ];
+  const testimonials = (data?.testimonials && Array.isArray(data.testimonials) && data.testimonials.length > 0)
+    ? data.testimonials
+    : (initialData.testimonials || []);
+
+  const clients = (data?.clients && Array.isArray(data.clients) && data.clients.length > 0)
+    ? data.clients
+    : (initialData.clients || []);
 
   const filteredProjects = activeFilter === "All" 
     ? projects 
@@ -189,38 +183,98 @@ const Portfolio: React.FC = () => {
       <section className="py-24 bg-white dark:bg-slate-900 overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-16">
-                  <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Trusted by Industry Leaders</h2>
-                  <p className="text-slate-600 dark:text-slate-400">Our solutions empower organizations of all sizes.</p>
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-xs font-bold uppercase tracking-wider mb-4 border border-brand-200/50 dark:border-brand-800/50">
+                    Client Success Stories
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-4">
+                    Trusted by Industry Leaders
+                  </h2>
+                  <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+                    Discover how our ERP and automation solutions empower schools, healthcare networks, and enterprises across India.
+                  </p>
               </div>
 
-              {/* Testimonial Cards */}
+              {/* Dynamic Testimonial Cards */}
               <div className="grid md:grid-cols-2 gap-8 mb-20">
-                  {testimonials.map((t, i) => (
-                      <div key={i} className="bg-slate-50 dark:bg-slate-800 p-8 rounded-3xl relative">
-                          <Quote className="absolute top-8 right-8 text-slate-200 dark:text-slate-700 w-12 h-12" />
-                          <div className="relative z-10">
-                              <p className="text-lg text-slate-700 dark:text-slate-300 italic mb-6 leading-relaxed">
+                  {testimonials.map((t: any, i: number) => (
+                      <motion.div 
+                        key={t.id || i}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: i * 0.1, duration: 0.5 }}
+                        className="bg-slate-50 dark:bg-slate-800/90 border border-slate-100 dark:border-slate-700/60 p-8 rounded-3xl relative shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                      >
+                          <Quote className="absolute top-8 right-8 text-brand-500/10 dark:text-brand-400/10 w-16 h-16 pointer-events-none" />
+                          <div className="relative z-10 mb-6">
+                              {/* Star Rating */}
+                              <div className="flex items-center gap-1 mb-4">
+                                {[...Array(t.rating || 5)].map((_, starIdx) => (
+                                  <Star key={starIdx} size={16} className="fill-amber-400 text-amber-400" />
+                                ))}
+                              </div>
+                              <p className="text-base sm:text-lg text-slate-700 dark:text-slate-300 italic leading-relaxed">
                                   "{t.text}"
                               </p>
-                              <div className="flex items-center gap-4">
-                                  <img src={t.image} alt={t.name} className="w-12 h-12 rounded-full border-2 border-white dark:border-slate-600" />
-                                  <div>
-                                      <h4 className="font-bold text-slate-900 dark:text-white">{t.name}</h4>
-                                      <p className="text-sm text-slate-500 dark:text-slate-400">{t.role}</p>
-                                  </div>
+                          </div>
+
+                          <div className="flex items-center gap-4 pt-4 border-t border-slate-200/60 dark:border-slate-700/60 relative z-10">
+                              <img 
+                                src={t.image} 
+                                alt={t.name} 
+                                className="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-slate-600 shadow-md shrink-0" 
+                                onError={(e: any) => {
+                                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=0D8ABC&color=fff`;
+                                }}
+                              />
+                              <div>
+                                  <h4 className="font-bold text-slate-900 dark:text-white text-base">{t.name}</h4>
+                                  <p className="text-xs font-semibold text-brand-600 dark:text-brand-400">{t.role}</p>
+                                  {t.company && (
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{t.company}</p>
+                                  )}
                               </div>
                           </div>
-                      </div>
+                      </motion.div>
                   ))}
               </div>
 
-              {/* Simple Client Logo Placeholder Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-                  {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="h-20 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center">
-                          <span className="font-black text-xl text-slate-300 dark:text-slate-600">CLIENT LOGO</span>
-                      </div>
-                  ))}
+              {/* Dynamic Client Images / Logos Grid */}
+              <div className="pt-8 border-t border-slate-100 dark:border-slate-800">
+                  <div className="text-center mb-8">
+                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                      Partnered with leading institutions & enterprises
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+                      {clients.map((c: any, i: number) => (
+                          <motion.div
+                            key={c.id || i}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: i * 0.05, duration: 0.4 }}
+                            className="group relative bg-slate-50/80 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+                          >
+                              <div className="w-14 h-14 rounded-xl overflow-hidden mb-2.5 bg-white dark:bg-slate-700/80 p-1 border border-slate-100 dark:border-slate-600 shadow-inner flex items-center justify-center">
+                                  <img 
+                                    src={c.logo} 
+                                    alt={c.name} 
+                                    className="w-full h-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
+                                    onError={(e: any) => {
+                                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=random&color=fff`;
+                                    }}
+                                  />
+                              </div>
+                              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 line-clamp-1 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                                {c.name}
+                              </span>
+                              <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-0.5">
+                                {c.category}
+                              </span>
+                          </motion.div>
+                      ))}
+                  </div>
               </div>
           </div>
       </section>
