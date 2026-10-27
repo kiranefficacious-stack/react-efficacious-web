@@ -7,6 +7,8 @@ import {
   Cpu, Cloud, Monitor, Layout, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import Contact from '../components/Contact';
+import { useContent } from '../hooks/useContent';
+import { useNavigate } from 'react-router-dom';
 
 // --- CUSTOM ANIMATION COMPONENTS (Mobile Focused) ---
 
@@ -513,6 +515,8 @@ const features = [
 ];
 
 const MobileDevelopment: React.FC = () => {
+  const { data } = useContent();
+  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
 
   // Auto-play the process slider
@@ -568,9 +572,11 @@ const MobileDevelopment: React.FC = () => {
                         <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors shadow-lg shadow-brand-500/30 flex items-center justify-center gap-2">
                             Start Your Project <ArrowRight size={20} />
                         </button>
-                        <button className="px-8 py-4 bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                            View Portfolio
-                        </button>
+                        {data?.portfolio && data.portfolio.length > 0 && (
+                          <button onClick={() => navigate('/portfolio')} className="px-8 py-4 bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                              View Portfolio
+                          </button>
+                        )}
                     </div>
                 </motion.div>
 
@@ -834,9 +840,11 @@ const MobileDevelopment: React.FC = () => {
                     <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="w-full sm:w-auto bg-white text-blue-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 transition-colors shadow-lg active:scale-95">
                         Get a Free Quote
                     </button>
-                    <button className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-lg border border-white/30 hover:bg-white/10 text-white transition-colors">
-                        Our Portfolio
-                    </button>
+                    {data?.portfolio && data.portfolio.length > 0 && (
+                      <button onClick={() => navigate('/portfolio')} className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-lg border border-white/30 hover:bg-white/10 text-white transition-colors">
+                          Our Portfolio
+                      </button>
+                    )}
                 </div>
             </motion.div>
         </div>

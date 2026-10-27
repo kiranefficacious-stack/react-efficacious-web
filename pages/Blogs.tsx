@@ -6,9 +6,20 @@ import { Calendar, User, ArrowRight, Clock, Search, Sparkles } from 'lucide-reac
 import { useContent } from '../hooks/useContent';
 
 const Blogs: React.FC = () => {
-  const { data } = useContent();
+  const { data, contentLoading } = useContent();
   const navigate = useNavigate();
   const blogs: any[] = data?.blogs || [];
+
+  React.useEffect(() => {
+    if (!contentLoading && blogs.length === 0) {
+      navigate('/', { replace: true });
+    }
+  }, [contentLoading, blogs, navigate]);
+
+  if (!contentLoading && blogs.length === 0) {
+    return null;
+  }
+
   const featuredPost = blogs.length > 0 ? blogs[0] : null;
 
   const [searchQuery, setSearchQuery]   = useState('');

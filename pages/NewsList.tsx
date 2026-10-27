@@ -7,9 +7,20 @@ import { useContent } from '../hooks/useContent';
 import { useNavigate } from 'react-router-dom';
 
 const NewsList: React.FC = () => {
-  const { data } = useContent();
+  const { data, contentLoading } = useContent();
   const navigate = useNavigate();
-  const newsItems = data.news || [];
+  const newsItems = data?.news || [];
+
+  React.useEffect(() => {
+    if (!contentLoading && newsItems.length === 0) {
+      navigate('/', { replace: true });
+    }
+  }, [contentLoading, newsItems, navigate]);
+
+  if (!contentLoading && newsItems.length === 0) {
+    return null;
+  }
+
   const [activeFilter, setActiveFilter] = useState("All");
 
   const categories = ["All", ...new Set(newsItems.map((n: any) => n.category))];

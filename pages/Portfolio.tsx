@@ -7,9 +7,20 @@ import { useContent } from '../hooks/useContent';
 import { useNavigate } from 'react-router-dom';
 
 const Portfolio: React.FC = () => {
-  const { data } = useContent();
+  const { data, contentLoading } = useContent();
   const navigate = useNavigate();
-  const projects = data.portfolio || [];
+  const projects = data?.portfolio || [];
+
+  React.useEffect(() => {
+    if (!contentLoading && projects.length === 0) {
+      navigate('/', { replace: true });
+    }
+  }, [contentLoading, projects, navigate]);
+
+  if (!contentLoading && projects.length === 0) {
+    return null;
+  }
+
   const [activeFilter, setActiveFilter] = useState("All");
 
   const categories = ["All", ...new Set(projects.map((p: any) => p.category))];

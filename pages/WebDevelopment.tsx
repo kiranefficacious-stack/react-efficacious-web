@@ -7,6 +7,8 @@ import {
   Monitor, Database, Server, Terminal
 } from 'lucide-react';
 import Contact from '../components/Contact';
+import { useContent } from '../hooks/useContent';
+import { useNavigate } from 'react-router-dom';
 
 // --- CUSTOM ANIMATION COMPONENTS ---
 
@@ -423,6 +425,8 @@ const features = [
 ];
 
 const WebDevelopment: React.FC = () => {
+  const { data } = useContent();
+  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
 
   // Auto-play the process slider with longer delay (8s)
@@ -653,9 +657,11 @@ const WebDevelopment: React.FC = () => {
                     <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="w-full sm:w-auto bg-white text-brand-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-50 transition-colors shadow-lg active:scale-95">
                         Start Your Project
                     </button>
-                    <button className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-lg border border-white/30 hover:bg-white/10 text-white transition-colors">
-                        View Portfolio
-                    </button>
+                    {data?.portfolio && data.portfolio.length > 0 && (
+                      <button onClick={() => navigate('/portfolio')} className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-lg border border-white/30 hover:bg-white/10 text-white transition-colors">
+                          View Portfolio
+                      </button>
+                    )}
                 </div>
             </motion.div>
         </div>

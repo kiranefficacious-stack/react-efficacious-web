@@ -213,13 +213,25 @@ const ChatWidget: React.FC = () => {
             const partnerCount = siteData?.partners?.items?.length || 'multiple';
             matchedAnswer = `We're proud to work with ${partnerCount} trusted channel partners across India. We're always open to expanding our network. Would you like me to connect you with our partnership team?`;
         } else if (text.includes('news') || text.includes('update') || text.includes('event')) {
-            const latestNews = siteData?.news?.[0]?.title || 'innovations';
-            matchedAnswer = `Recently, we've been very excited about "${latestNews}"! You can read all the details in our News & Events section.`;
+            const latestNews = siteData?.news?.[0]?.title;
+            if (latestNews) {
+                matchedAnswer = `Recently, we've been very excited about "${latestNews}"! You can read all the details in our News & Events section.`;
+            } else {
+                matchedAnswer = `We regularly post updates and company announcements. Feel free to explore our services or get in touch with us!`;
+            }
         } else if (text.includes('portfolio') || text.includes('client') || text.includes('project') || text.includes('case study')) {
-            const client = siteData?.portfolio?.[0]?.title || 'top educational institutions';
-            matchedAnswer = `We've had the pleasure of delivering solutions like the ${client}. Our Portfolio highlights our end-to-end capabilities beautifully. Are you looking to start a new project?`;
+            const client = siteData?.portfolio?.[0]?.title;
+            if (client) {
+                matchedAnswer = `We've had the pleasure of delivering solutions like the ${client}. Our Portfolio highlights our end-to-end capabilities beautifully. Are you looking to start a new project?`;
+            } else {
+                matchedAnswer = `We have delivered numerous high-impact ERP and custom software solutions across industries. Are you looking to start a new project?`;
+            }
         } else if (text.includes('blog') || text.includes('article') || text.includes('newsletter')) {
-            matchedAnswer = "Our tech leaders love sharing their knowledge! They frequently write blogs covering EdTech AI, Cybersecurity, and Software Architecture. You should definitely check out our Blogs page. Do you have a favorite topic?";
+            if (siteData?.blogs && siteData.blogs.length > 0) {
+                matchedAnswer = "Our tech leaders love sharing their knowledge! They frequently write blogs covering EdTech AI, Cybersecurity, and Software Architecture. You should definitely check out our Blogs page. Do you have a favorite topic?";
+            } else {
+                matchedAnswer = "Our tech leaders frequently share industry insights and technical knowledge. What kind of solutions or topics are you most interested in?";
+            }
         } else if (text.includes('hello') || text.includes('hi') || text.includes('hey')) {
             matchedAnswer = "Hi there! 👋 It's great to meet you. How is your day going? How can I help you today?";
         } else if (text.includes('thank')) {

@@ -82,13 +82,18 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
   // Use dark theme nav styles (light text) if we are on a dark hero page and not scrolled
   const useDarkThemeNav = !isScrolled && isDarkHero;
 
+  const hasPortfolio = Boolean(data?.portfolio && data.portfolio.length > 0);
+  const hasBlogs = Boolean(data?.blogs && data.blogs.length > 0);
+  const hasNews = Boolean(data?.news && data.news.length > 0);
+
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'About Us', href: '/about' },
     { name: 'Services', href: '/services', dropdownItems: serviceItems },
     { name: 'Products', href: '/products', dropdownItems: productItems.length ? productItems : undefined },
-    { name: 'Portfolio', href: '/portfolio' },
-    { name: 'Blogs', href: '/blogs' },
+    ...(hasPortfolio ? [{ name: 'Portfolio', href: '/portfolio' }] : []),
+    ...(hasBlogs ? [{ name: 'Blogs', href: '/blogs' }] : []),
+    ...(hasNews ? [{ name: 'News', href: '/news' }] : []),
     { name: 'Partners', href: '/partners', dropdownItems: partnerItems },
     { name: 'Careers', href: '/careers' },
     { name: 'Contact Us', href: '/contact' },

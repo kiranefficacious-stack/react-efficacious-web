@@ -29,8 +29,8 @@ const heroGradientMap: Record<string, string> = {
 const BlogDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data } = useContent();
-  const blogs: any[] = data.blogs || [];
+  const { data, contentLoading } = useContent();
+  const blogs: any[] = data?.blogs || [];
 
   const post = blogs.find((b: any) => b.id === Number(id));
   const otherPosts = blogs.filter((b: any) => b.id !== Number(id)).slice(0, 3);
@@ -49,10 +49,12 @@ const BlogDetail: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!post) navigate('/blogs');
-  }, [post, navigate]);
+    if (!contentLoading && (blogs.length === 0 || !post)) {
+      navigate('/', { replace: true });
+    }
+  }, [contentLoading, blogs, post, navigate]);
 
-  if (!post) return null;
+  if (!contentLoading && (blogs.length === 0 || !post)) return null;
 
   const colour      = post.color || 'brand';
   const categoryCSS = colourMap[colour] ?? colourMap.brand;

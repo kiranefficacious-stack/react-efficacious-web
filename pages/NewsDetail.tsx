@@ -8,18 +8,18 @@ import Contact from '../components/Contact';
 const NewsDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data } = useContent();
+  const { data, contentLoading } = useContent();
   
   // Find news item or redirect if not found
-  const article = data.news?.find((n: any) => n.id === Number(id));
+  const article = data?.news?.find((n: any) => n.id === Number(id));
 
   useEffect(() => {
-    if (!article) {
-      navigate('/');
+    if (!contentLoading && (!data?.news || data.news.length === 0 || !article)) {
+      navigate('/', { replace: true });
     }
-  }, [article, navigate]);
+  }, [contentLoading, data?.news, article, navigate]);
 
-  if (!article) return null;
+  if (!contentLoading && (!data?.news || data.news.length === 0 || !article)) return null;
 
   // Formatting specific style parsing based on given mock data format
   const baseColor = article.color?.split(' ')[0]?.replace('text-', '') || 'brand-600';

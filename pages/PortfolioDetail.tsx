@@ -8,18 +8,18 @@ import Contact from '../components/Contact';
 const PortfolioDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data } = useContent();
+  const { data, contentLoading } = useContent();
   
   // Find project or redirect if not found
   const project = data.portfolio?.find((p: any) => p.id === Number(id));
 
   useEffect(() => {
-    if (!project) {
-      navigate('/portfolio');
+    if (!contentLoading && (!data?.portfolio || data.portfolio.length === 0 || !project)) {
+      navigate('/', { replace: true });
     }
-  }, [project, navigate]);
+  }, [contentLoading, data?.portfolio, project, navigate]);
 
-  if (!project) return null;
+  if (!contentLoading && (!data?.portfolio || data.portfolio.length === 0 || !project)) return null;
 
   // We are creating fallback specific case study details mapping since the mock data only has basic fields
   const challengeText = "The client struggled with fragmented operations, manual documentation processes, and a lack of real-time visibility across branches. They needed a unified, robust system capable of scaling alongside their rapidly growing user base while maintaining strict security standards.";
