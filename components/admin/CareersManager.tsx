@@ -54,8 +54,8 @@ const CareersManager: React.FC = () => {
     description: {
       required: true,
       minLength: 20,
-      maxLength: 500,
-      message: 'Description must be between 20 and 500 characters'
+      maxLength: 5000,
+      message: 'Description must be between 20 and 5000 characters'
     }
   };
 
@@ -199,7 +199,7 @@ const CareersManager: React.FC = () => {
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
                   {career.title}
                 </h3>
-                <p className="text-slate-600 dark:text-slate-300 mb-3">
+                <p className="text-slate-600 dark:text-slate-300 mb-3 whitespace-pre-line line-clamp-3">
                   {career.description}
                 </p>
                 
@@ -326,8 +326,9 @@ const CareersManager: React.FC = () => {
                 onChange={(value) => setFormData({ ...formData, description: value })}
                 error={errors.description}
                 required
-                rows={4}
+                rows={6}
                 placeholder="Job description and responsibilities"
+                helpText={`${formData.description.length}/5000 characters`}
               />
 
               {/* Criteria Management */}

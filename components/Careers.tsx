@@ -452,7 +452,7 @@ To / Recipient:   ${recipientEmail}
                                       className="border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50"
                                   >
                                       <div className="p-6 md:p-8">
-                                          <p className="text-slate-700 dark:text-slate-300 mb-6">{job.description}</p>
+                                          <p className="text-slate-700 dark:text-slate-300 mb-6 whitespace-pre-line leading-relaxed">{job.description}</p>
                                           
                                           <h4 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                                               <CheckCircle2 size={18} className="text-brand-500" /> Job Criteria
