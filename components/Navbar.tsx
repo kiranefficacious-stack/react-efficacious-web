@@ -209,11 +209,11 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                               animate={{ opacity: 1, y: 0, scale: 1 }}
                               exit={{ opacity: 0, y: 15, scale: 0.95 }}
                               transition={{ duration: 0.2 }}
-                              className="absolute top-full left-0 mt-2 before:absolute before:-top-2 before:left-0 before:w-full before:h-2 w-80 sm:w-96 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+                              className="absolute top-full left-0 mt-2 before:absolute before:-top-2 before:left-0 before:w-full before:h-2 w-max min-w-[200px] max-w-[280px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden"
                             >
                                 <div className="p-2 space-y-1">
                                     {link.dropdownItems.map((item: any, idx: number) => {
-                                      const itemClasses = `flex items-center gap-3 p-3 rounded-xl transition-all group border border-transparent hover:bg-[#E48100]/10 dark:hover:bg-slate-800 ${
+                                      const itemClasses = `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group border border-transparent hover:bg-[#E48100]/10 dark:hover:bg-slate-800 ${
                                         item.comingSoon ? 'opacity-60 hover:opacity-100' : ''
                                       }`;
 
@@ -222,11 +222,11 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                                           <div className="w-8 h-8 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm shrink-0 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-[#E48100]">
                                             {item.icon}
                                           </div>
-                                          <div className="flex items-center flex-1 min-w-0">
-                                            <span className="text-sm font-semibold truncate text-slate-700 dark:text-slate-200 group-hover:text-[#E48100] dark:group-hover:text-[#E48100]">
+                                          <div className="flex items-center flex-1 min-w-0 pr-1">
+                                            <span className="text-sm font-semibold whitespace-nowrap text-slate-700 dark:text-slate-200 group-hover:text-[#E48100] dark:group-hover:text-[#E48100]">
                                               {item.name}
                                               {item.comingSoon && (
-                                                <span className="ml-1.5 text-xs font-normal text-slate-400 dark:text-slate-500">
+                                                <span className="ml-1.5 text-xs font-normal text-slate-400 dark:text-slate-500 whitespace-nowrap">
                                                   (Coming Soon)
                                                 </span>
                                               )}

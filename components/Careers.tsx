@@ -4,9 +4,11 @@ import {
   Briefcase, CheckCircle2, Upload, Send, 
   MapPin, Clock, ChevronDown, 
   ChevronUp, User, Mail, Phone, FileText, Globe, TrendingUp,
-  FileCheck, MessageSquare, Coffee
+  FileCheck, MessageSquare, Coffee, AlertCircle, Loader2, X
 } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
+import { db } from '../lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const motion = m as any;
 
@@ -29,14 +31,78 @@ const Careers: React.FC = () => {
     position: '',
     message: ''
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [fileError, setFileError] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [statusMessage, setStatusMessage] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const validateFile = (file: File): string | null => {
+    const allowedExtensions = ['pdf', 'doc', 'docx'];
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    if (!ext || !allowedExtensions.includes(ext)) {
+      return 'Please upload a PDF or DOCX file (.pdf, .doc, .docx)';
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      return 'File size exceeds 5MB limit. Please choose a smaller file.';
+    }
+    return null;
+  };
+
+  const validate = (values = formData): Record<string, string> => {
+    const errs: Record<string, string> = {};
+
+    if (!values.name.trim()) {
+      errs.name = 'Full name is required';
+    } else if (values.name.trim().length < 2) {
+      errs.name = 'Name must be at least 2 characters';
+    }
+
+    if (!values.email.trim()) {
+      errs.email = 'Email address is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) {
+      errs.email = 'Please enter a valid email address';
+    }
+
+    if (!values.mobile.trim()) {
+      errs.mobile = 'Mobile number is required';
+    } else {
+      const digits = values.mobile.replace(/\D/g, '');
+      if (digits.length < 10) {
+        errs.mobile = 'Please enter a valid 10-digit mobile number';
+      }
+    }
+
+    if (!values.address.trim()) {
+      errs.address = 'City / Location is required';
+    } else if (values.address.trim().length < 2) {
+      errs.address = 'Please enter a valid location';
+    }
+
+    if (!values.position || values.position.trim() === '' || values.position === 'Select a position') {
+      errs.position = 'Please select a position from the dropdown';
+    }
+
+    return errs;
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (touched[name]) {
+      const newErrors = validate({ ...formData, [name]: value });
+      setErrors(prev => ({ ...prev, [name]: newErrors[name] || '' }));
+    }
+  };
+
+  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name } = e.target;
+    setTouched(prev => ({ ...prev, [name]: true }));
+    const newErrors = validate();
+    setErrors(prev => ({ ...prev, [name]: newErrors[name] || '' }));
   };
 
   const handleDrag = (e: React.DragEvent) => {
@@ -50,8 +116,16 @@ const Careers: React.FC = () => {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFileError('');
     if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+      const file = e.target.files[0];
+      const err = validateFile(file);
+      if (err) {
+        setFileError(err);
+        setSelectedFile(null);
+      } else {
+        setSelectedFile(file);
+      }
     }
   };
 
@@ -59,78 +133,145 @@ const Careers: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
+    setFileError('');
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setSelectedFile(e.dataTransfer.files[0]);
+      const file = e.dataTransfer.files[0];
+      const err = validateFile(file);
+      if (err) {
+        setFileError(err);
+        setSelectedFile(null);
+      } else {
+        setSelectedFile(file);
+      }
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setTouched({
+      name: true,
+      email: true,
+      mobile: true,
+      address: true,
+      position: true
+    });
+
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0 || fileError) {
+      setErrors(validationErrors);
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitStatus('idle');
+    setStatusMessage('');
 
+    const recipientEmail = 'info@efficacious.co.in';
+    let savedToFirestore = false;
+    let emailDelivered = false;
+
+    // 1. Save application into Firestore job_applications
     try {
-        // --- DEVELOPER SIMULATION MODE ---
-        // If keys are still placeholders, we simulate a successful send so you can test the UI.
-        if (['YOUR_PUBLIC_KEY', 'service_job_apply', 'template_job_apply'].some(k => 
-            ['YOUR_PUBLIC_KEY', 'service_job_apply', 'template_job_apply'].includes(k) && 
-            (k === 'YOUR_PUBLIC_KEY' || k === 'service_job_apply' || k === 'template_job_apply')
-        ) && (
-            'service_job_apply' === 'service_job_apply' // Check if placeholders exist
-        )) {
-            // Check if any placeholder is still present
-            const hasPlaceholders = 
-                'service_job_apply'.includes('service_job_apply') || 
-                'template_job_apply'.includes('template_job_apply') || 
-                'YOUR_PUBLIC_KEY'.includes('YOUR_PUBLIC_KEY');
-
-            if (hasPlaceholders) {
-                if (import.meta.env.DEV) {
-                    console.log("EmailJS Simulation Mode ACTIVE: Replace placeholders in Careers.tsx to send real emails.");
-                }
-                await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
-                setSubmitStatus('success');
-                setFormData({ name: '', email: '', mobile: '', address: '', position: '', message: '' });
-                setSelectedFile(null);
-                return;
-            }
-        }
-
-        // --- REAL EMAIL NOTIFICATION TRIGGER (EmailJS REST API) ---
-        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                service_id: 'service_job_apply', 
-                template_id: 'template_job_apply', 
-                user_id: 'YOUR_PUBLIC_KEY', 
-                template_params: {
-                    from_name: formData.name,
-                    from_email: formData.email,
-                    mobile: formData.mobile,
-                    position: formData.position,
-                    address: formData.address,
-                    message: formData.message,
-                    resume_name: selectedFile ? selectedFile.name : 'No file attached'
-                }
-            })
-        });
-
-        if (response.ok) {
-            setSubmitStatus('success');
-            setFormData({ name: '', email: '', mobile: '', address: '', position: '', message: '' });
-            setSelectedFile(null);
-        } else {
-            const errorData = await response.text();
-            console.error("EmailJS Error Response:", errorData);
-            setSubmitStatus('error');
-        }
-    } catch (error) {
-        console.error("Critical Submission error:", error);
-        setSubmitStatus('error');
-    } finally {
-        setIsSubmitting(false);
+      await addDoc(collection(db, 'job_applications'), {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        mobile: formData.mobile.trim(),
+        address: formData.address.trim(),
+        position: formData.position,
+        message: formData.message.trim() || 'No cover letter provided',
+        resumeName: selectedFile ? selectedFile.name : 'No file attached',
+        resumeSize: selectedFile ? selectedFile.size : 0,
+        createdAt: serverTimestamp(),
+        status: 'new'
+      });
+      savedToFirestore = true;
+    } catch (dbErr) {
+      console.warn('Firestore job application save error:', dbErr);
     }
+
+    // 2. Send via FormSubmit AJAX (with resume attachment if selected)
+    try {
+      const formPayload = new FormData();
+      formPayload.append('name', formData.name.trim());
+      formPayload.append('email', formData.email.trim());
+      formPayload.append('mobile', formData.mobile.trim());
+      formPayload.append('address', formData.address.trim());
+      formPayload.append('position', formData.position);
+      formPayload.append('message', formData.message.trim() || 'No cover letter provided');
+      formPayload.append('_subject', `New Job Application: ${formData.position} - ${formData.name.trim()}`);
+      formPayload.append('_replyto', formData.email.trim());
+      formPayload.append('_template', 'table');
+      formPayload.append('_captcha', 'false');
+
+      if (selectedFile) {
+        formPayload.append('attachment', selectedFile);
+      }
+
+      const formSubmitToken = import.meta.env.VITE_FORMSUBMIT_TOKEN || '99a588cd0cd777cbb113f4394a597440';
+      const res = await fetch(`https://formsubmit.co/ajax/${formSubmitToken}`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json'
+        },
+        body: formPayload
+      });
+
+      const resData = await res.json().catch(() => null);
+      if (res.ok && (resData?.success === 'true' || resData?.success === true)) {
+        emailDelivered = true;
+      }
+    } catch (mailErr) {
+      console.warn('FormSubmit careers send error:', mailErr);
+    }
+
+    // 3. Fallback: EmailJS if environment variables are configured
+    const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
+    const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
+    const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
+
+    if (!emailDelivered && SERVICE_ID && TEMPLATE_ID && PUBLIC_KEY) {
+      try {
+        const emailjsRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            service_id: SERVICE_ID,
+            template_id: TEMPLATE_ID,
+            user_id: PUBLIC_KEY,
+            template_params: {
+              from_name: formData.name.trim(),
+              from_email: formData.email.trim(),
+              mobile: formData.mobile.trim(),
+              position: formData.position,
+              address: formData.address.trim(),
+              message: formData.message.trim(),
+              resume_name: selectedFile ? selectedFile.name : 'No file attached'
+            }
+          })
+        });
+        if (emailjsRes.ok) {
+          emailDelivered = true;
+        }
+      } catch (e) {
+        console.warn('EmailJS careers send error:', e);
+      }
+    }
+
+    if (savedToFirestore || emailDelivered) {
+      setSubmitStatus('success');
+      setStatusMessage('Thank you! Your application has been submitted successfully.');
+      setFormData({ name: '', email: '', mobile: '', address: '', position: '', message: '' });
+      setSelectedFile(null);
+      setTouched({});
+      setErrors({});
+      setFileError('');
+    } else {
+      setSubmitStatus('error');
+      setStatusMessage('Unable to send application automatically. Please email your CV directly to info@efficacious.co.in.');
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -377,85 +518,155 @@ const Careers: React.FC = () => {
                           className="bg-white dark:bg-slate-800 rounded-3xl p-8 lg:p-10 shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700"
                       >
                           <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-8">Application Form</h3>
-                          <form onSubmit={handleSubmit} className="space-y-6">
+                          <form noValidate onSubmit={handleSubmit} className="space-y-6">
+                              {submitStatus === 'error' && (
+                                  <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm flex flex-col gap-2">
+                                      <div className="flex items-start gap-2">
+                                          <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                                          <span>{statusMessage || 'Something went wrong while submitting your application.'}</span>
+                                      </div>
+                                      <a 
+                                          href={`mailto:info@efficacious.co.in?subject=${encodeURIComponent(`Job Application: ${formData.position || 'Open Role'} - ${formData.name || 'Applicant'}`)}&body=${encodeURIComponent(`Dear HR Team,\n\nI would like to apply for the position of ${formData.position || 'an open role'}.\n\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.mobile}\nAddress: ${formData.address}\n\nCover Letter / Message:\n${formData.message}`)}`}
+                                          className="inline-flex items-center gap-1.5 text-xs font-bold underline hover:text-red-700 dark:hover:text-red-300 self-start ml-7"
+                                      >
+                                          <Mail size={14} /> Send CV directly via your email client
+                                      </a>
+                                  </div>
+                              )}
+
                               <div className="grid md:grid-cols-2 gap-6">
-                                  <div className="space-y-2 group">
-                                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Full Name</label>
+                                  <div className="space-y-1.5 group">
+                                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1 flex items-center justify-between">
+                                          <span>Full Name <span className="text-red-500">*</span></span>
+                                      </label>
                                       <div className="relative">
-                                          <User className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                                          <User className={`absolute left-4 top-3.5 w-5 h-5 transition-colors ${touched.name && errors.name ? 'text-red-500' : 'text-slate-400 group-focus-within:text-brand-500'}`} />
                                           <input 
                                               type="text" 
                                               name="name"
                                               value={formData.name}
                                               onChange={handleInputChange}
-                                              className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-medium"
+                                              onBlur={handleInputBlur}
+                                              className={`w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-medium focus:outline-none focus:ring-2 ${
+                                                touched.name && errors.name 
+                                                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' 
+                                                  : 'border-slate-200 dark:border-slate-700 focus:ring-brand-500/20 focus:border-brand-500'
+                                              }`}
                                               placeholder="John Doe"
-                                              required
+                                              aria-invalid={Boolean(touched.name && errors.name)}
                                           />
                                       </div>
+                                      {touched.name && errors.name && (
+                                        <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-medium ml-1">
+                                          <AlertCircle size={12} className="shrink-0" /> {errors.name}
+                                        </p>
+                                      )}
                                   </div>
                                   
-                                  <div className="space-y-2 group">
-                                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Email Address</label>
+                                  <div className="space-y-1.5 group">
+                                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1 flex items-center justify-between">
+                                          <span>Email Address <span className="text-red-500">*</span></span>
+                                      </label>
                                       <div className="relative">
-                                          <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                                          <Mail className={`absolute left-4 top-3.5 w-5 h-5 transition-colors ${touched.email && errors.email ? 'text-red-500' : 'text-slate-400 group-focus-within:text-brand-500'}`} />
                                           <input 
                                               type="email" 
                                               name="email"
                                               value={formData.email}
                                               onChange={handleInputChange}
-                                              className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-medium"
+                                              onBlur={handleInputBlur}
+                                              className={`w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-medium focus:outline-none focus:ring-2 ${
+                                                touched.email && errors.email 
+                                                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' 
+                                                  : 'border-slate-200 dark:border-slate-700 focus:ring-brand-500/20 focus:border-brand-500'
+                                              }`}
                                               placeholder="john@example.com"
-                                              required
+                                              aria-invalid={Boolean(touched.email && errors.email)}
                                           />
                                       </div>
+                                      {touched.email && errors.email && (
+                                        <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-medium ml-1">
+                                          <AlertCircle size={12} className="shrink-0" /> {errors.email}
+                                        </p>
+                                      )}
                                   </div>
                               </div>
 
                               <div className="grid md:grid-cols-2 gap-6">
-                                  <div className="space-y-2 group">
-                                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Mobile Number</label>
+                                  <div className="space-y-1.5 group">
+                                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1 flex items-center justify-between">
+                                          <span>Mobile Number <span className="text-red-500">*</span></span>
+                                      </label>
                                       <div className="relative">
-                                          <Phone className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                                          <Phone className={`absolute left-4 top-3.5 w-5 h-5 transition-colors ${touched.mobile && errors.mobile ? 'text-red-500' : 'text-slate-400 group-focus-within:text-brand-500'}`} />
                                           <input 
                                               type="tel" 
                                               name="mobile"
                                               value={formData.mobile}
                                               onChange={handleInputChange}
-                                              className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-medium"
+                                              onBlur={handleInputBlur}
+                                              className={`w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-medium focus:outline-none focus:ring-2 ${
+                                                touched.mobile && errors.mobile 
+                                                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' 
+                                                  : 'border-slate-200 dark:border-slate-700 focus:ring-brand-500/20 focus:border-brand-500'
+                                              }`}
                                               placeholder="+91 98765 43210"
-                                              required
+                                              aria-invalid={Boolean(touched.mobile && errors.mobile)}
                                           />
                                       </div>
+                                      {touched.mobile && errors.mobile && (
+                                        <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-medium ml-1">
+                                          <AlertCircle size={12} className="shrink-0" /> {errors.mobile}
+                                        </p>
+                                      )}
                                   </div>
 
-                                  <div className="space-y-2 group">
-                                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Address</label>
+                                  <div className="space-y-1.5 group">
+                                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1 flex items-center justify-between">
+                                          <span>Address / City <span className="text-red-500">*</span></span>
+                                      </label>
                                       <div className="relative">
-                                          <MapPin className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                                          <MapPin className={`absolute left-4 top-3.5 w-5 h-5 transition-colors ${touched.address && errors.address ? 'text-red-500' : 'text-slate-400 group-focus-within:text-brand-500'}`} />
                                           <input 
                                               type="text" 
                                               name="address"
                                               value={formData.address}
                                               onChange={handleInputChange}
-                                              className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-medium"
+                                              onBlur={handleInputBlur}
+                                              className={`w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-medium focus:outline-none focus:ring-2 ${
+                                                touched.address && errors.address 
+                                                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' 
+                                                  : 'border-slate-200 dark:border-slate-700 focus:ring-brand-500/20 focus:border-brand-500'
+                                              }`}
                                               placeholder="City, State"
-                                              required
+                                              aria-invalid={Boolean(touched.address && errors.address)}
                                           />
                                       </div>
+                                      {touched.address && errors.address && (
+                                        <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-medium ml-1">
+                                          <AlertCircle size={12} className="shrink-0" /> {errors.address}
+                                        </p>
+                                      )}
                                   </div>
                               </div>
 
-                              <div className="space-y-2 group">
-                                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Applied Position</label>
+                              <div className="space-y-1.5 group">
+                                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1 flex items-center justify-between">
+                                      <span>Applied Position <span className="text-red-500">*</span></span>
+                                  </label>
                                   <div className="relative">
-                                      <Briefcase className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                                      <Briefcase className={`absolute left-4 top-3.5 w-5 h-5 transition-colors ${touched.position && errors.position ? 'text-red-500' : 'text-slate-400 group-focus-within:text-brand-500'}`} />
                                       <select 
                                           name="position"
                                           value={formData.position}
                                           onChange={handleInputChange}
-                                          className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all appearance-none text-slate-900 dark:text-white placeholder:text-slate-400 font-medium cursor-pointer"
-                                          required
+                                          onBlur={handleInputBlur}
+                                          className={`w-full pl-11 pr-10 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border transition-all appearance-none text-slate-900 dark:text-white font-medium cursor-pointer focus:outline-none focus:ring-2 ${
+                                            touched.position && errors.position 
+                                              ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' 
+                                              : 'border-slate-200 dark:border-slate-700 focus:ring-brand-500/20 focus:border-brand-500'
+                                          }`}
+                                          aria-invalid={Boolean(touched.position && errors.position)}
                                       >
                                           <option value="">Select a position</option>
                                           {openings.map(job => (
@@ -465,12 +676,26 @@ const Careers: React.FC = () => {
                                       </select>
                                       <ChevronDown className="absolute right-4 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
                                   </div>
+                                  {touched.position && errors.position && (
+                                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-medium ml-1">
+                                      <AlertCircle size={12} className="shrink-0" /> {errors.position}
+                                    </p>
+                                  )}
                               </div>
 
-                              <div className="space-y-2">
-                                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Upload CV / Resume</label>
+                              <div className="space-y-1.5">
+                                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1 flex items-center justify-between">
+                                      <span>Upload CV / Resume</span>
+                                      <span className="text-xs text-slate-400">PDF, DOCX up to 5MB</span>
+                                  </label>
                                   <div 
-                                      className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer group ${dragActive ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20' : 'border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 hover:bg-white dark:hover:bg-slate-800'}`}
+                                      className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all cursor-pointer group ${
+                                        fileError 
+                                          ? 'border-red-500 bg-red-50/50 dark:bg-red-950/20' 
+                                          : dragActive 
+                                            ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20' 
+                                            : 'border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 hover:bg-white dark:hover:bg-slate-800'
+                                      }`}
                                       onDragEnter={handleDrag}
                                       onDragLeave={handleDrag}
                                       onDragOver={handleDrag}
@@ -478,24 +703,42 @@ const Careers: React.FC = () => {
                                   >
                                       <input 
                                         type="file" 
+                                        accept=".pdf,.doc,.docx"
                                         onChange={handleFileChange}
                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
                                       />
-                                      <div className="w-14 h-14 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                                          <Upload className="w-7 h-7 text-slate-500 dark:text-slate-300" />
+                                      <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                                          <Upload className="w-6 h-6 text-slate-500 dark:text-slate-300" />
                                       </div>
                                       <p className="text-sm text-slate-700 dark:text-slate-200 font-medium">
                                           {selectedFile ? (
-                                              <span className="text-brand-600 font-bold">{selectedFile.name}</span>
+                                              <span className="text-brand-600 dark:text-brand-400 font-bold flex items-center justify-center gap-2">
+                                                  <span>{selectedFile.name} ({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                                                  <button
+                                                      type="button"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedFile(null);
+                                                      }}
+                                                      className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-500 hover:text-red-500"
+                                                      title="Remove file"
+                                                  >
+                                                      <X size={14} />
+                                                  </button>
+                                              </span>
                                           ) : (
-                                              <>Drag & Drop or <span className="text-brand-600 dark:text-brand-400 underline">Click to Upload</span></>
+                                              <>Drag & Drop or <span className="text-brand-600 dark:text-brand-400 underline font-semibold">Click to Upload</span></>
                                           )}
                                       </p>
-                                      <p className="text-xs text-slate-400 mt-1">PDF, DOCX up to 5MB</p>
                                   </div>
+                                  {fileError && (
+                                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-medium ml-1">
+                                      <AlertCircle size={12} className="shrink-0" /> {fileError}
+                                    </p>
+                                  )}
                               </div>
 
-                              <div className="space-y-2 group">
+                              <div className="space-y-1.5 group">
                                   <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Cover Letter / Message</label>
                                   <div className="relative">
                                       <FileText className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
@@ -505,49 +748,51 @@ const Careers: React.FC = () => {
                                           onChange={handleInputChange}
                                           rows={3}
                                           className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all resize-none text-slate-900 dark:text-white placeholder:text-slate-400 font-medium"
-                                          placeholder="Tell us a bit about yourself..."
+                                          placeholder="Tell us a bit about yourself and relevant experience..."
                                       ></textarea>
                                   </div>
                               </div>
 
-                              <div className="relative pt-4">
+                              <div className="relative pt-2">
                                   {submitStatus === 'success' && (
                                       <motion.div 
-                                          initial={{ opacity: 0, scale: 0.9 }}
+                                          initial={{ opacity: 0, scale: 0.95 }}
                                           animate={{ opacity: 1, scale: 1 }}
-                                          className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white dark:bg-slate-800 rounded-xl border border-emerald-500 text-center p-4 shadow-xl"
+                                          className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white dark:bg-slate-800 rounded-2xl border border-emerald-500 text-center p-6 shadow-2xl"
                                       >
-                                          <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-full flex items-center justify-center mb-3">
-                                              <CheckCircle2 size={24} />
+                                          <div className="w-14 h-14 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-3">
+                                              <CheckCircle2 size={32} />
                                           </div>
-                                          <h4 className="font-bold text-slate-900 dark:text-white mb-1">Application Sent!</h4>
-                                          <p className="text-xs text-slate-500">We'll get back to you shortly.</p>
+                                          <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Application Sent Successfully!</h4>
+                                          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mb-4">
+                                              Thank you for applying. Your application has been recorded and our HR team will review your profile shortly.
+                                          </p>
                                           <button 
+                                            type="button"
                                             onClick={() => setSubmitStatus('idle')}
-                                            className="mt-4 text-[10px] font-bold text-brand-600 uppercase tracking-widest hover:underline"
+                                            className="px-4 py-2 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-xs font-bold rounded-lg uppercase tracking-wider hover:bg-brand-100 transition-colors"
                                           >
-                                            Send another?
+                                            Submit Another Application
                                           </button>
                                       </motion.div>
-                                  )}
-
-                                  {submitStatus === 'error' && (
-                                      <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 text-xs text-center font-medium">
-                                          Something went wrong. Please try again later.
-                                      </div>
                                   )}
 
                                   <button 
                                       type="submit"
                                       disabled={isSubmitting}
-                                      className="w-full bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-700 hover:to-purple-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-500/30 flex items-center justify-center gap-2 transition-all hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                      className="w-full bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-700 hover:to-purple-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-500/30 flex items-center justify-center gap-2 transition-all hover:-translate-y-1 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
                                   >
                                       {isSubmitting ? (
-                                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                          <>
+                                              <Loader2 size={20} className="animate-spin" />
+                                              <span>Sending Application...</span>
+                                          </>
                                       ) : (
-                                          <Send size={20} />
+                                          <>
+                                              <Send size={20} />
+                                              <span>Send Application</span>
+                                          </>
                                       )}
-                                      {isSubmitting ? 'Sending...' : 'Send Application'}
                                   </button>
                               </div>
                           </form>
