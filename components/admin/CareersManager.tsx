@@ -4,6 +4,8 @@ import { useToast } from '../../hooks/useToast';
 import { validateForm, ValidationErrors } from '../../utils/validation';
 import FormField from './FormField';
 import ConfirmDialog from './ConfirmDialog';
+import RichTextEditor from './RichTextEditor';
+import { sanitizeDescriptionHtml, extractPlainText } from '../../utils/sanitizeHtml';
 import { Plus, Edit2, Trash2, X, Briefcase } from 'lucide-react';
 
 interface CareerForm {
@@ -53,8 +55,10 @@ const CareersManager: React.FC = () => {
     },
     description: {
       required: true,
-      minLength: 20,
-      maxLength: 5000,
+      custom: (val: string) => {
+        const len = extractPlainText(val).length;
+        return len >= 20 && len <= 5000;
+      },
       message: 'Description must be between 20 and 5000 characters'
     }
   };
@@ -199,9 +203,10 @@ const CareersManager: React.FC = () => {
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
                   {career.title}
                 </h3>
-                <p className="text-slate-600 dark:text-slate-300 mb-3 whitespace-pre-line line-clamp-3">
-                  {career.description}
-                </p>
+                <div
+                  className="text-slate-600 dark:text-slate-300 mb-3 line-clamp-3 prose dark:prose-invert max-w-none text-sm [&_p]:mb-1"
+                  dangerouslySetInnerHTML={{ __html: sanitizeDescriptionHtml(career.description) }}
+                />
                 
                 <div className="flex flex-wrap items-center gap-2 text-sm mb-3">
                   <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">
@@ -318,17 +323,15 @@ const CareersManager: React.FC = () => {
                 ]}
               />
 
-              <FormField
+              <RichTextEditor
                 label="Description"
                 name="description"
-                type="textarea"
                 value={formData.description}
                 onChange={(value) => setFormData({ ...formData, description: value })}
                 error={errors.description}
                 required
-                rows={6}
-                placeholder="Job description and responsibilities"
-                helpText={`${formData.description.length}/5000 characters`}
+                maxLength={5000}
+                placeholder="Job description, role overview, and responsibilities..."
               />
 
               {/* Criteria Management */}

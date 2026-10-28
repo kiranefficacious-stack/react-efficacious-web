@@ -7,6 +7,7 @@ import {
   FileCheck, MessageSquare, Coffee, AlertCircle, Loader2, X
 } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
+import { sanitizeDescriptionHtml } from '../utils/sanitizeHtml';
 import emailjs from '@emailjs/browser';
 
 const motion = m as any;
@@ -452,7 +453,10 @@ To / Recipient:   ${recipientEmail}
                                       className="border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50"
                                   >
                                       <div className="p-6 md:p-8">
-                                          <p className="text-slate-700 dark:text-slate-300 mb-6 whitespace-pre-line leading-relaxed">{job.description}</p>
+                                          <div 
+                                              className="text-slate-700 dark:text-slate-300 mb-6 leading-relaxed prose dark:prose-invert max-w-none [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+                                              dangerouslySetInnerHTML={{ __html: sanitizeDescriptionHtml(job.description) }}
+                                          />
                                           
                                           <h4 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                                               <CheckCircle2 size={18} className="text-brand-500" /> Job Criteria
