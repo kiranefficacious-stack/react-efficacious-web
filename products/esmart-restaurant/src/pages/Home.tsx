@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import CTABand from '../components/CTABand';
 import TestimonialsCarousel from '../components/TestimonialsCarousel';
+import { sendEmailNotification } from '../../../../utils/sendMail';
 
 
 /* ─── Animated Counter Hook ─────────────────────────── */
@@ -182,31 +183,26 @@ export default function Home() {
     setFormState(s => ({ ...s, error: '' }));
 
     try {
-      const endpoint = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || '/api/send-email';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'product_contact',
-          product: 'e-Smart Restaurant (Free Demo Request)',
-          name: formState.name.trim(),
-          phone: formState.phone.trim(),
-          mobile: formState.phone.trim(),
-          restaurant: formState.restaurant.trim(),
-          city: formState.city.trim() || 'Not provided',
-          outlets: formState.outlets || '1',
-          subject: `Demo Request for ${formState.restaurant.trim()}`,
-          message: `Demo Request from Restaurant Home Page. Restaurant: ${formState.restaurant.trim()}, Outlets: ${formState.outlets || '1'}, City: ${formState.city.trim() || 'Not specified'}, Phone: ${formState.phone.trim()}.`,
-        }),
+      const result = await sendEmailNotification({
+        type: 'product_contact',
+        product: 'e-Smart Restaurant (Free Demo Request)',
+        name: formState.name.trim(),
+        email: 'info@efficacious.co.in',
+        phone: formState.phone.trim(),
+        mobile: formState.phone.trim(),
+        restaurant: formState.restaurant.trim(),
+        city: formState.city.trim() || 'Not provided',
+        outlets: formState.outlets || '1',
+        subject: `Demo Request for ${formState.restaurant.trim()}`,
+        message: `Demo Request from Restaurant Home Page. Restaurant: ${formState.restaurant.trim()}, Outlets: ${formState.outlets || '1'}, City: ${formState.city.trim() || 'Not specified'}, Phone: ${formState.phone.trim()}.`,
       });
 
-      const data = await response.json().catch(() => null);
-      if (response.ok && (data?.success === true || data?.success === 'true')) {
+      if (result.success) {
         setFormState(s => ({ ...s, submitted: true, error: '' }));
       } else {
         setFormState(s => ({
           ...s,
-          error: data?.error || 'Unable to submit demo request right now. Please email us directly at info@efficacious.co.in',
+          error: result.error || 'Unable to submit demo request right now. Please email us directly at info@efficacious.co.in',
         }));
       }
     } catch (err: any) {

@@ -95,9 +95,19 @@ export default defineConfig(({ mode }) => {
         {
           name: 'multi-spa-fallback',
           configureServer(server) {
-            // Local dev mailer endpoint (/api/send-email)
+            // Local dev mailer endpoint (/api/send-email, index.php, send-email.php)
             server.middlewares.use(async (req, res, next) => {
-              if (req.url === '/api/send-email' && req.method === 'POST') {
+              const cleanUrl = (req.url || '').split('?')[0];
+              const isMailer = req.method === 'POST' && (
+                cleanUrl === '/api/send-email' ||
+                cleanUrl === '/api/send-email/' ||
+                cleanUrl === '/api/send-email.php' ||
+                cleanUrl.endsWith('/api/send-email') ||
+                cleanUrl.endsWith('/api/send-email/') ||
+                cleanUrl.endsWith('/api/send-email.php') ||
+                cleanUrl.endsWith('/api/send-email/index.php')
+              );
+              if (isMailer) {
                 let bodyStr = '';
                 req.on('data', chunk => { bodyStr += chunk; });
                 req.on('end', async () => {

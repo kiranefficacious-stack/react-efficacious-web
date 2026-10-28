@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Phone, Mail, MapPin, Clock, MessageCircle, Headphones, CheckCircle, ChevronDown, ArrowRight } from 'lucide-react';
+import { sendEmailNotification } from '../../../../utils/sendMail';
 
 const CONTACT_FAQS = [
   { q: 'How do I request a demo?', a: 'Fill in the form on this page and our team will reach out within 2 business hours to schedule a personalised walkthrough.' },
@@ -49,31 +50,25 @@ export default function Contact() {
     setSubmitError('');
 
     try {
-      const endpoint = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || '/api/send-email';
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'product_contact',
-          product: 'e-Smart Restaurant POS',
-          name: form.name.trim(),
-          email: form.email.trim(),
-          phone: form.phone.trim(),
-          mobile: form.phone.trim(),
-          restaurant: form.restaurant.trim(),
-          city: form.city.trim(),
-          outlets: form.outlets,
-          time: form.time,
-          subject: `Demo Request for ${form.restaurant.trim()}`,
-          message: form.message.trim() || `Demo request for ${form.restaurant.trim()}. Outlets: ${form.outlets || '1'}, City: ${form.city || 'N/A'}, Best time: ${form.time || 'Anytime'}.`,
-        }),
+      const result = await sendEmailNotification({
+        type: 'product_contact',
+        product: 'e-Smart Restaurant POS',
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        mobile: form.phone.trim(),
+        restaurant: form.restaurant.trim(),
+        city: form.city.trim(),
+        outlets: form.outlets,
+        time: form.time,
+        subject: `Demo Request for ${form.restaurant.trim()}`,
+        message: form.message.trim() || `Demo request for ${form.restaurant.trim()}. Outlets: ${form.outlets || '1'}, City: ${form.city || 'N/A'}, Best time: ${form.time || 'Anytime'}.`,
       });
 
-      const resData = await res.json().catch(() => null);
-      if (res.ok && (resData?.success === true || resData?.success === 'true')) {
+      if (result.success) {
         setForm(s => ({ ...s, submitted: true }));
       } else {
-        setSubmitError(resData?.error || 'Unable to submit demo request right now. Please email info@efficacious.co.in directly.');
+        setSubmitError(result.error || 'Unable to submit demo request right now. Please email info@efficacious.co.in directly.');
       }
     } catch (err) {
       console.error('Restaurant contact form error:', err);

@@ -10,39 +10,42 @@
   Header unset X-Powered-By
 </IfModule>
 
+# Ensure directory requests find index.html and index.php
+DirectoryIndex index.html index.php
+
 # ==============================================================================
-# SPA Routing & Rewrites (Apache 2.2 / 2.4 & LiteSpeed Compatible)
+# SPA Routing & Rewrites (Works in root domain and any sub-directory / base URL)
 # ==============================================================================
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /
 
-  # Allow real files and directories to pass through directly
+  # 1. Mailer API: Route /api/send-email directly to PHP without trailing slash 301 redirects
+  RewriteRule ^api/send-email/?$ api/send-email/index.php [L,QSA]
+  RewriteRule ^api/send-email\.php$ api/send-email/index.php [L,QSA]
+
+  # 2. Allow existing physical files and directories to pass through directly
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Sub-app SPA routing (handles client-side routes like /products/esmart-restaurant/about)
+  # 3. Sub-app SPA routing (handles client-side routes like /products/esmart-restaurant/about)
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^products/esmart-restaurant(/.*)?$ /products/esmart-restaurant/index.html [L]
+  RewriteRule ^products/esmart-restaurant(/.*)?$ products/esmart-restaurant/index.html [L]
 
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^products/esmart-school(/.*)?$ /products/esmart-school/index.html [L]
+  RewriteRule ^products/esmart-school(/.*)?$ products/esmart-school/index.html [L]
 
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^products/emart-queue(/.*)?$ /products/emart-queue/index.html [L]
+  RewriteRule ^products/emart-queue(/.*)?$ products/emart-queue/index.html [L]
 
-  # Main React App SPA routing — redirect all virtual paths (/admin, /login, /about, etc.) to index.html
+  # 4. Main React App SPA routing — redirect all virtual paths (/careers, /admin, /contact, etc.) to index.html
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^.*$ /index.html [L]
+  RewriteRule ^.*$ index.html [L]
 </IfModule>
 
-# Ensure directory requests serve index.html
-DirectoryIndex index.html
-
 # Fallback for servers where mod_rewrite is not permitted
-ErrorDocument 404 /index.html
+ErrorDocument 404 index.html

@@ -3,6 +3,7 @@ import { motion as m } from 'framer-motion';
 import { MapPin, Mail, Phone, Send, User, MessageSquare, FileText, Smartphone, Home, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
 import emailjs from '@emailjs/browser';
+import { sendEmailNotification } from '../utils/sendMail';
 
 const motion = m as any;
 
@@ -120,33 +121,25 @@ ${formData.message.trim()}
 To / Recipient:   ${recipientEmail}
 `.trim();
 
-    // 2. Email Notification Endpoint (Cloud Function or local dev mailer)
-    const CLOUD_FUNCTIONS_URL = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || '/api/send-email';
-    if (CLOUD_FUNCTIONS_URL) {
-      try {
-        const fnRes = await fetch(CLOUD_FUNCTIONS_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: 'contact',
-            name: formData.name.trim(),
-            email: formData.email.trim(),
-            mobile: formData.mobile.trim(),
-            address: formData.address.trim(),
-            subject: formData.subject.trim(),
-            message: formData.message.trim(),
-          }),
-        });
-        const fnData = await fnRes.json().catch(() => null);
-        if (fnRes.ok && (fnData?.success === true || fnData?.success === 'true')) {
-          emailDelivered = true;
-        } else if (fnData?.error) {
-          console.warn('Mailer endpoint error:', fnData.error);
-          setErrorMessage(fnData.error);
-        }
-      } catch (fnErr: any) {
-        console.warn('Firebase Cloud Function send error:', fnErr);
+    // 2. Email Notification Endpoint (Universal Mailer: auto-resolves base URLs, PHP, and dev server)
+    try {
+      const mailRes = await sendEmailNotification({
+        type: 'contact',
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        mobile: formData.mobile.trim(),
+        address: formData.address.trim(),
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
+      });
+
+      if (mailRes.success) {
+        emailDelivered = true;
+      } else if (mailRes.error) {
+        console.warn('Mailer endpoint error:', mailRes.error);
       }
+    } catch (mailErr: any) {
+      console.warn('Contact mail send error:', mailErr);
     }
 
     // 3. EmailJS (From info@efficacious.co.in To info@efficacious.co.in)

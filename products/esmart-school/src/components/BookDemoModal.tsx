@@ -5,6 +5,7 @@ import {
   CheckCircle2, Send, Loader2, ChevronDown
 } from 'lucide-react';
 import emailjs from '@emailjs/browser';
+import { sendEmailNotification } from '../../../../utils/sendMail';
 
 
 
@@ -79,30 +80,24 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
     setStatus('sending');
 
     try {
-      const endpoint = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || '/api/send-email';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'product_contact',
-          product: 'eSMARTs School ERP - Demo Request',
-          name: form.name.trim(),
-          email: form.email.trim(),
-          phone: form.phone.trim(),
-          mobile: form.phone.trim(),
-          schoolName: form.schoolName.trim(),
-          city: form.city.trim(),
-          studentCount: form.studentCount || '1–500',
-          subject: `Demo Request for ${form.schoolName.trim()}${form.studentCount ? ` (${form.studentCount} Students)` : ''}`,
-          message: form.message.trim() || `Demo request for ${form.schoolName.trim()}. Student capacity: ${form.studentCount || '1–500'}, Location: ${form.city || 'N/A'}.`,
-        }),
+      const result = await sendEmailNotification({
+        type: 'product_contact',
+        product: 'eSMARTs School ERP - Demo Request',
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        mobile: form.phone.trim(),
+        schoolName: form.schoolName.trim(),
+        city: form.city.trim(),
+        studentCount: form.studentCount || '1–500',
+        subject: `Demo Request for ${form.schoolName.trim()}${form.studentCount ? ` (${form.studentCount} Students)` : ''}`,
+        message: form.message.trim() || `Demo request for ${form.schoolName.trim()}. Student capacity: ${form.studentCount || '1–500'}, Location: ${form.city || 'N/A'}.`,
       });
 
-      const resData = await response.json().catch(() => null);
-      if (response.ok && (resData?.success === true || resData?.success === 'true')) {
+      if (result.success) {
         setStatus('success');
       } else {
-        console.warn('Demo booking mailer error:', resData?.error);
+        console.warn('Demo booking mailer error:', result.error);
         setStatus('error');
       }
     } catch (err) {

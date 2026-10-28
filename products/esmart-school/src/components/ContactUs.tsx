@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Send, Mail, User, School, MessageSquare, MapPin, Phone, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import React, { useState } from 'react';
+import { sendEmailNotification } from '../../../../utils/sendMail';
 
 export function ContactUs() {
   const [formData, setFormData] = useState({
@@ -22,33 +23,24 @@ export function ContactUs() {
     setSubmitSuccess(false);
 
     try {
-      const endpoint = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || '/api/send-email';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'product_contact',
-          product: 'eSMARTs School ERP',
-          name: formData.name.trim(),
-          email: formData.email.trim(),
-          phone: formData.phone.trim(),
-          mobile: formData.phone.trim(),
-          schoolName: formData.schoolName.trim(),
-          details: formData.details.trim(),
-          subject: `School ERP Inquiry - ${formData.schoolName.trim()}`,
-          message: formData.message.trim(),
-        }),
+      const result = await sendEmailNotification({
+        type: 'product_contact',
+        product: 'eSMARTs School ERP',
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        mobile: formData.phone.trim(),
+        schoolName: formData.schoolName.trim(),
+        details: formData.details.trim(),
+        subject: `School ERP Inquiry - ${formData.schoolName.trim()}`,
+        message: formData.message.trim(),
       });
 
-      const result = await response.json().catch(() => null);
-
-      if (response.ok && (result?.success === true || result?.success === 'true')) {
+      if (result.success) {
         setSubmitSuccess(true);
         setFormData({ name: '', email: '', phone: '', schoolName: '', details: '', message: '' });
       } else {
-        setErrorMessage(result?.error || 'Unable to deliver message right now. Please email us directly at info@efficacious.co.in');
+        setErrorMessage(result.error || 'Unable to deliver message right now. Please email us directly at info@efficacious.co.in');
       }
     } catch (err: any) {
       console.error('Submission error:', err);

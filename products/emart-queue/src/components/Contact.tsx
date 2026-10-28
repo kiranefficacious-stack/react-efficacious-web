@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, AppWindow } from 'lucide-react';
+import { sendEmailNotification } from '../../../../utils/sendMail';
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -28,29 +29,22 @@ export function Contact() {
     
     try {
       const fullName = `${formData.firstName} ${formData.lastName}`.trim() || formData.firstName;
-      const response = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'product_contact',
-          product: 'eSmart Queue (Token & Queue Management)',
-          name: fullName,
-          email: formData.email.trim(),
-          company: formData.company.trim(),
-          message: formData.message.trim(),
-        }),
+      const result = await sendEmailNotification({
+        type: 'product_contact',
+        product: 'eSmart Queue (Token & Queue Management)',
+        name: fullName,
+        email: formData.email.trim(),
+        company: formData.company.trim(),
+        subject: `Queue Management Inquiry - ${formData.company.trim() || fullName}`,
+        message: formData.message.trim(),
       });
 
-      const result = await response.json().catch(() => null);
-      
-      if (response.ok && (result?.success === true || result?.success === 'true')) {
+      if (result.success) {
         setStatus('success');
         setFormData({ firstName: '', lastName: '', email: '', company: '', message: '' });
       } else {
         setStatus('error');
-        setErrorMessage(result?.error || 'Unable to deliver message right now. Please email us directly at info@efficacious.co.in');
+        setErrorMessage(result.error || 'Unable to deliver message right now. Please email us directly at info@efficacious.co.in');
       }
     } catch (error) {
       console.error('Queue contact submission error:', error);
