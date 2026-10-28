@@ -28,7 +28,7 @@ const slides = [
   {
     id: 1,
     mockupId: 2,
-    tag: "Hospitality",
+    tag: "Food & Dining",
     title: "eSmart Restaurant",
     highlight: "Smart Dining",
     description: "Digitized ordering, kitchen management, and profitability analytics to enhance the dining experience for modern customers.",
