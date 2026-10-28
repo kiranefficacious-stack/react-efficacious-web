@@ -12,6 +12,8 @@ export function Contact() {
   });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
+  const [errorMessage, setErrorMessage] = useState('');
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
@@ -22,24 +24,38 @@ export function Contact() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('submitting');
+    setErrorMessage('');
     
     try {
-      const response = await fetch('/api/partner', {
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim() || formData.firstName;
+      const response = await fetch('/api/send-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          type: 'product_contact',
+          product: 'eSmart Queue (Token & Queue Management)',
+          name: fullName,
+          email: formData.email.trim(),
+          company: formData.company.trim(),
+          message: formData.message.trim(),
+        }),
       });
+
+      const result = await response.json().catch(() => null);
       
-      if (response.ok) {
+      if (response.ok && (result?.success === true || result?.success === 'true')) {
         setStatus('success');
         setFormData({ firstName: '', lastName: '', email: '', company: '', message: '' });
       } else {
         setStatus('error');
+        setErrorMessage(result?.error || 'Unable to deliver message right now. Please email us directly at info@efficacious.co.in');
       }
     } catch (error) {
+      console.error('Queue contact submission error:', error);
       setStatus('error');
+      setErrorMessage('Unable to connect to mail server. Please email us directly at info@efficacious.co.in');
     }
   };
 
@@ -149,14 +165,15 @@ export function Contact() {
                 </div>
                 
                 {status === 'error' && (
-                  <div className="text-red-600 text-sm font-medium">
-                    Failed to send request. Please try again later.
+                  <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium">
+                    {errorMessage || 'Failed to send request. Please email us directly at info@efficacious.co.in.'}
                   </div>
                 )}
                 
-                <button disabled={status === 'submitting'} type="submit" className="w-full px-8 py-4 text-base font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-colors shadow-sm disabled:opacity-70">
-                  {status === 'submitting' ? 'Submitting...' : 'Submit Inquiry'}
+                <button disabled={status === 'submitting'} type="submit" className="w-full px-8 py-4 text-base font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer">
+                  {status === 'submitting' ? 'Delivering to info@efficacious.co.in...' : 'Submit Inquiry'}
                 </button>
+                <p className="text-center text-xs text-slate-400">Sent directly to info@efficacious.co.in</p>
               </form>
             )}
           </motion.div>

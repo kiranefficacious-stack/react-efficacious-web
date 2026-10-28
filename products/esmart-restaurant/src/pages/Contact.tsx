@@ -24,6 +24,8 @@ export default function Contact() {
     name: '', email: '', phone: '', restaurant: '', city: '', outlets: '', time: '', message: '',
     submitted: false, errors: {},
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const set = (field: string, value: string) =>
@@ -38,11 +40,47 @@ export default function Contact() {
     return errs;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) { setForm(s => ({ ...s, errors: errs })); return; }
-    setForm(s => ({ ...s, submitted: true }));
+
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    try {
+      const endpoint = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || '/api/send-email';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'product_contact',
+          product: 'e-Smart Restaurant POS',
+          name: form.name.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          mobile: form.phone.trim(),
+          restaurant: form.restaurant.trim(),
+          city: form.city.trim(),
+          outlets: form.outlets,
+          time: form.time,
+          subject: `Demo Request for ${form.restaurant.trim()}`,
+          message: form.message.trim() || `Demo request for ${form.restaurant.trim()}. Outlets: ${form.outlets || '1'}, City: ${form.city || 'N/A'}, Best time: ${form.time || 'Anytime'}.`,
+        }),
+      });
+
+      const resData = await res.json().catch(() => null);
+      if (res.ok && (resData?.success === true || resData?.success === 'true')) {
+        setForm(s => ({ ...s, submitted: true }));
+      } else {
+        setSubmitError(resData?.error || 'Unable to submit demo request right now. Please email info@efficacious.co.in directly.');
+      }
+    } catch (err) {
+      console.error('Restaurant contact form error:', err);
+      setSubmitError('Unable to connect to mail server. Please email info@efficacious.co.in directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const field = (id: string, label: string, type = 'text', placeholder = '') => (
@@ -126,13 +164,21 @@ export default function Contact() {
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:outline-none text-sm bg-white resize-none"
                   />
                 </div>
+                {submitError && (
+                  <p className="text-red-600 text-xs bg-red-50 p-3 rounded-xl border border-red-200">
+                    {submitError}
+                  </p>
+                )}
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-orange-200 flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full py-3.5 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark disabled:opacity-70 transition-colors shadow-lg shadow-orange-200 flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                 >
-                  Request My Free Demo <ArrowRight className="w-4 h-4" />
+                  {isSubmitting ? 'Delivering to info@efficacious.co.in...' : (
+                    <>Request My Free Demo <ArrowRight className="w-4 h-4" /></>
+                  )}
                 </button>
-                <p className="text-center text-xs text-gray-400">No commitment. Free onboarding. Cancel anytime.</p>
+                <p className="text-center text-xs text-gray-400">Sent directly to info@efficacious.co.in • Free onboarding</p>
               </form>
             )}
           </div>

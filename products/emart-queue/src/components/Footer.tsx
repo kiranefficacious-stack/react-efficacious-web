@@ -19,11 +19,11 @@ const navLinks = {
     { label: 'Why Us',          href: '#why-us'    },
   ],
   Company: [
+    { label: '← Main Website',  href: '/'          },
     { label: 'About Us',        href: '#about'     },
     { label: 'Contact',         href: '#contact'   },
     { label: 'Partner with Us', href: '#contact'   },
-    { label: 'Careers',         href: '#'          },
-    { label: 'Press Kit',       href: '#'          },
+    { label: 'Careers',         href: '/careers'   },
   ],
   Developers: [
     { label: 'API Documentation', href: '#' },
@@ -63,8 +63,8 @@ export function Footer({ onPrivacyClick, onTermsClick }: FooterProps) {
             className="lg:col-span-4 flex flex-col gap-6"
           >
             {/* Logo */}
-            <a href="#" className="w-fit">
-              <img src={logo} alt="Smart Queue" className="h-12 w-auto brightness-0 invert" />
+            <a href="/" title="Efficacious Home" className="w-fit">
+              <img src={logo} alt="Smart Queue" className="h-12 w-auto brightness-0 invert hover:opacity-80 transition-opacity" />
             </a>
 
             <p className="text-sm leading-relaxed max-w-xs">

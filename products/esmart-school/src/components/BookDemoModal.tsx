@@ -61,7 +61,6 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
                                   e.email      = 'Valid email is required.';
     if (!form.phone.trim())      e.phone      = 'Phone number is required.';
     if (!form.schoolName.trim()) e.schoolName = 'School name is required.';
-    if (!form.studentCount)      e.studentCount = 'Please select student count.';
     return e;
   };
 
@@ -79,51 +78,35 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
 
     setStatus('sending');
 
-    // Build a mailto body as fallback / primary delivery
-    const subject = encodeURIComponent(`[eSMARTs Demo Request] ${form.schoolName}`);
-    const body = encodeURIComponent(
-      `New Demo Request\n` +
-      `================\n` +
-      `Name:          ${form.name}\n` +
-      `Email:         ${form.email}\n` +
-      `Phone:         ${form.phone}\n` +
-      `School:        ${form.schoolName}\n` +
-      `City:          ${form.city || 'N/A'}\n` +
-      `Students:      ${form.studentCount}\n` +
-      `Message:       ${form.message || 'N/A'}\n`
-    );
-
-    // Try EmailJS first; fall back to mailto if not configured
     try {
-      // EmailJS: update these three IDs after setting up EmailJS account
-      // https://www.emailjs.com/ → Service ID, Template ID, Public Key
-      const SERVICE_ID  = import.meta.env.VITE_EMAILJS_SERVICE_ID  || '';
-      const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
-      const PUBLIC_KEY  = import.meta.env.VITE_EMAILJS_PUBLIC_KEY  || '';
+      const endpoint = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || '/api/send-email';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'product_contact',
+          product: 'eSMARTs School ERP - Demo Request',
+          name: form.name.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          mobile: form.phone.trim(),
+          schoolName: form.schoolName.trim(),
+          city: form.city.trim(),
+          studentCount: form.studentCount || '1–500',
+          subject: `Demo Request for ${form.schoolName.trim()}${form.studentCount ? ` (${form.studentCount} Students)` : ''}`,
+          message: form.message.trim() || `Demo request for ${form.schoolName.trim()}. Student capacity: ${form.studentCount || '1–500'}, Location: ${form.city || 'N/A'}.`,
+        }),
+      });
 
-      if (SERVICE_ID && TEMPLATE_ID && PUBLIC_KEY) {
-        await emailjs.send(
-          SERVICE_ID,
-          TEMPLATE_ID,
-          {
-            from_name:     form.name,
-            from_email:    form.email,
-            phone:         form.phone,
-            school_name:   form.schoolName,
-            city:          form.city || 'N/A',
-            student_count: form.studentCount,
-            message:       form.message || 'N/A',
-            to_email:      'info@efficacious.co.in',
-          },
-          PUBLIC_KEY
-        );
+      const resData = await response.json().catch(() => null);
+      if (response.ok && (resData?.success === true || resData?.success === 'true')) {
         setStatus('success');
       } else {
-        // Fallback: open user's default mail client with pre-filled content
-        window.location.href = `mailto:info@efficacious.co.in?subject=${subject}&body=${body}`;
-        setStatus('success');
+        console.warn('Demo booking mailer error:', resData?.error);
+        setStatus('error');
       }
-    } catch {
+    } catch (err) {
+      console.error('Demo booking error:', err);
       setStatus('error');
     }
   };

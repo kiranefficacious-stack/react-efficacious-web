@@ -143,10 +143,16 @@ function App() {
                       <Route path="/services/pvc-card-printing" element={<PVCCardPrinting />} />
                       <Route path="/products" element={<Products />} />
                       <Route path="/products/esmart-school" element={<ESmartSchoolRedirect />} />
+                      <Route path="/products/esmart-school/*" element={<ESmartSchoolRedirect />} />
                       <Route path="/products/esmart-track" element={<Navigate to="/products" replace />} />
                       <Route path="/products/esmart-restaurant" element={<ESmartRestaurantRedirect />} />
+                      <Route path="/products/esmart-restaurant/*" element={<ESmartRestaurantRedirect />} />
                       <Route path="/products/esmart-health" element={<ESmartHealthRedirect />} />
+                      <Route path="/products/esmart-health/*" element={<ESmartHealthRedirect />} />
                       <Route path="/products/emart-queue" element={<EMartQueueRedirect />} />
+                      <Route path="/products/emart-queue/*" element={<EMartQueueRedirect />} />
+                      <Route path="/products/esmart-queue" element={<EMartQueueRedirect />} />
+                      <Route path="/products/esmart-queue/*" element={<EMartQueueRedirect />} />
                       <Route path="/products/esmart-team" element={<ESmartTeam />} />
                       <Route path="/products/esmart-society" element={<Navigate to="/products" replace />} />
                       <Route path="/portfolio" element={<Portfolio />} />

@@ -169,14 +169,55 @@ const ADDONS = [
 export default function Home() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [formState, setFormState] = useState({ name: '', phone: '', restaurant: '', city: '', outlets: '', submitted: false, error: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleDemoSubmit = (e: React.FormEvent) => {
+  const handleDemoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formState.name || !formState.phone || !formState.restaurant) {
+    if (!formState.name.trim() || !formState.phone.trim() || !formState.restaurant.trim()) {
       setFormState(s => ({ ...s, error: 'Please fill in Name, Phone, and Restaurant Name.' }));
       return;
     }
-    setFormState(s => ({ ...s, submitted: true, error: '' }));
+
+    setIsSubmitting(true);
+    setFormState(s => ({ ...s, error: '' }));
+
+    try {
+      const endpoint = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || '/api/send-email';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'product_contact',
+          product: 'e-Smart Restaurant (Free Demo Request)',
+          name: formState.name.trim(),
+          phone: formState.phone.trim(),
+          mobile: formState.phone.trim(),
+          restaurant: formState.restaurant.trim(),
+          city: formState.city.trim() || 'Not provided',
+          outlets: formState.outlets || '1',
+          subject: `Demo Request for ${formState.restaurant.trim()}`,
+          message: `Demo Request from Restaurant Home Page. Restaurant: ${formState.restaurant.trim()}, Outlets: ${formState.outlets || '1'}, City: ${formState.city.trim() || 'Not specified'}, Phone: ${formState.phone.trim()}.`,
+        }),
+      });
+
+      const data = await response.json().catch(() => null);
+      if (response.ok && (data?.success === true || data?.success === 'true')) {
+        setFormState(s => ({ ...s, submitted: true, error: '' }));
+      } else {
+        setFormState(s => ({
+          ...s,
+          error: data?.error || 'Unable to submit demo request right now. Please email us directly at info@efficacious.co.in',
+        }));
+      }
+    } catch (err: any) {
+      console.error('Demo submission error:', err);
+      setFormState(s => ({
+        ...s,
+        error: 'Unable to connect to mail server. Please email us directly at info@efficacious.co.in',
+      }));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -475,10 +516,16 @@ export default function Home() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-orange-200 flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full py-3.5 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-orange-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  Request Free Demo <ArrowRight className="w-4 h-4" />
+                  {isSubmitting ? (
+                    'Delivering to info@efficacious.co.in...'
+                  ) : (
+                    <>Request Free Demo <ArrowRight className="w-4 h-4" /></>
+                  )}
                 </button>
+                <p className="text-center text-xs text-gray-400">Sent directly to info@efficacious.co.in</p>
               </form>
             )}
           </FadeIn>

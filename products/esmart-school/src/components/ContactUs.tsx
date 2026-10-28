@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Send, Mail, User, School, MessageSquare, MapPin, Phone } from 'lucide-react';
+import { Send, Mail, User, School, MessageSquare, MapPin, Phone, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import React, { useState } from 'react';
 
 export function ContactUs() {
@@ -11,11 +11,51 @@ export function ContactUs() {
     details: '',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Thank you for your interest! We will get back to you soon.');
-    setFormData({ name: '', email: '', phone: '', schoolName: '', details: '', message: '' });
+    setIsSubmitting(true);
+    setErrorMessage('');
+    setSubmitSuccess(false);
+
+    try {
+      const endpoint = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || '/api/send-email';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'product_contact',
+          product: 'eSMARTs School ERP',
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          mobile: formData.phone.trim(),
+          schoolName: formData.schoolName.trim(),
+          details: formData.details.trim(),
+          subject: `School ERP Inquiry - ${formData.schoolName.trim()}`,
+          message: formData.message.trim(),
+        }),
+      });
+
+      const result = await response.json().catch(() => null);
+
+      if (response.ok && (result?.success === true || result?.success === 'true')) {
+        setSubmitSuccess(true);
+        setFormData({ name: '', email: '', phone: '', schoolName: '', details: '', message: '' });
+      } else {
+        setErrorMessage(result?.error || 'Unable to deliver message right now. Please email us directly at info@efficacious.co.in');
+      }
+    } catch (err: any) {
+      console.error('Submission error:', err);
+      setErrorMessage('Unable to connect to mail server. Please email us directly at info@efficacious.co.in');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -76,6 +116,27 @@ export function ContactUs() {
             transition={{ duration: 0.6 }}
             className="bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200 dark:border-slate-800 shadow-xl"
           >
+            {submitSuccess && (
+              <div className="mb-6 p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-start gap-3">
+                <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-bold text-emerald-900 dark:text-emerald-200 text-sm">Message Sent Successfully!</h4>
+                  <p className="text-emerald-700 dark:text-emerald-300 text-xs mt-1 leading-relaxed">
+                    Thank you for your interest in eSMARTs. Your inquiry has been sent directly to <strong>info@efficacious.co.in</strong>. Our team will contact you shortly.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {errorMessage && (
+              <div className="mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                <p className="text-red-700 dark:text-red-300 text-xs leading-relaxed">
+                  {errorMessage}
+                </p>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -196,10 +257,20 @@ export function ContactUs() {
 
               <button
                 type="submit"
-                className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-4 px-8 rounded-xl transition-colors flex items-center justify-center gap-2"
+                disabled={isSubmitting}
+                className="w-full bg-primary-600 hover:bg-primary-700 disabled:opacity-70 text-white font-bold py-4 px-8 rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
               >
-                <span>Send Message</span>
-                <Send className="w-5 h-5" />
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Delivering to info@efficacious.co.in...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Send Message</span>
+                    <Send className="w-5 h-5" />
+                  </>
+                )}
               </button>
             </form>
           </motion.div>

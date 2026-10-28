@@ -148,6 +148,15 @@ export function Footer() {
               Quick Links
             </h4>
             <ul className="space-y-2.5">
+                <li>
+                  <a
+                    href="/"
+                    className="group flex items-center gap-1.5 text-sm text-primary-400 hover:text-white font-medium transition-colors"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5" />
+                    ← Efficacious Main Website
+                  </a>
+                </li>
               {navLinks.map(({ label, href }) => (
                 <li key={label}>
                   <a

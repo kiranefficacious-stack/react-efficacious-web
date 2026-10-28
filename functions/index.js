@@ -50,11 +50,23 @@ exports.sendEmailNotification = onRequest(
 
     try {
       const {
-        type = "contact", // 'contact' or 'career'
+        type = "contact", // 'contact', 'career', or 'product_contact'
+        product,
         name,
+        firstName,
+        lastName,
         email,
         mobile,
+        phone,
         address,
+        city,
+        schoolName,
+        restaurant,
+        company,
+        outlets,
+        studentCount,
+        time,
+        details,
         subject,
         position,
         message,
@@ -63,7 +75,12 @@ exports.sendEmailNotification = onRequest(
         resumeDataUrl,
       } = req.body;
 
-      if (!name || !email) {
+      const fullName = (name || (firstName && lastName ? `${firstName} ${lastName}` : (firstName || lastName || '')) || 'Prospective Client').trim();
+      const contactPhone = (mobile || phone || '').trim();
+      const orgName = (schoolName || restaurant || company || '').trim();
+      const location = (city || address || '').trim();
+
+      if (!fullName || !email) {
         return res.status(400).json({ success: false, error: "Name and Email are required." });
       }
 
@@ -112,14 +129,14 @@ exports.sendEmailNotification = onRequest(
       let emailHtml = "";
 
       if (type === "career") {
-        emailSubject = `${name.trim()} <${email.trim()}> - Application: ${position || "Open Role"}${resumeName ? " [CV Attached]" : ""}`;
+        emailSubject = `${fullName} <${email.trim()}> - Application: ${position || "Open Role"}${resumeName ? " [CV Attached]" : ""}`;
         emailText = `
 New Job Application Received:
 --------------------------------------------------
-Candidate Name:   ${name}
+Candidate Name:   ${fullName}
 Email Address:    ${email}
-Mobile Number:    ${mobile || "N/A"}
-Location/City:    ${address || "N/A"}
+Mobile Number:    ${contactPhone || "N/A"}
+Location/City:    ${location || "N/A"}
 Applied Position: ${position || "N/A"}
 Resume Uploaded:  ${resumeName ? `${resumeName} (${resumeSize || ""})` : "None"}
 
@@ -133,10 +150,10 @@ Sent to: info@efficacious.co.in
 <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
   <h2 style="color: #0f172a; margin-top: 0;">New Job Application</h2>
   <table style="width: 100%; border-collapse: collapse;">
-    <tr><td style="padding: 8px 0; color: #64748b; width: 140px;">Candidate:</td><td style="padding: 8px 0; font-weight: bold; color: #0f172a;">${name}</td></tr>
+    <tr><td style="padding: 8px 0; color: #64748b; width: 140px;">Candidate:</td><td style="padding: 8px 0; font-weight: bold; color: #0f172a;">${fullName}</td></tr>
     <tr><td style="padding: 8px 0; color: #64748b;">Email:</td><td style="padding: 8px 0; color: #0284c7;">${email}</td></tr>
-    <tr><td style="padding: 8px 0; color: #64748b;">Phone:</td><td style="padding: 8px 0; color: #0f172a;">${mobile || "N/A"}</td></tr>
-    <tr><td style="padding: 8px 0; color: #64748b;">Location:</td><td style="padding: 8px 0; color: #0f172a;">${address || "N/A"}</td></tr>
+    <tr><td style="padding: 8px 0; color: #64748b;">Phone:</td><td style="padding: 8px 0; color: #0f172a;">${contactPhone || "N/A"}</td></tr>
+    <tr><td style="padding: 8px 0; color: #64748b;">Location:</td><td style="padding: 8px 0; color: #0f172a;">${location || "N/A"}</td></tr>
     <tr><td style="padding: 8px 0; color: #64748b;">Position:</td><td style="padding: 8px 0; font-weight: bold; color: #d97706;">${position || "General Application"}</td></tr>
     <tr><td style="padding: 8px 0; color: #64748b;">Resume:</td><td style="padding: 8px 0; color: #0f172a;">${resumeName ? `<strong>${resumeName}</strong> (${resumeSize || ""})` : "No file uploaded"}</td></tr>
   </table>
@@ -145,15 +162,55 @@ Sent to: info@efficacious.co.in
   <p style="background: #f8fafc; padding: 12px; border-radius: 6px; color: #334155; line-height: 1.5; white-space: pre-wrap;">${message || "No notes provided"}</p>
 </div>
         `.trim();
+      } else if (product || type === "product_contact") {
+        const prodName = product || "Product";
+        emailSubject = `${fullName} <${email.trim()}> - [${prodName}] ${orgName ? `${orgName} - ` : ''}${subject || 'Demo / Inquiry'}`;
+        emailText = `
+New ${prodName} Inquiry Received:
+--------------------------------------------------
+Product:          ${prodName}
+Full Name:        ${fullName}
+Email Address:    ${email}
+Phone Number:     ${contactPhone || "N/A"}
+Organization:     ${orgName || "N/A"}
+City/Location:    ${location || "N/A"}
+Scale / Details:  ${studentCount ? `${studentCount} Students` : ''}${outlets ? `${outlets} Outlets` : ''}${details ? `${details}` : ''}${time ? ` (Preferred: ${time})` : ''}
+
+Message / Notes:
+${message || "No message provided"}
+--------------------------------------------------
+Sent to: info@efficacious.co.in
+        `.trim();
+
+        emailHtml = `
+<div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+  <div style="display: inline-block; padding: 3px 10px; border-radius: 20px; background: #fff7ed; color: #c2410c; font-size: 12px; font-weight: bold; margin-bottom: 6px;">${prodName}</div>
+  <h2 style="color: #0f172a; margin-top: 0;">New Product Inquiry</h2>
+  <table style="width: 100%; border-collapse: collapse;">
+    <tr><td style="padding: 8px 0; color: #64748b; width: 140px;">Product:</td><td style="padding: 8px 0; font-weight: bold; color: #E48100;">${prodName}</td></tr>
+    <tr><td style="padding: 8px 0; color: #64748b;">Full Name:</td><td style="padding: 8px 0; font-weight: bold; color: #0f172a;">${fullName}</td></tr>
+    <tr><td style="padding: 8px 0; color: #64748b;">Email:</td><td style="padding: 8px 0; color: #0284c7;">${email}</td></tr>
+    <tr><td style="padding: 8px 0; color: #64748b;">Phone:</td><td style="padding: 8px 0; color: #0f172a;">${contactPhone || "N/A"}</td></tr>
+    ${orgName ? `<tr><td style="padding: 8px 0; color: #64748b;">Organization:</td><td style="padding: 8px 0; color: #0f172a;">${orgName}</td></tr>` : ''}
+    ${location ? `<tr><td style="padding: 8px 0; color: #64748b;">Location:</td><td style="padding: 8px 0; color: #0f172a;">${location}</td></tr>` : ''}
+    ${studentCount ? `<tr><td style="padding: 8px 0; color: #64748b;">Students:</td><td style="padding: 8px 0; color: #0f172a;">${studentCount}</td></tr>` : ''}
+    ${outlets ? `<tr><td style="padding: 8px 0; color: #64748b;">Outlets:</td><td style="padding: 8px 0; color: #0f172a;">${outlets}</td></tr>` : ''}
+    ${details ? `<tr><td style="padding: 8px 0; color: #64748b;">Details:</td><td style="padding: 8px 0; color: #0f172a;">${details}</td></tr>` : ''}
+  </table>
+  <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 16px 0;" />
+  <h4 style="margin: 0 0 8px 0; color: #0f172a;">Message / Notes:</h4>
+  <p style="background: #f8fafc; padding: 12px; border-radius: 6px; color: #334155; line-height: 1.5; white-space: pre-wrap;">${message || "No message provided"}</p>
+</div>
+        `.trim();
       } else {
-        emailSubject = `${name.trim()} <${email.trim()}> - Website Inquiry: ${subject || "General"}`;
+        emailSubject = `${fullName} <${email.trim()}> - Website Inquiry: ${subject || "General"}`;
         emailText = `
 New Contact Inquiry from Website:
 --------------------------------------------------
-Full Name:        ${name}
+Full Name:        ${fullName}
 Email Address:    ${email}
-Mobile Number:    ${mobile || "N/A"}
-Location/Address: ${address || "N/A"}
+Mobile Number:    ${contactPhone || "N/A"}
+Location/Address: ${location || "N/A"}
 Subject:          ${subject || "General Inquiry"}
 
 Message:
@@ -166,10 +223,10 @@ Sent to: info@efficacious.co.in
 <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
   <h2 style="color: #0f172a; margin-top: 0;">New Contact Inquiry</h2>
   <table style="width: 100%; border-collapse: collapse;">
-    <tr><td style="padding: 8px 0; color: #64748b; width: 140px;">Full Name:</td><td style="padding: 8px 0; font-weight: bold; color: #0f172a;">${name}</td></tr>
+    <tr><td style="padding: 8px 0; color: #64748b; width: 140px;">Full Name:</td><td style="padding: 8px 0; font-weight: bold; color: #0f172a;">${fullName}</td></tr>
     <tr><td style="padding: 8px 0; color: #64748b;">Email:</td><td style="padding: 8px 0; color: #0284c7;">${email}</td></tr>
-    <tr><td style="padding: 8px 0; color: #64748b;">Phone:</td><td style="padding: 8px 0; color: #0f172a;">${mobile || "N/A"}</td></tr>
-    <tr><td style="padding: 8px 0; color: #64748b;">Location:</td><td style="padding: 8px 0; color: #0f172a;">${address || "N/A"}</td></tr>
+    <tr><td style="padding: 8px 0; color: #64748b;">Phone:</td><td style="padding: 8px 0; color: #0f172a;">${contactPhone || "N/A"}</td></tr>
+    <tr><td style="padding: 8px 0; color: #64748b;">Location:</td><td style="padding: 8px 0; color: #0f172a;">${location || "N/A"}</td></tr>
     <tr><td style="padding: 8px 0; color: #64748b;">Subject:</td><td style="padding: 8px 0; font-weight: bold; color: #d97706;">${subject || "General"}</td></tr>
   </table>
   <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 16px 0;" />
@@ -182,7 +239,7 @@ Sent to: info@efficacious.co.in
       const mailOptions = {
         from: `"Efficacious Website" <info@efficacious.co.in>`,
         to: "info@efficacious.co.in",
-        replyTo: `${name} <${email}>`,
+        replyTo: `${fullName} <${email}>`,
         subject: emailSubject,
         text: emailText,
         html: emailHtml,

@@ -46,7 +46,7 @@ const PLACEHOLDER_ROUTES = [
 
 export default function App() {
   return (
-    <BrowserRouter basename="/products/esmart-restaurant/">
+    <BrowserRouter basename="/products/esmart-restaurant">
       <ScrollToTop />
       <Routes>
         <Route
