@@ -111,9 +111,9 @@ export function Footer() {
             {/* Badges */}
             <div className="flex flex-wrap gap-2 mb-6">
               {[
-                { icon: Shield,      label: 'ISO Certified'   },
-                { icon: GraduationCap, label: '500+ Schools'  },
-                { icon: BookOpen,    label: 'CBSE Compatible' },
+                { icon: Shield,        label: 'ISO Certified'   },
+                { icon: GraduationCap, label: '50+ Schools'   },
+                { icon: BookOpen,      label: 'CBSE Compatible' },
               ].map(({ icon: Icon, label }) => (
                 <span key={label} className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 bg-slate-800/60 border border-slate-700/60 px-2.5 py-1 rounded-full">
                   <Icon className="w-3 h-3 text-primary-400" />

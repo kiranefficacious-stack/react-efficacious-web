@@ -54,7 +54,7 @@ const slides = [
     href: "https://www.e-smarthealth.co.in/",
     isExternal: true,
     blobColor: "rgba(16,185,129,0.4)",
-    appStoreLink: "#",
+    appStoreLink: "https://apps.apple.com/in/app/e-smart-health/id6756566627",
     playStoreLink: "https://play.google.com/store/apps/details?id=com.efficacious.esmarthealth&hl=en",
   },
   {
@@ -70,7 +70,7 @@ const slides = [
     href: "/products/emart-queue/",
     isExternal: false,
     blobColor: "rgba(124,58,237,0.4)",
-    appStoreLink: "#",
+    appStoreLink: "https://apps.apple.com/ph/app/e-smart-queue/id6784201811",
     playStoreLink: "https://play.google.com/store/apps/details?id=com.efficacious.esmartqueue",
   },
 ];
@@ -115,10 +115,33 @@ const Hero: React.FC = () => {
 
   // Find dynamic product data for the current slide
   const activeSlideData = slides[currentSlide];
-  // Normalize trailing slash for matching
-  const matchingProduct = data?.products?.find((p: any) => 
-    p.href?.replace(/\/$/, '') === activeSlideData.href.replace(/\/$/, '')
-  );
+  const matchingProduct = data?.products?.find((p: any) => {
+    if (!p) return false;
+    // Match by normalized title (e.g. "esmarthealth" === "esmarthealth", "esmartqueue" === "esmartqueue")
+    const pTitle = p.title?.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const slideTitle = activeSlideData.title?.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (pTitle && slideTitle && (pTitle === slideTitle || pTitle.includes(slideTitle) || slideTitle.includes(pTitle))) {
+      return true;
+    }
+
+    // Match by href keywords (health, queue, restaurant, school)
+    const pHref = p.href?.toLowerCase().replace(/\/$/, '') || '';
+    const slideHref = activeSlideData.href?.toLowerCase().replace(/\/$/, '') || '';
+    if (pHref && slideHref) {
+      if (pHref === slideHref) return true;
+      if (pHref.includes('health') && (slideHref.includes('health') || slideHref.includes('e-smarthealth'))) return true;
+      if (pHref.includes('queue') && slideHref.includes('queue')) return true;
+      if (pHref.includes('restaurant') && slideHref.includes('restaurant')) return true;
+      if (pHref.includes('school') && slideHref.includes('school')) return true;
+    }
+
+    // Match by ID (slide id is 0, 1, 2, 3; Firestore id is 1, 3, 2, 4)
+    if (String(p.id) === String(activeSlideData.id + 1) || String(p.id) === String(activeSlideData.id)) {
+      return true;
+    }
+
+    return false;
+  });
   
   const activeContent = {
     ...activeSlideData,

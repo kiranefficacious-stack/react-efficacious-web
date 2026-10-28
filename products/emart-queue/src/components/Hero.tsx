@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Download, Building2 } from 'lucide-react';
+import { ArrowRight, Download, Building2, Apple, Play } from 'lucide-react';
 
 export function Hero() {
   return (
@@ -45,19 +45,31 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            className="flex flex-wrap items-center justify-center gap-4"
           >
             <a
-                href="https://play.google.com/store/apps/details?id=com.efficacious.esmartqueue"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-primary-600 rounded-xl shadow-lg shadow-primary-200 transition-transform hover:scale-105"
-              >
-                <Download size={20} />
-                Download the App
-              </a>
-            <a href="#contact" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
-              <Building2 size={20} />
+              href="https://apps.apple.com/ph/app/e-smart-queue/id6784201811"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 text-sm font-bold text-white bg-slate-900 rounded-xl shadow-lg transition-transform hover:scale-105 active:scale-95"
+            >
+              <Apple size={18} />
+              App Store
+            </a>
+            <a
+              href="https://play.google.com/store/apps/details?id=com.efficacious.esmartqueue"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 text-sm font-bold text-white bg-primary-600 rounded-xl shadow-lg shadow-primary-200 transition-transform hover:scale-105 active:scale-95"
+            >
+              <Play size={16} className="fill-white" />
+              Google Play
+            </a>
+            <a 
+              href="#contact" 
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shadow-sm"
+            >
+              <Building2 size={18} />
               Partner with Us
             </a>
           </motion.div>

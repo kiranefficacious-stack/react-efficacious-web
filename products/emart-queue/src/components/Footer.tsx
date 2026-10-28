@@ -164,8 +164,10 @@ export function Footer({ onPrivacyClick, onTermsClick }: FooterProps) {
               <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Download the App</p>
               <div className="flex flex-wrap gap-2">
                 <a
-                  href="#"
+                  href="https://apps.apple.com/ph/app/e-smart-queue/id6784201811"
                   id="footer-appstore-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition-colors"
                 >
                   <span className="text-lg leading-none">🍎</span>

@@ -103,14 +103,24 @@ export function Contact() {
             <div className="pt-8 border-t border-slate-200">
               <h4 className="font-bold text-slate-900 mb-4">Get the App Today</h4>
               <div className="flex gap-4">
-                <button className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg transition-colors font-bold shadow-sm">
+                <a
+                  href="https://apps.apple.com/ph/app/e-smart-queue/id6784201811"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg transition-colors font-bold shadow-sm"
+                >
                   <AppWindow className="w-5 h-5" />
                   App Store
-                </button>
-                <button className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg transition-colors font-bold shadow-sm">
+                </a>
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.efficacious.esmartqueue"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg transition-colors font-bold shadow-sm"
+                >
                   <AppWindow className="w-5 h-5" />
                   Google Play
-                </button>
+                </a>
               </div>
             </div>
           </motion.div>

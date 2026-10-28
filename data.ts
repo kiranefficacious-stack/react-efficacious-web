@@ -573,7 +573,7 @@ export const initialData = {
         { title: "Communication Center", iconName: "Bell" }
       ],
       stats: [
-        { label: "Schools Onboarded", value: "500+" },
+        { label: "Schools Onboarded", value: "50+" },
         { label: "Parents Connected", value: "1M+" },
         { label: "Uptime Guaranteed", value: "99.9%" }
       ]
@@ -587,7 +587,7 @@ export const initialData = {
       href: "https://www.e-smarthealth.co.in/",
       newTab: true,
       iconName: "Activity",
-      appStoreLink: "",
+      appStoreLink: "https://apps.apple.com/in/app/e-smart-health/id6756566627",
       playStoreLink: "https://play.google.com/store/apps/details?id=com.efficacious.esmarthealth&hl=en",
       gradient: "from-emerald-400 via-teal-500 to-cyan-600",
       bgAccent: "bg-emerald-500/10",
@@ -677,7 +677,7 @@ export const initialData = {
       href: "/products/emart-queue/",
       newTab: true,
       iconName: "Timer",
-      appStoreLink: "",
+      appStoreLink: "https://apps.apple.com/ph/app/e-smart-queue/id6784201811",
       playStoreLink: "https://play.google.com/store/apps/details?id=com.efficacious.esmartqueue",
       gradient: "from-violet-400 via-fuchsia-500 to-pink-600",
       bgAccent: "bg-violet-500/10",

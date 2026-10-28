@@ -10,7 +10,7 @@ const FounderCard: React.FC<{ member: any; index: number }> = ({ member, index }
   const stats = [
     { icon: Calendar,    label: 'Founded',           value: '2012' },
     { icon: Building2,   label: 'Products Launched',  value: '4+' },
-    { icon: Users,       label: 'Schools Empowered',  value: '500+' },
+    { icon: Users,       label: 'Schools Empowered',  value: '50+' },
     { icon: TrendingUp,  label: 'Years of Growth',    value: '12+' },
   ];
 
