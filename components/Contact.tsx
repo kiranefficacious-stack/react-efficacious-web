@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { motion as m } from 'framer-motion';
 import { MapPin, Mail, Phone, Send, User, MessageSquare, FileText, Smartphone, Home, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
-import { db } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import emailjs from '@emailjs/browser';
 
 const motion = m as any;
 
@@ -24,7 +23,6 @@ const Contact: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [pendingActivation, setPendingActivation] = useState(false);
 
   const validate = (values = formData): Record<string, string> => {
     const errs: Record<string, string> = {};
@@ -102,67 +100,91 @@ const Contact: React.FC = () => {
     setIsSubmitting(true);
     setErrorMessage('');
     setSubmitSuccess(false);
-    setPendingActivation(false);
 
-    const recipientEmail = contact?.email || 'info@efficacious.co.in';
-    let savedToFirestore = false;
+    const recipientEmail = 'info@efficacious.co.in';
     let emailDelivered = false;
-    let activationRequired = false;
 
-    // 1. Save into Firestore so inquiries are immediately visible to admin
-    try {
-      await addDoc(collection(db, 'contact_inquiries'), {
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        mobile: formData.mobile.trim(),
-        address: formData.address.trim() || 'Not specified',
-        subject: formData.subject.trim(),
-        message: formData.message.trim(),
-        recipient: recipientEmail,
-        createdAt: serverTimestamp(),
-        status: 'new'
-      });
-      savedToFirestore = true;
-    } catch (dbErr) {
-      console.warn('Firestore store error:', dbErr);
-    }
+    // Formatted rich text body content
+    const formattedBody = `
+New Contact Inquiry from Website:
+--------------------------------------------------
+Full Name:        ${formData.name.trim()}
+Email Address:    ${formData.email.trim()}
+Mobile Number:    ${formData.mobile.trim()}
+Location/Address: ${formData.address.trim() || 'Not specified'}
+Subject:          ${formData.subject.trim()}
 
-    // 2. Send via FormSubmit AJAX (using FormSubmit token to protect naked email)
-    const formSubmitToken = import.meta.env.VITE_FORMSUBMIT_TOKEN || '99a588cd0cd777cbb113f4394a597440';
-    try {
-      const response = await fetch(`https://formsubmit.co/ajax/${formSubmitToken}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          name: formData.name.trim(),
-          email: formData.email.trim(),
-          mobile: formData.mobile.trim(),
-          address: formData.address.trim() || 'Not specified',
-          subject: formData.subject.trim(),
-          message: formData.message.trim(),
-          _subject: `New Contact Inquiry: ${formData.subject.trim()} - ${formData.name.trim()}`,
-          _replyto: formData.email.trim(),
-          _template: 'table',
-          _captcha: 'false'
-        })
-      });
+Message Content:
+${formData.message.trim()}
+--------------------------------------------------
+To / Recipient:   ${recipientEmail}
+`.trim();
 
-      const resData = await response.json().catch(() => null);
-      if (response.ok && (resData?.success === 'true' || resData?.success === true)) {
-        emailDelivered = true;
-      } else if (resData?.message && /activation/i.test(resData.message)) {
-        activationRequired = true;
+    // 2. Email Notification Endpoint (Cloud Function or local dev mailer)
+    const CLOUD_FUNCTIONS_URL = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || '/api/send-email';
+    if (CLOUD_FUNCTIONS_URL) {
+      try {
+        const fnRes = await fetch(CLOUD_FUNCTIONS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'contact',
+            name: formData.name.trim(),
+            email: formData.email.trim(),
+            mobile: formData.mobile.trim(),
+            address: formData.address.trim(),
+            subject: formData.subject.trim(),
+            message: formData.message.trim(),
+          }),
+        });
+        const fnData = await fnRes.json().catch(() => null);
+        if (fnRes.ok && (fnData?.success === true || fnData?.success === 'true')) {
+          emailDelivered = true;
+        } else if (fnData?.error) {
+          console.warn('Mailer endpoint error:', fnData.error);
+          setErrorMessage(fnData.error);
+        }
+      } catch (fnErr: any) {
+        console.warn('Firebase Cloud Function send error:', fnErr);
       }
-    } catch (err: any) {
-      console.warn('Contact FormSubmit error:', err);
     }
 
-    if (savedToFirestore || emailDelivered) {
+    // 3. EmailJS (From info@efficacious.co.in To info@efficacious.co.in)
+    const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
+    const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
+    const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
+
+    if (!emailDelivered && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY) {
+      try {
+        await emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_TEMPLATE_ID,
+          {
+            to_name: 'Efficacious Team',
+            to_email: recipientEmail,
+            from_name: formData.name.trim(),
+            from_email: formData.email.trim(),
+            reply_to: formData.email.trim(),
+            name: formData.name.trim(),
+            email: formData.email.trim(),
+            mobile: formData.mobile.trim(),
+            phone: formData.mobile.trim(),
+            address: formData.address.trim() || 'Not specified',
+            subject: formData.subject.trim(),
+            message: formData.message.trim(),
+            body_content: formattedBody,
+            content: formattedBody
+          },
+          EMAILJS_PUBLIC_KEY
+        );
+        emailDelivered = true;
+      } catch (emailjsErr) {
+        console.warn('EmailJS send error:', emailjsErr);
+      }
+    }
+
+    if (emailDelivered) {
       setSubmitSuccess(true);
-      setPendingActivation(activationRequired);
       setFormData({
         name: '',
         mobile: '',
@@ -174,7 +196,7 @@ const Contact: React.FC = () => {
       setTouched({});
       setErrors({});
     } else {
-      setErrorMessage(`Could not deliver message automatically. Please click below to email us directly at ${recipientEmail}.`);
+      setErrorMessage('Unable to deliver message right now. Please email us directly at info@efficacious.co.in.');
     }
 
     setIsSubmitting(false);
@@ -285,11 +307,7 @@ const Contact: React.FC = () => {
                 <p className="text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto mb-6">
                   Thank you for reaching out. We have received your inquiry and our team will get in touch with you shortly.
                 </p>
-                {pendingActivation && (
-                  <p className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg p-2.5 mb-6 max-w-md mx-auto">
-                    Note: Your message is stored in our database. Email routing is pending administrator verification at {contact.email || 'info@efficacious.co.in'}.
-                  </p>
-                )}
+
                 <button
                   type="button"
                   onClick={() => setSubmitSuccess(false)}
@@ -301,17 +319,9 @@ const Contact: React.FC = () => {
             ) : (
               <form noValidate onSubmit={handleSubmit} className="space-y-5">
                 {errorMessage && (
-                  <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm flex flex-col gap-2">
-                    <div className="flex items-start gap-2">
-                      <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                      <span>{errorMessage}</span>
-                    </div>
-                    <a 
-                      href={`mailto:${contact.email || 'info@efficacious.co.in'}?subject=${encodeURIComponent(formData.subject || 'Website Inquiry')}&body=${encodeURIComponent(`Name: ${formData.name}\nPhone: ${formData.mobile}\nAddress: ${formData.address}\n\nMessage:\n${formData.message}`)}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold underline hover:text-red-700 dark:hover:text-red-300 self-start ml-7"
-                    >
-                      <Mail size={14} /> Open default mail app instead
-                    </a>
+                  <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm flex items-start gap-2">
+                    <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                    <span>{errorMessage}</span>
                   </div>
                 )}
 

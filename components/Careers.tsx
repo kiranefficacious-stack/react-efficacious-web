@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
 import { 
   Briefcase, CheckCircle2, Upload, Send, 
@@ -7,8 +7,7 @@ import {
   FileCheck, MessageSquare, Coffee, AlertCircle, Loader2, X
 } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
-import { db } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import emailjs from '@emailjs/browser';
 
 const motion = m as any;
 
@@ -39,6 +38,20 @@ const Careers: React.FC = () => {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const readFileAsDataUrl = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        resolve(typeof reader.result === 'string' ? reader.result : '');
+      };
+      reader.onerror = () => {
+        resolve('');
+      };
+      reader.readAsDataURL(file);
+    });
+  };
 
   const validateFile = (file: File): string | null => {
     const allowedExtensions = ['pdf', 'doc', 'docx'];
@@ -168,107 +181,116 @@ const Careers: React.FC = () => {
     setStatusMessage('');
 
     const recipientEmail = 'info@efficacious.co.in';
-    let savedToFirestore = false;
     let emailDelivered = false;
 
-    // 1. Save application into Firestore job_applications
-    try {
-      await addDoc(collection(db, 'job_applications'), {
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        mobile: formData.mobile.trim(),
-        address: formData.address.trim(),
-        position: formData.position,
-        message: formData.message.trim() || 'No cover letter provided',
-        resumeName: selectedFile ? selectedFile.name : 'No file attached',
-        resumeSize: selectedFile ? selectedFile.size : 0,
-        createdAt: serverTimestamp(),
-        status: 'new'
-      });
-      savedToFirestore = true;
-    } catch (dbErr) {
-      console.warn('Firestore job application save error:', dbErr);
-    }
-
-    // 2. Send via FormSubmit AJAX (with resume attachment if selected)
-    try {
-      const formPayload = new FormData();
-      formPayload.append('name', formData.name.trim());
-      formPayload.append('email', formData.email.trim());
-      formPayload.append('mobile', formData.mobile.trim());
-      formPayload.append('address', formData.address.trim());
-      formPayload.append('position', formData.position);
-      formPayload.append('message', formData.message.trim() || 'No cover letter provided');
-      formPayload.append('_subject', `New Job Application: ${formData.position} - ${formData.name.trim()}`);
-      formPayload.append('_replyto', formData.email.trim());
-      formPayload.append('_template', 'table');
-      formPayload.append('_captcha', 'false');
-
-      if (selectedFile) {
-        formPayload.append('attachment', selectedFile);
-      }
-
-      const formSubmitToken = import.meta.env.VITE_FORMSUBMIT_TOKEN || '99a588cd0cd777cbb113f4394a597440';
-      const res = await fetch(`https://formsubmit.co/ajax/${formSubmitToken}`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json'
-        },
-        body: formPayload
-      });
-
-      const resData = await res.json().catch(() => null);
-      if (res.ok && (resData?.success === 'true' || resData?.success === true)) {
-        emailDelivered = true;
-      }
-    } catch (mailErr) {
-      console.warn('FormSubmit careers send error:', mailErr);
-    }
-
-    // 3. Fallback: EmailJS if environment variables are configured
-    const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
-    const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
-    const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
-
-    if (!emailDelivered && SERVICE_ID && TEMPLATE_ID && PUBLIC_KEY) {
+    // 1. Read file as Data URL if under 850KB for direct email attachment
+    let resumeDataUrl = '';
+    if (selectedFile && selectedFile.size <= 850 * 1024) {
       try {
-        const emailjsRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        resumeDataUrl = await readFileAsDataUrl(selectedFile);
+      } catch (readErr) {
+        console.warn('Could not read resume as data URL:', readErr);
+      }
+    }
+
+    // Formatted rich text body content
+    const formattedCareerBody = `
+New Job Application Received:
+--------------------------------------------------
+Candidate Name:   ${formData.name.trim()}
+Email Address:    ${formData.email.trim()}
+Mobile Number:    ${formData.mobile.trim()}
+Location / City:  ${formData.address.trim()}
+Applied Position: ${formData.position}
+
+Resume Attached:  ${selectedFile ? `${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)` : 'No file attached'}
+
+Cover Letter / Candidate Notes:
+${formData.message.trim() || 'No cover letter provided'}
+--------------------------------------------------
+To / Recipient:   ${recipientEmail}
+`.trim();
+
+    // 2. Email Notification Endpoint (Cloud Function or local dev mailer)
+    const CLOUD_FUNCTIONS_URL = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || '/api/send-email';
+    if (CLOUD_FUNCTIONS_URL) {
+      try {
+        const fnRes = await fetch(CLOUD_FUNCTIONS_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            service_id: SERVICE_ID,
-            template_id: TEMPLATE_ID,
-            user_id: PUBLIC_KEY,
-            template_params: {
-              from_name: formData.name.trim(),
-              from_email: formData.email.trim(),
-              mobile: formData.mobile.trim(),
-              position: formData.position,
-              address: formData.address.trim(),
-              message: formData.message.trim(),
-              resume_name: selectedFile ? selectedFile.name : 'No file attached'
-            }
-          })
+            type: 'career',
+            name: formData.name.trim(),
+            email: formData.email.trim(),
+            mobile: formData.mobile.trim(),
+            address: formData.address.trim(),
+            position: formData.position,
+            message: formData.message.trim(),
+            resumeName: selectedFile ? selectedFile.name : '',
+            resumeSize: selectedFile ? `${(selectedFile.size / 1024).toFixed(1)} KB` : '',
+            resumeDataUrl: resumeDataUrl || '',
+          }),
         });
-        if (emailjsRes.ok) {
+        const fnData = await fnRes.json().catch(() => null);
+        if (fnRes.ok && (fnData?.success === true || fnData?.success === 'true')) {
           emailDelivered = true;
+        } else if (fnData?.error) {
+          console.warn('Mailer endpoint error:', fnData.error);
+          setStatusMessage(fnData.error);
         }
-      } catch (e) {
-        console.warn('EmailJS careers send error:', e);
+      } catch (fnErr: any) {
+        console.warn('Firebase Cloud Function careers send error:', fnErr);
       }
     }
 
-    if (savedToFirestore || emailDelivered) {
+    // 3. EmailJS (From info@efficacious.co.in To info@efficacious.co.in)
+    const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
+    const EMAILJS_CAREERS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_CAREERS_TEMPLATE_ID || import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
+    const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
+
+    if (!emailDelivered && EMAILJS_SERVICE_ID && EMAILJS_CAREERS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY) {
+      try {
+        await emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_CAREERS_TEMPLATE_ID,
+          {
+            to_name: 'Efficacious HR Team',
+            to_email: recipientEmail,
+            from_name: formData.name.trim(),
+            from_email: formData.email.trim(),
+            reply_to: formData.email.trim(),
+            name: formData.name.trim(),
+            email: formData.email.trim(),
+            mobile: formData.mobile.trim(),
+            phone: formData.mobile.trim(),
+            address: formData.address.trim(),
+            position: formData.position,
+            message: formData.message.trim() || 'No cover letter provided',
+            resume_name: selectedFile ? selectedFile.name : 'No file attached',
+            resume_size: selectedFile ? `${(selectedFile.size / 1024).toFixed(1)} KB` : 'N/A',
+            body_content: formattedCareerBody,
+            content: formattedCareerBody
+          },
+          EMAILJS_PUBLIC_KEY
+        );
+        emailDelivered = true;
+      } catch (emailjsErr) {
+        console.warn('EmailJS careers send error:', emailjsErr);
+      }
+    }
+
+    if (emailDelivered) {
       setSubmitStatus('success');
       setStatusMessage('Thank you! Your application has been submitted successfully.');
       setFormData({ name: '', email: '', mobile: '', address: '', position: '', message: '' });
       setSelectedFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
       setTouched({});
       setErrors({});
       setFileError('');
     } else {
       setSubmitStatus('error');
-      setStatusMessage('Unable to send application automatically. Please email your CV directly to info@efficacious.co.in.');
+      setStatusMessage('Unable to submit your application right now. Please email your CV directly to info@efficacious.co.in.');
     }
 
     setIsSubmitting(false);
@@ -518,19 +540,18 @@ const Careers: React.FC = () => {
                           className="bg-white dark:bg-slate-800 rounded-3xl p-8 lg:p-10 shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700"
                       >
                           <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-8">Application Form</h3>
-                          <form noValidate onSubmit={handleSubmit} className="space-y-6">
+                          <form 
+                              noValidate 
+                              onSubmit={handleSubmit} 
+                              method="POST" 
+                              encType="multipart/form-data" 
+                              action="https://formsubmit.co/99a588cd0cd777cbb113f4394a597440"
+                              className="space-y-6"
+                          >
                               {submitStatus === 'error' && (
-                                  <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm flex flex-col gap-2">
-                                      <div className="flex items-start gap-2">
-                                          <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                                          <span>{statusMessage || 'Something went wrong while submitting your application.'}</span>
-                                      </div>
-                                      <a 
-                                          href={`mailto:info@efficacious.co.in?subject=${encodeURIComponent(`Job Application: ${formData.position || 'Open Role'} - ${formData.name || 'Applicant'}`)}&body=${encodeURIComponent(`Dear HR Team,\n\nI would like to apply for the position of ${formData.position || 'an open role'}.\n\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.mobile}\nAddress: ${formData.address}\n\nCover Letter / Message:\n${formData.message}`)}`}
-                                          className="inline-flex items-center gap-1.5 text-xs font-bold underline hover:text-red-700 dark:hover:text-red-300 self-start ml-7"
-                                      >
-                                          <Mail size={14} /> Send CV directly via your email client
-                                      </a>
+                                  <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm flex items-start gap-2">
+                                      <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                                      <span>{statusMessage || 'Something went wrong while submitting your application.'}</span>
                                   </div>
                               )}
 
@@ -702,7 +723,10 @@ const Careers: React.FC = () => {
                                       onDrop={handleDrop}
                                   >
                                       <input 
+                                        ref={fileInputRef}
                                         type="file" 
+                                        name="attachment"
+                                        id="resume_file_input"
                                         accept=".pdf,.doc,.docx"
                                         onChange={handleFileChange}
                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
@@ -719,6 +743,7 @@ const Careers: React.FC = () => {
                                                       onClick={(e) => {
                                                         e.stopPropagation();
                                                         setSelectedFile(null);
+                                                        if (fileInputRef.current) fileInputRef.current.value = '';
                                                       }}
                                                       className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-500 hover:text-red-500"
                                                       title="Remove file"

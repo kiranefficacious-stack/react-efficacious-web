@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 🔒 HIGH SECURITY: Completely block all client/browser access to system secrets.
+    // No visitor or inspector in any browser can ever read or write this collection.
+    match /system_secrets/{document=**} {
+      allow read, write: if false;
+    }
+
+    // Allow general website collections, strictly excluding system_secrets
+    match /{collection}/{document=**} {
+      allow read, write: if collection != 'system_secrets';
+    }
+  }
+}
