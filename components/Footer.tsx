@@ -10,8 +10,8 @@ const Footer: React.FC = () => {
   // Hook to get the current URL path
   const location = useLocation();
   
-  // Check if the current path starts with /admin
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  // Check if the current path starts with /admin or is /login
+  const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname === '/login';
 
   // If we are on an admin page, do not render the footer
   if (isAdminRoute) {

@@ -66,7 +66,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
     });
 
   // Check if the current route is an admin route
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname === '/login';
 
   // Pages that have a dark hero section regardless of theme mode
   const darkHeroRoutes = [

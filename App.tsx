@@ -106,7 +106,11 @@ function App() {
       <div className={`flex flex-col min-h-screen transition-opacity duration-700 ${isLoading || contentLoading || authLoading ? 'opacity-0' : 'opacity-100'}`}>
         {!isLoading && !contentLoading && !authLoading && (
             <>
-                {!location.pathname.startsWith('/direct-chat/') && (
+                {!(
+                  location.pathname.startsWith('/admin') ||
+                  location.pathname === '/login' ||
+                  location.pathname.startsWith('/direct-chat/')
+                ) && (
                   <Navbar isDark={isDark} toggleTheme={toggleTheme} />
                 )}
                 
@@ -174,7 +178,11 @@ function App() {
                   </ErrorBoundary>
                 </main>
                 
-                {!location.pathname.startsWith('/direct-chat/') && (
+                {!(
+                  location.pathname.startsWith('/admin') ||
+                  location.pathname === '/login' ||
+                  location.pathname.startsWith('/direct-chat/')
+                ) && (
                   <>
                     <Footer />
                     <ChatWidget />
