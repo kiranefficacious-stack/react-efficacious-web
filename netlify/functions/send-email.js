@@ -256,3 +256,55 @@ export async function handler(event, context) {
     body: JSON.stringify(result.data)
   };
 }
+
+// Netlify Functions v2 handler (default export)
+export default async function (request, context) {
+  if (!request || !request.method) {
+    return handler(request, context);
+  }
+
+  const method = request.method.toUpperCase();
+  if (method === 'OPTIONS') {
+    return new Response(JSON.stringify({ status: 'ok' }), {
+      status: 200,
+      headers: CORS_HEADERS
+    });
+  }
+  if (method === 'GET') {
+    return new Response(JSON.stringify({
+      status: 'active',
+      service: 'Efficacious Mailer API',
+      server: 'Netlify Serverless (Node.js)',
+      message: 'Endpoint is online and ready to receive POST submissions.'
+    }), {
+      status: 200,
+      headers: CORS_HEADERS
+    });
+  }
+  if (method !== 'POST') {
+    return new Response(JSON.stringify({ success: false, error: 'Method Not Allowed' }), {
+      status: 405,
+      headers: CORS_HEADERS
+    });
+  }
+
+  let body = {};
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ success: false, error: 'Invalid JSON payload' }), {
+      status: 400,
+      headers: CORS_HEADERS
+    });
+  }
+
+  const result = await sendEmailCore(body);
+  return new Response(JSON.stringify(result.data), {
+    status: result.status,
+    headers: CORS_HEADERS
+  });
+}
+
+export const config = {
+  path: ['/api/send-email', '/.netlify/functions/send-email']
+};
