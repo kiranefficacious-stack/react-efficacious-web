@@ -4,6 +4,8 @@ import { MapPin, Mail, Phone, Send, User, MessageSquare, FileText, Smartphone, H
 import { useContent } from '../hooks/useContent';
 import emailjs from '@emailjs/browser';
 import { sendEmailNotification } from '../utils/sendMail';
+import { db } from '../lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const motion = m as any;
 
@@ -121,6 +123,24 @@ ${formData.message.trim()}
 To / Recipient:   ${recipientEmail}
 `.trim();
 
+    // 1. Save directly to Firestore database
+    let savedToDatabase = false;
+    try {
+      await addDoc(collection(db, 'contact_inquiries'), {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        mobile: formData.mobile.trim(),
+        address: formData.address.trim() || 'Not specified',
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
+        createdAt: serverTimestamp(),
+        submittedAt: new Date().toISOString()
+      });
+      savedToDatabase = true;
+    } catch (dbErr) {
+      console.warn('Firestore inquiry save warning:', dbErr);
+    }
+
     // 2. Email Notification Endpoint (Universal Mailer: auto-resolves base URLs, PHP, and dev server)
     try {
       const mailRes = await sendEmailNotification({
@@ -176,7 +196,7 @@ To / Recipient:   ${recipientEmail}
       }
     }
 
-    if (emailDelivered) {
+    if (emailDelivered || savedToDatabase) {
       setSubmitSuccess(true);
       setFormData({
         name: '',
