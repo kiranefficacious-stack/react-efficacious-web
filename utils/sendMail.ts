@@ -189,6 +189,15 @@ export function getCandidateEndpoints(): string[] {
     const isNetlify = hostname.includes('netlify.app');
     const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
 
+    // Dedicated .NET API subdomain if deployed
+    endpoints.push('https://api.efficacious.co.in/api/send-email');
+
+    // Local .NET development server
+    if (isLocalhost) {
+      endpoints.push('http://localhost:5000/api/send-email');
+      endpoints.push('https://localhost:5001/api/send-email');
+    }
+
     // When running on GoDaddy / cPanel / custom domain (e.g. efficacious.co.in),
     // prioritize the local PHP mailer endpoint first
     if (!isNetlify && !isLocalhost) {
