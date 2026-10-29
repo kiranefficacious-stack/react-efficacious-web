@@ -390,23 +390,21 @@ try {
     $sent = false;
 }
 
-// 2. Fallback to GoDaddy internal relay if native mail() didn't return true
-if (!$sent) {
-    try {
-        $relayHost = $config['relay_host'] ?? "relay-hosting.secureserver.net";
-        $relayPort = $config['relay_port'] ?? 25;
-        $sent = sendViaSmtp($relayHost, $relayPort, "", "", $smtpUser, $recipient, $emailSubject, $bodyMime, $headers);
-    } catch (Exception $e) {
-        $sent = false;
-    }
-}
-
-// 3. Fallback to GoDaddy external SMTP over SSL port 465
+// 2. Direct Fallback to GoDaddy Authenticated SMTP over SSL port 465
 if (!$sent) {
     try {
         $smtpHost = $config['smtp_host'] ?? "smtpout.secureserver.net";
         $smtpPort = $config['smtp_port'] ?? 465;
         $sent = sendViaSmtp($smtpHost, $smtpPort, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers);
+    } catch (Exception $e) {
+        $sent = false;
+    }
+}
+
+// 3. Optional fallback to GoDaddy SMTP TLS port 587
+if (!$sent) {
+    try {
+        $sent = sendViaSmtp("smtpout.secureserver.net", 587, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers);
     } catch (Exception $e) {
         $sent = false;
     }
