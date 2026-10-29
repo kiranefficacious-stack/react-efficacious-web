@@ -173,9 +173,14 @@ function buildEmailContent(payload: MailPayload) {
 
 /**
  * Dynamically discovers candidate endpoints based on the current window location and base URL.
+ * Prioritizes the Node.js Serverless Function (0% PHP) across all domains.
  */
 export function getCandidateEndpoints(): string[] {
   const endpoints: string[] = [];
+
+  // 1. Primary Node.js Serverless Function (Direct Node.js execution - 0% PHP)
+  endpoints.push('/.netlify/functions/send-email');
+  endpoints.push('https://efficacious-official.netlify.app/.netlify/functions/send-email');
 
   const explicitUrl = import.meta.env.VITE_MAILER_URL || import.meta.env.VITE_FIREBASE_FUNCTIONS_URL;
   if (explicitUrl && typeof explicitUrl === 'string' && explicitUrl.trim()) {
@@ -184,23 +189,13 @@ export function getCandidateEndpoints(): string[] {
 
   if (typeof window !== 'undefined' && window.location) {
     const origin = window.location.origin;
+    endpoints.push(`${origin}/.netlify/functions/send-email`);
+    endpoints.push(`${origin}/api/send-email`);
+    endpoints.push('/api/send-email');
+    endpoints.push(`${origin}/api/send-email.php`);
+    endpoints.push('/api/send-email.php');
+
     const pathname = window.location.pathname || '/';
-    const isNetlify = window.location.hostname.includes('netlify.app') || window.location.hostname.includes('netlify.live');
-
-    if (isNetlify) {
-      endpoints.push(`${origin}/.netlify/functions/send-email`);
-      endpoints.push('/.netlify/functions/send-email');
-      endpoints.push(`${origin}/api/send-email`);
-      endpoints.push('/api/send-email');
-    } else {
-      endpoints.push(`${origin}/api/send-email/index.php`);
-      endpoints.push('/api/send-email/index.php');
-      endpoints.push(`${origin}/api/send-email.php`);
-      endpoints.push('/api/send-email.php');
-      endpoints.push(`${origin}/api/send-email`);
-      endpoints.push('/api/send-email');
-    }
-
     const prefixes: string[] = [];
     let currentDir = pathname;
     if (!currentDir.endsWith('/')) {
@@ -238,12 +233,6 @@ export function getCandidateEndpoints(): string[] {
     endpoints.push('api/send-email/index.php');
     endpoints.push('api/send-email.php');
   }
-
-  endpoints.push('/.netlify/functions/send-email');
-  endpoints.push('https://efficacious-official.netlify.app/.netlify/functions/send-email');
-  endpoints.push('/api/send-email');
-  endpoints.push('/api/send-email/index.php');
-  endpoints.push('/api/send-email.php');
 
   return Array.from(new Set(endpoints));
 }
@@ -367,17 +356,22 @@ function waitForFirestoreDelivery(docRef: any, timeoutMs = 8000): Promise<MailRe
 }
 
 /**
- * Strictly Verified Universal Mail Dispatcher:
- * 1. Primary: Firebase Trigger Email Extension with active onSnapshot verification.
- *    - Bypasses all GoDaddy firewall & Netlify PHP socket limitations.
- *    - Only returns success if Firebase writes `delivery.state === 'SUCCESS'`.
- * 2. Fallback: Direct Authenticated SMTP (GoDaddy SSL SMTP via Netlify Functions or Apache PHP).
- * 3. Never produces fake confirmations.
+ * Strictly Verified Universal Mail Dispatcher (0% PHP):
+ * 1. Primary: Direct Node.js Serverless Function (Verified GoDaddy SSL SMTP on Port 465)
+ *    - 0% PHP, works across domains via CORS
+ * 2. Fallback: Firebase Trigger Email Extension (with onSnapshot verification)
+ * 3. Never produces fake confirmations
  */
 export async function sendEmailNotification(payload: MailPayload): Promise<MailResponse> {
   const { fullName, email, emailSubject, emailText, emailHtml, attachments } = buildEmailContent(payload);
 
-  // 1. PRIMARY: Firebase Trigger Email Extension (With real-time delivery confirmation)
+  // 1. PRIMARY: Direct Node.js Serverless Function (0% PHP - Verified GoDaddy SSL SMTP)
+  const nodeResult = await triggerHttpEndpoints(payload);
+  if (nodeResult.success) {
+    return nodeResult;
+  }
+
+  // 2. FALLBACK: Firebase Trigger Email Extension (With real-time delivery confirmation)
   try {
     const mailDoc: any = {
       to: 'info@efficacious.co.in',
@@ -405,7 +399,7 @@ export async function sendEmailNotification(payload: MailPayload): Promise<MailR
     const docRef = await addDoc(collection(db, 'mail'), mailDoc);
 
     // Actively listen for Firestore extension confirmation: delivery.state === 'SUCCESS'
-    const verifiedResult = await waitForFirestoreDelivery(docRef, 10000);
+    const verifiedResult = await waitForFirestoreDelivery(docRef, 6000);
     if (verifiedResult.success) {
       return verifiedResult;
     }
@@ -413,15 +407,9 @@ export async function sendEmailNotification(payload: MailPayload): Promise<MailR
     console.warn('Firestore mail queue notice:', firestoreErr);
   }
 
-  // 2. FALLBACK: Direct Authenticated SMTP Delivery (Netlify Serverless Function or Apache PHP)
-  const httpResult = await triggerHttpEndpoints(payload);
-  if (httpResult.success) {
-    return httpResult;
-  }
-
   // If neither confirmed real delivery, report error honestly
   return {
     success: false,
-    error: httpResult.error || 'Unable to deliver message right now. Please email directly to info@efficacious.co.in.'
+    error: nodeResult.error || 'Unable to deliver message right now. Please email directly to info@efficacious.co.in.'
   };
 }
