@@ -255,7 +255,7 @@ if ($attachmentContent) {
 
 // Function to send via GoDaddy SMTP over SSL / TLS
 function sendViaSmtp($host, $port, $user, $pass, $from, $to, $subject, $body, $headers = '') {
-    $timeout = 10;
+    $timeout = 3;
     $context = stream_context_create([
         'ssl' => [
             'verify_peer' => false,
@@ -267,7 +267,11 @@ function sendViaSmtp($host, $port, $user, $pass, $from, $to, $subject, $body, $h
     $prefix = ($port == 465) ? "ssl://" : "";
     $socket = @stream_socket_client("{$prefix}{$host}:{$port}", $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $context);
     if (!$socket) {
-        $socket = @fsockopen("ssl://{$host}", $port, $errno, $errstr, $timeout);
+        if ($port == 465) {
+            $socket = @fsockopen("ssl://{$host}", $port, $errno, $errstr, $timeout);
+        } else {
+            $socket = @fsockopen($host, $port, $errno, $errstr, $timeout);
+        }
     }
     if (!$socket) {
         return false;

@@ -1,0 +1,49 @@
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Direct API endpoint routing to Netlify Functions
+[[redirects]]
+  from = "/api/send-email"
+  to = "/.netlify/functions/send-email"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/send-email/*"
+  to = "/.netlify/functions/send-email"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/send-email.php"
+  to = "/.netlify/functions/send-email"
+  status = 200
+  force = true
+
+# Multi-SPA Product Sub-apps
+[[redirects]]
+  from = "/products/esmart-restaurant/*"
+  to = "/products/esmart-restaurant/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/products/esmart-school/*"
+  to = "/products/esmart-school/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/products/emart-queue/*"
+  to = "/products/emart-queue/index.html"
+  status = 200
+
+# Main App SPA Fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+

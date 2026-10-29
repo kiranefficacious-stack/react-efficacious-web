@@ -102,6 +102,43 @@
 </head>
   <body class="bg-white dark:bg-dark-bg text-slate-800 dark:text-dark-text transition-colors duration-300 antialiased selection:bg-brand-500 selection:text-white">
     <div id="root"></div>
+
+    <!-- Netlify Forms detection hooks for static hosting -->
+    <form name="contact" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="form-name" value="contact" />
+      <input type="text" name="bot-field" />
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <input type="tel" name="mobile" />
+      <input type="text" name="address" />
+      <input type="text" name="subject" />
+      <textarea name="message"></textarea>
+    </form>
+    <form name="career" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="form-name" value="career" />
+      <input type="text" name="bot-field" />
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <input type="tel" name="mobile" />
+      <input type="text" name="address" />
+      <input type="text" name="position" />
+      <textarea name="message"></textarea>
+      <input type="text" name="resume_info" />
+    </form>
+    <form name="product-inquiry" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="form-name" value="product-inquiry" />
+      <input type="text" name="bot-field" />
+      <input type="text" name="product" />
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <input type="tel" name="mobile" />
+      <input type="text" name="address" />
+      <input type="text" name="schoolName" />
+      <input type="text" name="studentCount" />
+      <input type="text" name="outlets" />
+      <textarea name="message"></textarea>
+    </form>
+
   <script type="module" src="/index.tsx"></script>
 </body>
 </html>

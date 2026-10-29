@@ -19,9 +19,10 @@ DirectoryIndex index.html index.php
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # 1. Mailer API: Route /api/send-email directly to PHP without trailing slash 301 redirects
-  RewriteRule ^api/send-email/?$ api/send-email/index.php [L,QSA]
-  RewriteRule ^api/send-email\.php$ api/send-email/index.php [L,QSA]
+  # 1. Mailer API: Route ANY request containing api/send-email directly to the PHP script
+  RewriteRule (^|.*/)api/send-email/?$ api/send-email/index.php [L,QSA]
+  RewriteRule (^|.*/)api/send-email\.php$ api/send-email/index.php [L,QSA]
+  RewriteRule (^|.*/)api/send-email/index\.php$ api/send-email/index.php [L,QSA]
 
   # 2. Allow existing physical files and directories to pass through directly
   RewriteCond %{REQUEST_FILENAME} -f [OR]

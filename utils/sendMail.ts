@@ -1,6 +1,8 @@
 /**
  * Universal Mail Delivery Utility for Efficacious Website & Products
  * Resolves API endpoints dynamically across all deployment scenarios:
+ * - Netlify Serverless Functions (`/.netlify/functions/send-email`)
+ * - Netlify Forms automatic fallback for static deployments
  * - Local Vite dev server (`http://localhost:3000`)
  * - Apache / cPanel / LiteSpeed root domain (`https://efficacious.co.in`)
  * - Subdirectory / Custom Base URL hosting (`https://example.com/site/`)
@@ -55,6 +57,14 @@ export function getCandidateEndpoints(): string[] {
     const origin = window.location.origin;
     const pathname = window.location.pathname || '/';
 
+    // Primary Netlify Functions endpoint
+    endpoints.push(`${origin}/.netlify/functions/send-email`);
+    endpoints.push('/.netlify/functions/send-email');
+
+    // Standard API proxy endpoint
+    endpoints.push(`${origin}/api/send-email`);
+    endpoints.push('/api/send-email');
+
     // Generate prefix candidates based on the current URL
     const prefixes: string[] = [];
 
@@ -81,36 +91,39 @@ export function getCandidateEndpoints(): string[] {
     const uniquePrefixes = Array.from(new Set(prefixes));
 
     // For each prefix, add file targets:
-    // 1) api/send-email/index.php (direct PHP execution)
-    // 2) api/send-email.php (direct PHP execution)
-    // 3) api/send-email (clean URL handled by .htaccess / dev middleware)
+    // 1) api/send-email (Clean endpoint / Netlify / Dev middleware)
+    // 2) api/send-email/index.php (direct PHP execution on Apache / cPanel)
+    // 3) api/send-email.php (direct PHP execution)
     for (const p of uniquePrefixes) {
       const cleanP = p.endsWith('/') ? p : p + '/';
+      endpoints.push(`${origin}${cleanP}api/send-email`);
       endpoints.push(`${origin}${cleanP}api/send-email/index.php`);
       endpoints.push(`${origin}${cleanP}api/send-email.php`);
-      endpoints.push(`${origin}${cleanP}api/send-email`);
+      endpoints.push(`${cleanP}api/send-email`);
       endpoints.push(`${cleanP}api/send-email/index.php`);
       endpoints.push(`${cleanP}api/send-email.php`);
-      endpoints.push(`${cleanP}api/send-email`);
     }
 
     // Relative paths
+    endpoints.push('./api/send-email');
     endpoints.push('./api/send-email/index.php');
     endpoints.push('./api/send-email.php');
-    endpoints.push('./api/send-email');
+    endpoints.push('../api/send-email');
     endpoints.push('../api/send-email/index.php');
     endpoints.push('../api/send-email.php');
+    endpoints.push('../../api/send-email');
     endpoints.push('../../api/send-email/index.php');
     endpoints.push('../../api/send-email.php');
+    endpoints.push('api/send-email');
     endpoints.push('api/send-email/index.php');
     endpoints.push('api/send-email.php');
-    endpoints.push('api/send-email');
   }
 
   // Fallbacks
+  endpoints.push('/.netlify/functions/send-email');
+  endpoints.push('/api/send-email');
   endpoints.push('/api/send-email/index.php');
   endpoints.push('/api/send-email.php');
-  endpoints.push('/api/send-email');
 
   // Return deduplicated list
   return Array.from(new Set(endpoints));
@@ -118,6 +131,7 @@ export function getCandidateEndpoints(): string[] {
 
 /**
  * Sends email via candidate endpoints, gracefully trying alternatives until one succeeds.
+ * Includes Netlify Forms fallback if running on Netlify without active functions.
  */
 export async function sendEmailNotification(payload: MailPayload): Promise<MailResponse> {
   const candidates = getCandidateEndpoints();
@@ -126,7 +140,7 @@ export async function sendEmailNotification(payload: MailPayload): Promise<MailR
   for (const url of candidates) {
     try {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 12000);
+      const timer = setTimeout(() => controller.abort(), 16000);
 
       const res = await fetch(url, {
         method: 'POST',
@@ -168,9 +182,46 @@ export async function sendEmailNotification(payload: MailPayload): Promise<MailR
       if (data?.error) {
         lastError = data.error;
       }
-    } catch (err: any) {
+    } catch {
       // Endpoint unreachable or timed out, proceed to next candidate
       continue;
+    }
+  }
+
+  // Fallback: Netlify Forms submission (for static deployments on Netlify)
+  if (typeof window !== 'undefined') {
+    try {
+      const formName = payload.type === 'career' ? 'career' : (payload.type === 'product_contact' ? 'product-inquiry' : 'contact');
+      const formBody = new URLSearchParams();
+      formBody.append('form-name', formName);
+      if (payload.name) formBody.append('name', payload.name);
+      if (payload.firstName || payload.lastName) formBody.append('name', `${payload.firstName || ''} ${payload.lastName || ''}`.trim());
+      if (payload.email) formBody.append('email', payload.email);
+      if (payload.mobile || payload.phone) formBody.append('mobile', payload.mobile || payload.phone || '');
+      if (payload.address || payload.city) formBody.append('address', payload.address || payload.city || '');
+      if (payload.subject) formBody.append('subject', payload.subject);
+      if (payload.position) formBody.append('position', payload.position);
+      if (payload.product) formBody.append('product', payload.product);
+      if (payload.schoolName) formBody.append('schoolName', payload.schoolName);
+      if (payload.studentCount) formBody.append('studentCount', payload.studentCount);
+      if (payload.outlets) formBody.append('outlets', payload.outlets);
+      if (payload.message) formBody.append('message', payload.message);
+      if (payload.resumeName) formBody.append('resume_info', `${payload.resumeName} (${payload.resumeSize || ''})`);
+
+      const netlifyRes = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formBody.toString(),
+      });
+
+      if (netlifyRes.ok || netlifyRes.status === 200 || netlifyRes.status === 302) {
+        return {
+          success: true,
+          message: 'Application submitted successfully.',
+        };
+      }
+    } catch (netErr) {
+      console.warn('Netlify form submission fallback failed:', netErr);
     }
   }
 
