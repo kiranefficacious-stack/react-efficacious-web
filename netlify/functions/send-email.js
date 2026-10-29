@@ -218,6 +218,18 @@ export async function handler(event, context) {
       body: JSON.stringify({ status: 'ok' })
     };
   }
+  if (method === 'GET') {
+    return {
+      statusCode: 200,
+      headers: CORS_HEADERS,
+      body: JSON.stringify({
+        status: 'active',
+        service: 'Efficacious Mailer API',
+        server: 'Netlify Serverless (Node.js)',
+        message: 'Endpoint is online and ready to receive POST submissions.'
+      })
+    };
+  }
   if (method !== 'POST') {
     return {
       statusCode: 405,

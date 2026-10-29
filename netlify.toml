@@ -12,16 +12,19 @@
   from = "/api/send-email"
   to = "/.netlify/functions/send-email"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/send-email/*"
   to = "/.netlify/functions/send-email"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/send-email.php"
   to = "/.netlify/functions/send-email"
   status = 200
+  force = true
 
 # Multi-SPA Product Sub-apps
 [[redirects]]

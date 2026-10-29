@@ -24,6 +24,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+// Handle GET request (e.g. testing in browser)
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    http_response_code(200);
+    echo json_encode([
+        "status" => "active",
+        "service" => "Efficacious Mailer API",
+        "server" => "PHP " . (defined('PHP_VERSION') ? PHP_VERSION : 'Active'),
+        "message" => "Endpoint is online and ready to receive POST submissions."
+    ]);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(["success" => false, "error" => "Method Not Allowed. Use POST."]);

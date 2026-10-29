@@ -1,0 +1,16 @@
+# Ensure Apache executes index.php for this directory
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+  RewriteEngine Off
+</IfModule>
+
+<Files "index.php">
+  <IfModule mod_authz_core.c>
+    Require all granted
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Allow from all
+  </IfModule>
+</Files>

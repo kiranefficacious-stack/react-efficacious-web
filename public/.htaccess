@@ -20,9 +20,12 @@ DirectoryIndex index.html index.php
   RewriteEngine On
 
   # 1. Mailer API: Route ANY request containing api/send-email directly to the PHP script
-  RewriteRule (^|.*/)api/send-email/?$ api/send-email/index.php [L,QSA]
-  RewriteRule (^|.*/)api/send-email\.php$ api/send-email/index.php [L,QSA]
-  RewriteRule (^|.*/)api/send-email/index\.php$ api/send-email/index.php [L,QSA]
+  RewriteRule ^api/send-email/?$ api/send-email/index.php [L,QSA]
+  RewriteRule ^api/send-email\.php$ api/send-email/index.php [L,QSA]
+  RewriteRule ^api/send-email/index\.php$ api/send-email/index.php [L,QSA]
+  RewriteRule (^|.*/)api/send-email/?$ $1api/send-email/index.php [L,QSA]
+  RewriteRule (^|.*/)api/send-email\.php$ $1api/send-email/index.php [L,QSA]
+  RewriteRule (^|.*/)api/send-email/index\.php$ $1api/send-email/index.php [L,QSA]
 
   # 2. Allow existing physical files and directories to pass through directly
   RewriteCond %{REQUEST_FILENAME} -f [OR]

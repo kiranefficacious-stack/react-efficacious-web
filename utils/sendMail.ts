@@ -168,9 +168,15 @@ export async function sendEmailNotification(payload: MailPayload): Promise<MailR
       const contentType = res.headers.get('content-type') || '';
       const text = await res.text();
 
-      // If the response is HTML (starts with <!DOCTYPE or <html), this is SPA fallback, not mailer API
+      // If the response is HTML (SPA fallback) or raw unrendered PHP (<?php), skip it
       const trimmed = text.trim();
-      if (trimmed.startsWith('<!DOCTYPE') || trimmed.startsWith('<html') || trimmed.startsWith('<!doctype')) {
+      if (
+        trimmed.startsWith('<!DOCTYPE') ||
+        trimmed.startsWith('<html') ||
+        trimmed.startsWith('<!doctype') ||
+        trimmed.startsWith('<?php') ||
+        trimmed.startsWith('<?')
+      ) {
         continue;
       }
 
