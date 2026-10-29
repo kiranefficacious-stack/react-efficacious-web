@@ -368,22 +368,16 @@ function waitForFirestoreDelivery(docRef: any, timeoutMs = 8000): Promise<MailRe
 
 /**
  * Strictly Verified Universal Mail Dispatcher:
- * 1. Primary: Direct Authenticated SMTP (GoDaddy SSL SMTP via Netlify Functions or Apache PHP).
- *    Waits for the mail server's actual 200 OK acknowledgment.
- * 2. Fallback: Firebase Trigger Email Extension with active onSnapshot verification.
- *    Only returns success if delivery.state === 'SUCCESS'.
+ * 1. Primary: Firebase Trigger Email Extension with active onSnapshot verification.
+ *    - Bypasses all GoDaddy firewall & Netlify PHP socket limitations.
+ *    - Only returns success if Firebase writes `delivery.state === 'SUCCESS'`.
+ * 2. Fallback: Direct Authenticated SMTP (GoDaddy SSL SMTP via Netlify Functions or Apache PHP).
  * 3. Never produces fake confirmations.
  */
 export async function sendEmailNotification(payload: MailPayload): Promise<MailResponse> {
   const { fullName, email, emailSubject, emailText, emailHtml, attachments } = buildEmailContent(payload);
 
-  // 1. Direct Authenticated SMTP Delivery (Netlify Serverless Function or Apache PHP)
-  const httpResult = await triggerHttpEndpoints(payload);
-  if (httpResult.success) {
-    return httpResult;
-  }
-
-  // 2. Firebase Trigger Email Extension (With real-time delivery confirmation)
+  // 1. PRIMARY: Firebase Trigger Email Extension (With real-time delivery confirmation)
   try {
     const mailDoc: any = {
       to: 'info@efficacious.co.in',
@@ -411,7 +405,7 @@ export async function sendEmailNotification(payload: MailPayload): Promise<MailR
     const docRef = await addDoc(collection(db, 'mail'), mailDoc);
 
     // Actively listen for Firestore extension confirmation: delivery.state === 'SUCCESS'
-    const verifiedResult = await waitForFirestoreDelivery(docRef, 8000);
+    const verifiedResult = await waitForFirestoreDelivery(docRef, 10000);
     if (verifiedResult.success) {
       return verifiedResult;
     }
@@ -419,7 +413,13 @@ export async function sendEmailNotification(payload: MailPayload): Promise<MailR
     console.warn('Firestore mail queue notice:', firestoreErr);
   }
 
-  // If neither mail server gave a real confirmation of delivery, report error honestly
+  // 2. FALLBACK: Direct Authenticated SMTP Delivery (Netlify Serverless Function or Apache PHP)
+  const httpResult = await triggerHttpEndpoints(payload);
+  if (httpResult.success) {
+    return httpResult;
+  }
+
+  // If neither confirmed real delivery, report error honestly
   return {
     success: false,
     error: httpResult.error || 'Unable to deliver message right now. Please email directly to info@efficacious.co.in.'
