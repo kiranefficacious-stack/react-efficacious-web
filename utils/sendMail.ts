@@ -130,6 +130,7 @@ export function getCandidateEndpoints(): string[] {
 
   // Fallbacks
   endpoints.push('/.netlify/functions/send-email');
+  endpoints.push('https://efficacious-official.netlify.app/.netlify/functions/send-email');
   endpoints.push('/api/send-email');
   endpoints.push('/api/send-email/index.php');
   endpoints.push('/api/send-email.php');
@@ -149,7 +150,7 @@ export async function sendEmailNotification(payload: MailPayload): Promise<MailR
   for (const url of candidates) {
     try {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 25000);
+      const timer = setTimeout(() => controller.abort(), 60000);
 
       const res = await fetch(url, {
         method: 'POST',
