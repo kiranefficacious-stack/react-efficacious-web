@@ -4,6 +4,9 @@
  * Handles contact form, careers application (with resume attachment), and product demo inquiries.
  */
 
+// Define guard constant for configuration
+define('EFFICACIOUS_MAILER', true);
+
 // Disable error display in production output to ensure pure JSON response
 error_reporting(0);
 ini_set('display_errors', '0');
@@ -26,6 +29,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(["success" => false, "error" => "Method Not Allowed. Use POST."]);
     exit;
 }
+
+// Load external mail configuration if present
+$configFile = __DIR__ . '/mail_config.php';
+$config = file_exists($configFile) ? (include $configFile) : [];
+if (!is_array($config)) $config = [];
 
 // Read JSON input
 $rawInput = file_get_contents('php://input');
@@ -54,11 +62,12 @@ function decryptEmailPass($cipherText, $secret = "Efficacious@Secure2026!Key#987
     return $decrypted !== false ? $decrypted : $cipherText;
 }
 
-// Credentials
-$smtpUser = "info@efficacious.co.in";
-$encryptedPass = "enc:v1:663f01195bfc68e71a9d9719:2f23ccc527e680935b8e862bedc861b2:53eb399d182ae65d1b320b8c41fc5b2e";
-$smtpPass = decryptEmailPass($encryptedPass);
-$recipient = "info@efficacious.co.in";
+// Configuration values with fallbacks
+$smtpUser = $config['sender_email'] ?? "info@efficacious.co.in";
+$secretKey = $config['secret_key'] ?? "Efficacious@Secure2026!Key#9876";
+$encryptedPass = $config['encrypted_pass'] ?? "enc:v1:663f01195bfc68e71a9d9719:2f23ccc527e680935b8e862bedc861b2:53eb399d182ae65d1b320b8c41fc5b2e";
+$smtpPass = decryptEmailPass($encryptedPass, $secretKey);
+$recipient = $config['recipient'] ?? "info@efficacious.co.in";
 
 // Extract payload fields
 $type = $body['type'] ?? 'contact';
@@ -381,7 +390,9 @@ try {
 // 2. Fallback to GoDaddy internal relay if native mail() didn't return true
 if (!$sent) {
     try {
-        $sent = sendViaSmtp("relay-hosting.secureserver.net", 25, "", "", $smtpUser, $recipient, $emailSubject, $bodyMime, $headers);
+        $relayHost = $config['relay_host'] ?? "relay-hosting.secureserver.net";
+        $relayPort = $config['relay_port'] ?? 25;
+        $sent = sendViaSmtp($relayHost, $relayPort, "", "", $smtpUser, $recipient, $emailSubject, $bodyMime, $headers);
     } catch (Exception $e) {
         $sent = false;
     }
@@ -390,7 +401,9 @@ if (!$sent) {
 // 3. Fallback to GoDaddy external SMTP over SSL port 465
 if (!$sent) {
     try {
-        $sent = sendViaSmtp("smtpout.secureserver.net", 465, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers);
+        $smtpHost = $config['smtp_host'] ?? "smtpout.secureserver.net";
+        $smtpPort = $config['smtp_port'] ?? 465;
+        $sent = sendViaSmtp($smtpHost, $smtpPort, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers);
     } catch (Exception $e) {
         $sent = false;
     }
