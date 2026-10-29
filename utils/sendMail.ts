@@ -1,15 +1,16 @@
 /**
  * Universal Mail Delivery Utility for Efficacious Website & Products
- * Supports Option 2: Firebase Trigger Email (firestore-send-email) extension
- * with automatic fallback across all deployment scenarios:
- * - Firebase Firestore 'mail' collection (Extension-driven, 100% serverless)
- * - Netlify Serverless Functions (`/.netlify/functions/send-email`)
- * - Apache / cPanel / LiteSpeed direct endpoints (`https://efficacious.co.in/api/send-email`)
- * - Local Vite dev server (`http://localhost:3000`)
+ * Strictly verified delivery: NEVER gives fake confirmations.
+ *
+ * 1. Direct Authenticated SMTP (GoDaddy Port 465 via Netlify Functions or Apache PHP)
+ *    - Waits for real "250 Message accepted" response from the mail server.
+ * 2. Firebase Trigger Email Extension (with real-time onSnapshot delivery verification)
+ *    - Only confirms success if Firebase writes `delivery.state === 'SUCCESS'`.
+ *    - Never assumes document creation equals email delivery.
  */
 
 import { db } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 
 export interface MailPayload {
   type?: 'career' | 'contact' | 'product_contact';
@@ -248,7 +249,8 @@ export function getCandidateEndpoints(): string[] {
 }
 
 /**
- * Sends email via candidate HTTP endpoints (Netlify Functions or PHP mailer).
+ * Sends email via candidate HTTP endpoints (Netlify Functions or Apache PHP mailer).
+ * Real SMTP verification: Requires 200 OK and success === true from the server.
  */
 async function triggerHttpEndpoints(payload: MailPayload): Promise<MailResponse> {
   const candidates = getCandidateEndpoints();
@@ -290,10 +292,11 @@ async function triggerHttpEndpoints(payload: MailPayload): Promise<MailResponse>
         continue;
       }
 
+      // Real SMTP verification: The server confirmed actual delivery
       if (res.ok && (data?.success === true || data?.success === 'true')) {
         return {
           success: true,
-          message: data?.message || 'Email delivered successfully.',
+          message: data?.message || 'Email delivered successfully via GoDaddy SSL SMTP.',
         };
       }
 
@@ -307,21 +310,80 @@ async function triggerHttpEndpoints(payload: MailPayload): Promise<MailResponse>
 
   return {
     success: false,
-    error: lastError || 'Unable to submit your request right now. Please email directly to info@efficacious.co.in.',
+    error: lastError || 'Unable to deliver message right now. Please email us directly at info@efficacious.co.in.',
   };
 }
 
 /**
- * Universal Mail Dispatcher:
- * 1. Primary: Writes directly to Firestore 'mail' collection (Firebase Trigger Email Extension)
- *    - Works on ANY live domain (Netlify, GoDaddy, localhost)
- *    - Bypasses PHP and serverless limitations completely
- * 2. Fallback: Directly triggers HTTP endpoints
+ * Listens to Firestore 'mail' document until the Firebase Trigger Email extension
+ * writes an explicit delivery confirmation: delivery.state === 'SUCCESS'.
+ * NEVER fakes confirmation.
+ */
+function waitForFirestoreDelivery(docRef: any, timeoutMs = 8000): Promise<MailResponse> {
+  return new Promise((resolve) => {
+    let timer: any = null;
+    let unsub: any = null;
+
+    const cleanup = () => {
+      if (timer) clearTimeout(timer);
+      if (typeof unsub === 'function') unsub();
+    };
+
+    timer = setTimeout(() => {
+      cleanup();
+      resolve({
+        success: false,
+        error: 'Firestore mail extension did not confirm delivery within timeout.'
+      });
+    }, timeoutMs);
+
+    unsub = onSnapshot(docRef, (snap: any) => {
+      const data = snap.data();
+      const delivery = data?.delivery;
+
+      if (delivery) {
+        if (delivery.state === 'SUCCESS') {
+          cleanup();
+          resolve({
+            success: true,
+            message: 'Email delivered successfully to info@efficacious.co.in.'
+          });
+        } else if (delivery.state === 'ERROR') {
+          cleanup();
+          resolve({
+            success: false,
+            error: delivery.error || 'Server rejected email delivery.'
+          });
+        }
+      }
+    }, (err: any) => {
+      cleanup();
+      resolve({
+        success: false,
+        error: err?.message || 'Firestore subscription error'
+      });
+    });
+  });
+}
+
+/**
+ * Strictly Verified Universal Mail Dispatcher:
+ * 1. Primary: Direct Authenticated SMTP (GoDaddy SSL SMTP via Netlify Functions or Apache PHP).
+ *    Waits for the mail server's actual 200 OK acknowledgment.
+ * 2. Fallback: Firebase Trigger Email Extension with active onSnapshot verification.
+ *    Only returns success if delivery.state === 'SUCCESS'.
+ * 3. Never produces fake confirmations.
  */
 export async function sendEmailNotification(payload: MailPayload): Promise<MailResponse> {
   const { fullName, email, emailSubject, emailText, emailHtml, attachments } = buildEmailContent(payload);
 
-  // 1. PRIMARY: Firebase "Trigger Email" extension (Collection: 'mail')
+  // 1. Direct Authenticated SMTP Delivery (Netlify Serverless Function or Apache PHP)
+  const httpResult = await triggerHttpEndpoints(payload);
+  if (httpResult.success) {
+    return httpResult;
+  }
+
+  // 2. Firebase Trigger Email Extension (With real-time delivery confirmation)
   try {
     const mailDoc: any = {
       to: 'info@efficacious.co.in',
@@ -346,19 +408,20 @@ export async function sendEmailNotification(payload: MailPayload): Promise<MailR
       mailDoc.message.attachments = attachments;
     }
 
-    await addDoc(collection(db, 'mail'), mailDoc);
+    const docRef = await addDoc(collection(db, 'mail'), mailDoc);
 
-    // Also fire HTTP endpoints in background as a secondary delivery guarantee
-    triggerHttpEndpoints(payload).catch(() => {});
-
-    return {
-      success: true,
-      message: 'Email delivered successfully.'
-    };
+    // Actively listen for Firestore extension confirmation: delivery.state === 'SUCCESS'
+    const verifiedResult = await waitForFirestoreDelivery(docRef, 8000);
+    if (verifiedResult.success) {
+      return verifiedResult;
+    }
   } catch (firestoreErr) {
-    console.warn('Firestore mail collection write notice, attempting HTTP endpoints:', firestoreErr);
+    console.warn('Firestore mail queue notice:', firestoreErr);
   }
 
-  // 2. FALLBACK: HTTP endpoints (PHP / Netlify functions)
-  return await triggerHttpEndpoints(payload);
+  // If neither mail server gave a real confirmation of delivery, report error honestly
+  return {
+    success: false,
+    error: httpResult.error || 'Unable to deliver message right now. Please email directly to info@efficacious.co.in.'
+  };
 }
