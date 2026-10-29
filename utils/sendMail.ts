@@ -178,14 +178,32 @@ function buildEmailContent(payload: MailPayload) {
 export function getCandidateEndpoints(): string[] {
   const endpoints: string[] = [];
 
-  // 1. Primary Node.js Serverless Function (Direct Node.js execution - 0% PHP)
-  endpoints.push('/.netlify/functions/send-email');
-  endpoints.push('https://efficacious-official.netlify.app/.netlify/functions/send-email');
-
   const explicitUrl = import.meta.env.VITE_MAILER_URL || import.meta.env.VITE_FIREBASE_FUNCTIONS_URL;
   if (explicitUrl && typeof explicitUrl === 'string' && explicitUrl.trim()) {
     endpoints.push(explicitUrl.trim());
   }
+
+  if (typeof window !== 'undefined' && window.location) {
+    const origin = window.location.origin;
+    const hostname = (window.location.hostname || '').toLowerCase();
+    const isNetlify = hostname.includes('netlify.app');
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+
+    // When running on GoDaddy / cPanel / custom domain (e.g. efficacious.co.in),
+    // prioritize the local PHP mailer endpoint first
+    if (!isNetlify && !isLocalhost) {
+      endpoints.push(`${origin}/api/send-email/index.php`);
+      endpoints.push(`${origin}/api/send-email`);
+      endpoints.push('/api/send-email/index.php');
+      endpoints.push('/api/send-email');
+    }
+  }
+
+  // Primary Node.js Serverless Function (Netlify Serverless - 0% PHP)
+  endpoints.push('/.netlify/functions/send-email');
+  endpoints.push('/api/send-email');
+  endpoints.push('https://efficacious-official.netlify.app/.netlify/functions/send-email');
+  endpoints.push('https://efficacious-official.netlify.app/api/send-email');
 
   if (typeof window !== 'undefined' && window.location) {
     const origin = window.location.origin;
