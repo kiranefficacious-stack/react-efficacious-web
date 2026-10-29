@@ -30,8 +30,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Load external mail configuration if present
+// Load external mail configuration if present (checks current folder or root public_html)
 $configFile = __DIR__ . '/mail_config.php';
+if (!file_exists($configFile)) {
+    $configFile = dirname(dirname(__DIR__)) . '/mail_config.php';
+}
 $config = file_exists($configFile) ? (include $configFile) : [];
 if (!is_array($config)) $config = [];
 
