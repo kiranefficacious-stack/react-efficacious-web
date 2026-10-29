@@ -281,3 +281,7 @@ export default async function (request, context) {
     headers: CORS_HEADERS
   });
 }
+
+export const config = {
+  path: ['/api/send-email', '/api/send-email/index.php', '/api/send-email.php']
+};

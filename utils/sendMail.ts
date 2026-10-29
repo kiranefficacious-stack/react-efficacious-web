@@ -188,43 +188,6 @@ export async function sendEmailNotification(payload: MailPayload): Promise<MailR
     }
   }
 
-  // Fallback: Netlify Forms submission (for static deployments on Netlify)
-  if (typeof window !== 'undefined') {
-    try {
-      const formName = payload.type === 'career' ? 'career' : (payload.type === 'product_contact' ? 'product-inquiry' : 'contact');
-      const formBody = new URLSearchParams();
-      formBody.append('form-name', formName);
-      if (payload.name) formBody.append('name', payload.name);
-      if (payload.firstName || payload.lastName) formBody.append('name', `${payload.firstName || ''} ${payload.lastName || ''}`.trim());
-      if (payload.email) formBody.append('email', payload.email);
-      if (payload.mobile || payload.phone) formBody.append('mobile', payload.mobile || payload.phone || '');
-      if (payload.address || payload.city) formBody.append('address', payload.address || payload.city || '');
-      if (payload.subject) formBody.append('subject', payload.subject);
-      if (payload.position) formBody.append('position', payload.position);
-      if (payload.product) formBody.append('product', payload.product);
-      if (payload.schoolName) formBody.append('schoolName', payload.schoolName);
-      if (payload.studentCount) formBody.append('studentCount', payload.studentCount);
-      if (payload.outlets) formBody.append('outlets', payload.outlets);
-      if (payload.message) formBody.append('message', payload.message);
-      if (payload.resumeName) formBody.append('resume_info', `${payload.resumeName} (${payload.resumeSize || ''})`);
-
-      const netlifyRes = await fetch('/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formBody.toString(),
-      });
-
-      if (netlifyRes.ok || netlifyRes.status === 200 || netlifyRes.status === 302) {
-        return {
-          success: true,
-          message: 'Application submitted successfully.',
-        };
-      }
-    } catch (netErr) {
-      console.warn('Netlify form submission fallback failed:', netErr);
-    }
-  }
-
   return {
     success: false,
     error: lastError || 'Unable to submit your request right now. Please email directly to info@efficacious.co.in.',

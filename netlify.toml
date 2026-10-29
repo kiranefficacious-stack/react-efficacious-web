@@ -1,6 +1,7 @@
 [build]
   publish = "dist"
   command = "npm run build"
+  functions = "netlify/functions"
 
 [functions]
   directory = "netlify/functions"
@@ -11,19 +12,16 @@
   from = "/api/send-email"
   to = "/.netlify/functions/send-email"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/api/send-email/*"
   to = "/.netlify/functions/send-email"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/api/send-email.php"
   to = "/.netlify/functions/send-email"
   status = 200
-  force = true
 
 # Multi-SPA Product Sub-apps
 [[redirects]]
@@ -46,4 +44,3 @@
   from = "/*"
   to = "/index.html"
   status = 200
-

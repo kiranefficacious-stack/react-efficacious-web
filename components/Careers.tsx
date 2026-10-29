@@ -295,7 +295,7 @@ To / Recipient:   ${recipientEmail}
       }
     }
 
-    if (emailDelivered || savedToDatabase) {
+    if (emailDelivered) {
       setSubmitStatus('success');
       setStatusMessage('Thank you! Your application has been submitted successfully.');
       setFormData({ name: '', email: '', mobile: '', address: '', position: '', message: '' });

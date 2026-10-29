@@ -196,7 +196,7 @@ To / Recipient:   ${recipientEmail}
       }
     }
 
-    if (emailDelivered || savedToDatabase) {
+    if (emailDelivered) {
       setSubmitSuccess(true);
       setFormData({
         name: '',
