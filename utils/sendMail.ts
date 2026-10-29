@@ -56,14 +56,23 @@ export function getCandidateEndpoints(): string[] {
   if (typeof window !== 'undefined' && window.location) {
     const origin = window.location.origin;
     const pathname = window.location.pathname || '/';
+    const isNetlify = window.location.hostname.includes('netlify.app') || window.location.hostname.includes('netlify.live');
 
-    // Primary Netlify Functions endpoint
-    endpoints.push(`${origin}/.netlify/functions/send-email`);
-    endpoints.push('/.netlify/functions/send-email');
-
-    // Standard API proxy endpoint
-    endpoints.push(`${origin}/api/send-email`);
-    endpoints.push('/api/send-email');
+    if (isNetlify) {
+      // Primary Netlify Functions endpoint on Netlify domains
+      endpoints.push(`${origin}/.netlify/functions/send-email`);
+      endpoints.push('/.netlify/functions/send-email');
+      endpoints.push(`${origin}/api/send-email`);
+      endpoints.push('/api/send-email');
+    } else {
+      // Primary direct PHP / Apache endpoints on cPanel / GoDaddy / Custom domains
+      endpoints.push(`${origin}/api/send-email/index.php`);
+      endpoints.push('/api/send-email/index.php');
+      endpoints.push(`${origin}/api/send-email`);
+      endpoints.push('/api/send-email');
+      endpoints.push(`${origin}/api/send-email.php`);
+      endpoints.push('/api/send-email.php');
+    }
 
     // Generate prefix candidates based on the current URL
     const prefixes: string[] = [];
@@ -140,7 +149,7 @@ export async function sendEmailNotification(payload: MailPayload): Promise<MailR
   for (const url of candidates) {
     try {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 16000);
+      const timer = setTimeout(() => controller.abort(), 25000);
 
       const res = await fetch(url, {
         method: 'POST',

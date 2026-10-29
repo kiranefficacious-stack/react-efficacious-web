@@ -255,7 +255,7 @@ if ($attachmentContent) {
 
 // Function to send via GoDaddy SMTP over SSL / TLS
 function sendViaSmtp($host, $port, $user, $pass, $from, $to, $subject, $body, $headers = '') {
-    $timeout = 3;
+    $timeout = 2;
     $context = stream_context_create([
         'ssl' => [
             'verify_peer' => false,
@@ -277,11 +277,16 @@ function sendViaSmtp($host, $port, $user, $pass, $from, $to, $subject, $body, $h
         return false;
     }
 
+    // Strict 2-second timeout on socket operations so reads never block
+    stream_set_timeout($socket, 2);
+
     $read = function() use ($socket) {
         $res = '';
         while ($line = fgets($socket, 512)) {
             $res .= $line;
             if (substr($line, 3, 1) === ' ') break;
+            $info = stream_get_meta_data($socket);
+            if (!empty($info['timed_out'])) break;
         }
         return $res;
     };
@@ -297,7 +302,11 @@ function sendViaSmtp($host, $port, $user, $pass, $from, $to, $subject, $body, $h
     }
 
     $send("EHLO " . ($_SERVER['SERVER_NAME'] ?? 'efficacious.co.in'));
-    $read();
+    $ehloResp = $read();
+    if (empty($ehloResp)) {
+        fclose($socket);
+        return false;
+    }
 
     if (!empty($user) && !empty($pass)) {
         $send("AUTH LOGIN");
@@ -356,15 +365,20 @@ function sendViaSmtp($host, $port, $user, $pass, $from, $to, $subject, $body, $h
     return (substr($sendResp, 0, 3) === '250');
 }
 
-// 1. Try GoDaddy SMTP over SSL port 465
+// 1. Primary for cPanel / GoDaddy / Apache hosting:
+// Native mail() uses the local Exim / sendmail MTA on the server.
+// It is instantaneous (< 0.1s) and delivers directly into the local mailbox on the server.
 $sent = false;
 try {
-    $sent = sendViaSmtp("smtpout.secureserver.net", 465, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers);
+    $sent = @mail($recipient, $emailSubject, $bodyMime, $headers, "-f " . escapeshellarg($smtpUser));
+    if (!$sent) {
+        $sent = @mail($recipient, $emailSubject, $bodyMime, $headers);
+    }
 } catch (Exception $e) {
     $sent = false;
 }
 
-// 2. Try GoDaddy internal relay (works on GoDaddy hosted cPanel without remote port blocks)
+// 2. Fallback to GoDaddy internal relay if native mail() didn't return true
 if (!$sent) {
     try {
         $sent = sendViaSmtp("relay-hosting.secureserver.net", 25, "", "", $smtpUser, $recipient, $emailSubject, $bodyMime, $headers);
@@ -373,11 +387,12 @@ if (!$sent) {
     }
 }
 
-// 3. Fallback to PHP native mail() with envelope sender
+// 3. Fallback to GoDaddy external SMTP over SSL port 465
 if (!$sent) {
-    $sent = @mail($recipient, $emailSubject, $bodyMime, $headers, "-f " . escapeshellarg($smtpUser));
-    if (!$sent) {
-        $sent = @mail($recipient, $emailSubject, $bodyMime, $headers);
+    try {
+        $sent = sendViaSmtp("smtpout.secureserver.net", 465, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers);
+    } catch (Exception $e) {
+        $sent = false;
     }
 }
 
