@@ -98,7 +98,7 @@ export default defineConfig(({ mode }) => {
             // Local dev mailer endpoint (/api/send-email, index.php, send-email.php)
             server.middlewares.use(async (req, res, next) => {
               const cleanUrl = (req.url || '').split('?')[0];
-              const isMailer = req.method === 'POST' && (
+              const isMailerPath = (
                 cleanUrl === '/api/send-email' ||
                 cleanUrl === '/api/send-email/' ||
                 cleanUrl === '/api/send-email.php' ||
@@ -107,12 +107,23 @@ export default defineConfig(({ mode }) => {
                 cleanUrl.endsWith('/api/send-email.php') ||
                 cleanUrl.endsWith('/api/send-email/index.php')
               );
-              if (isMailer) {
-                let bodyStr = '';
-                req.on('data', chunk => { bodyStr += chunk; });
-                req.on('end', async () => {
-                  try {
-                    const body = JSON.parse(bodyStr || '{}');
+
+              if (isMailerPath) {
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+                res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+
+                if (req.method === 'OPTIONS') {
+                  res.statusCode = 204;
+                  return res.end();
+                }
+
+                if (req.method === 'POST') {
+                  let bodyStr = '';
+                  req.on('data', chunk => { bodyStr += chunk; });
+                  req.on('end', async () => {
+                    try {
+                      const body = JSON.parse(bodyStr || '{}');
                     const {
                       type = 'contact',
                       product,
@@ -255,21 +266,74 @@ export default defineConfig(({ mode }) => {
                     }
 
                     // Official GoDaddy SMTP for info@efficacious.co.in
-                    const transporter = nodemailer.createTransport({
-                      host: 'smtpout.secureserver.net',
-                      port: 465,
-                      secure: true,
-                      auth: {
-                        user: creds.user,
-                        pass: creds.pass
+                    // Primary: Port 587 (STARTTLS), Fallback: Port 465 (SSL)
+                    let sent = false;
+                    let lastSmtpErr: any = null;
+
+                    try {
+                      const transporter587 = nodemailer.createTransport({
+                        host: 'smtpout.secureserver.net',
+                        port: 587,
+                        secure: false,
+                        requireTLS: true,
+                        auth: {
+                          user: creds.user,
+                          pass: creds.pass
+                        },
+                        tls: {
+                          rejectUnauthorized: false
+                        },
+                        connectionTimeout: 10000,
+                        greetingTimeout: 10000,
+                        socketTimeout: 15000
+                      });
+                      await transporter587.sendMail(mailOptions);
+                      sent = true;
+                    } catch (err587: any) {
+                      console.warn('Vite dev server Port 587 SMTP error, attempting fallback port 465:', err587.message);
+                      lastSmtpErr = err587;
+                    }
+
+                    if (!sent) {
+                      try {
+                        const transporter465 = nodemailer.createTransport({
+                          host: 'smtpout.secureserver.net',
+                          port: 465,
+                          secure: true,
+                          auth: {
+                            user: creds.user,
+                            pass: creds.pass
+                          },
+                          tls: {
+                            rejectUnauthorized: false
+                          },
+                          connectionTimeout: 10000,
+                          greetingTimeout: 10000,
+                          socketTimeout: 15000
+                        });
+                        await transporter465.sendMail(mailOptions);
+                        sent = true;
+                      } catch (err465: any) {
+                        console.error('Vite dev server Port 465 fallback also failed:', err465.message);
+                        lastSmtpErr = err465;
                       }
-                    });
+                    }
 
-                    await transporter.sendMail(mailOptions);
-
-                    res.statusCode = 200;
-                    res.setHeader('Content-Type', 'application/json');
-                    return res.end(JSON.stringify({ success: true, message: 'Email sent successfully with full body content to info@efficacious.co.in.' }));
+                    if (sent) {
+                      res.statusCode = 200;
+                      res.setHeader('Content-Type', 'application/json');
+                      return res.end(JSON.stringify({
+                        success: true,
+                        message: 'Email sent successfully via GoDaddy SMTP to info@efficacious.co.in.'
+                      }));
+                    } else {
+                      res.statusCode = 500;
+                      res.setHeader('Content-Type', 'application/json');
+                      return res.end(JSON.stringify({
+                        success: false,
+                        error: lastSmtpErr?.message || 'SMTP delivery failed on both ports (587 & 465)'
+                      }));
+                    }
                   } catch (err: any) {
                     console.error('API /api/send-email error:', err);
                     res.statusCode = 500;
@@ -279,8 +343,9 @@ export default defineConfig(({ mode }) => {
                 });
                 return;
               }
+            }
 
-              if (req.url && !req.url.includes('.')) {
+            if (req.url && !req.url.includes('.')) {
                 const urlPath = req.url.split('?')[0];
                 const query = req.url.includes('?') ? '?' + req.url.split('?')[1] : '';
 

@@ -166,37 +166,37 @@ async function sendEmailCore(body) {
   const smtpUser = process.env.EMAIL_USER || FALLBACK_USER;
   const smtpPass = decryptPassword(process.env.EMAIL_PASS || FALLBACK_PASS);
 
-  // Try port 465 (SSL) first, fallback to port 587 (STARTTLS)
+  // Try port 587 (STARTTLS) first, fallback to port 465 (SSL)
   try {
-    const transporter465 = nodemailer.createTransport({
+    const transporter587 = nodemailer.createTransport({
       host: 'smtpout.secureserver.net',
-      port: 465,
-      secure: true,
+      port: 587,
+      secure: false,
+      requireTLS: true,
       auth: { user: smtpUser, pass: smtpPass },
       connectionTimeout: 10000,
       greetingTimeout: 10000,
       socketTimeout: 15000,
     });
-    await transporter465.sendMail(mailOptions);
-    return { status: 200, data: { success: true, message: 'Email sent successfully via GoDaddy SSL SMTP to info@efficacious.co.in.' } };
-  } catch (err465) {
-    console.warn('Port 465 SMTP error, attempting fallback port 587:', err465.message);
+    await transporter587.sendMail(mailOptions);
+    return { status: 200, data: { success: true, message: 'Email sent successfully via GoDaddy TLS SMTP (Port 587) to info@efficacious.co.in.' } };
+  } catch (err587) {
+    console.warn('Port 587 SMTP error, attempting fallback port 465:', err587.message);
     try {
-      const transporter587 = nodemailer.createTransport({
+      const transporter465 = nodemailer.createTransport({
         host: 'smtpout.secureserver.net',
-        port: 587,
-        secure: false,
-        requireTLS: true,
+        port: 465,
+        secure: true,
         auth: { user: smtpUser, pass: smtpPass },
         connectionTimeout: 10000,
         greetingTimeout: 10000,
         socketTimeout: 15000,
       });
-      await transporter587.sendMail(mailOptions);
-      return { status: 200, data: { success: true, message: 'Email sent successfully via GoDaddy TLS SMTP to info@efficacious.co.in.' } };
-    } catch (err587) {
-      console.error('SMTP sending failed on both ports:', err587.message);
-      return { status: 500, data: { success: false, error: err587.message || 'SMTP delivery failed' } };
+      await transporter465.sendMail(mailOptions);
+      return { status: 200, data: { success: true, message: 'Email sent successfully via GoDaddy SSL SMTP (Port 465) to info@efficacious.co.in.' } };
+    } catch (err465) {
+      console.error('SMTP sending failed on both ports:', err465.message);
+      return { status: 500, data: { success: false, error: err465.message || 'SMTP delivery failed' } };
     }
   }
 }
@@ -256,55 +256,3 @@ export async function handler(event, context) {
     body: JSON.stringify(result.data)
   };
 }
-
-// Netlify Functions v2 handler (default export)
-export default async function (request, context) {
-  if (!request || !request.method) {
-    return handler(request, context);
-  }
-
-  const method = request.method.toUpperCase();
-  if (method === 'OPTIONS') {
-    return new Response(JSON.stringify({ status: 'ok' }), {
-      status: 200,
-      headers: CORS_HEADERS
-    });
-  }
-  if (method === 'GET') {
-    return new Response(JSON.stringify({
-      status: 'active',
-      service: 'Efficacious Mailer API',
-      server: 'Netlify Serverless (Node.js)',
-      message: 'Endpoint is online and ready to receive POST submissions.'
-    }), {
-      status: 200,
-      headers: CORS_HEADERS
-    });
-  }
-  if (method !== 'POST') {
-    return new Response(JSON.stringify({ success: false, error: 'Method Not Allowed' }), {
-      status: 405,
-      headers: CORS_HEADERS
-    });
-  }
-
-  let body = {};
-  try {
-    body = await request.json();
-  } catch {
-    return new Response(JSON.stringify({ success: false, error: 'Invalid JSON payload' }), {
-      status: 400,
-      headers: CORS_HEADERS
-    });
-  }
-
-  const result = await sendEmailCore(body);
-  return new Response(JSON.stringify(result.data), {
-    status: result.status,
-    headers: CORS_HEADERS
-  });
-}
-
-export const config = {
-  path: ['/api/send-email', '/.netlify/functions/send-email']
-};

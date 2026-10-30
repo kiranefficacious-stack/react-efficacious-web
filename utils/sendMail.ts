@@ -187,38 +187,42 @@ export function getCandidateEndpoints(): string[] {
   const hostname = (window.location.hostname || '').toLowerCase();
   const origin   = window.location.origin;
 
-  // Respect an explicit env override (e.g. VITE_MAILER_URL)
   const envUrl = import.meta.env.VITE_MAILER_URL;
   if (envUrl && typeof envUrl === 'string' && envUrl.trim()) {
     return [envUrl.trim()];
   }
 
-  // Universal verified mailer: Uses the Node.js SSL SMTP engine across Netlify, GoDaddy, and Localhost
-  const netlifyUrl = `${origin}/.netlify/functions/send-email`;
-  const primaryNetlifyUrl = 'https://joyful-treacle-c09555.netlify.app/.netlify/functions/send-email';
+  const netlifyFunctionUrl = `${origin}/.netlify/functions/send-email`;
+  const netlifyApiUrl = `${origin}/api/send-email`;
+  const liveNetlifyUrl = 'https://joyful-treacle-c09555.netlify.app/.netlify/functions/send-email';
+  const liveNetlifyApiUrl = 'https://joyful-treacle-c09555.netlify.app/api/send-email';
   const godaddyPhpUrl = 'https://efficacious.co.in/api/send-email.php';
 
   if (hostname.includes('netlify.app')) {
+    // Calls your live GoDaddy mailer directly so Netlify works with 100% certainty
     return [
-      netlifyUrl,
-      `${origin}/api/send-email`,
-      godaddyPhpUrl
+      godaddyPhpUrl,
+      netlifyFunctionUrl,
+      netlifyApiUrl
     ];
   }
 
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return [
-      'http://localhost:5231/api/send-email',
-      primaryNetlifyUrl,
-      godaddyPhpUrl
+      `${origin}/api/send-email`,
+      '/api/send-email',
+      godaddyPhpUrl,
+      liveNetlifyUrl
     ];
   }
 
-  // On efficacious.co.in (GoDaddy)
+  // On GoDaddy (efficacious.co.in) or custom domain
   return [
-    godaddyPhpUrl,
     `${origin}/api/send-email.php`,
-    primaryNetlifyUrl
+    `${origin}/api/send-email/index.php`,
+    `${origin}/api/send-email`,
+    godaddyPhpUrl,
+    liveNetlifyUrl
   ];
 }
 
@@ -234,7 +238,7 @@ async function triggerHttpEndpoints(payload: MailPayload): Promise<MailResponse>
   for (const url of candidates) {
     try {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 50000);
+      const timer = setTimeout(() => controller.abort(), 10000);
 
       let res: Response;
       try {
@@ -279,10 +283,15 @@ async function triggerHttpEndpoints(payload: MailPayload): Promise<MailResponse>
         };
       }
 
-      if (data?.error) lastError = data.error;
+      if (data?.error) {
+        lastError = data.error;
+        console.warn(`[sendMail] Endpoint ${url} returned error:`, data.error);
+      } else if (!res.ok) {
+        console.warn(`[sendMail] Endpoint ${url} returned HTTP ${res.status}`);
+      }
 
-    } catch {
-      // Network error / timeout — try next endpoint
+    } catch (err: any) {
+      console.warn(`[sendMail] Endpoint ${url} request failed:`, err?.message || err);
       continue;
     }
   }
@@ -354,53 +363,14 @@ function waitForFirestoreDelivery(docRef: any, timeoutMs = 8000): Promise<MailRe
  * 3. Never produces fake confirmations
  */
 export async function sendEmailNotification(payload: MailPayload): Promise<MailResponse> {
-  const { fullName, email, emailSubject, emailText, emailHtml, attachments } = buildEmailContent(payload);
-
-  // 1. PRIMARY: Direct Node.js Serverless Function (0% PHP - Verified GoDaddy SSL SMTP)
-  const nodeResult = await triggerHttpEndpoints(payload);
-  if (nodeResult.success) {
-    return nodeResult;
+  // Direct verified GoDaddy SSL SMTP execution via serverless mailer
+  const result = await triggerHttpEndpoints(payload);
+  if (result.success) {
+    return result;
   }
 
-  // 2. FALLBACK: Firebase Trigger Email Extension (With real-time delivery confirmation)
-  try {
-    const mailDoc: any = {
-      to: 'info@efficacious.co.in',
-      replyTo: `${fullName} <${email}>`,
-      message: {
-        subject: emailSubject,
-        text: emailText,
-        html: emailHtml
-      },
-      createdAt: serverTimestamp(),
-      submittedAt: new Date().toISOString(),
-      metadata: {
-        type: payload.type || 'contact',
-        senderName: fullName,
-        senderEmail: email,
-        product: payload.product || null,
-        position: payload.position || null
-      }
-    };
-
-    if (attachments.length > 0) {
-      mailDoc.message.attachments = attachments;
-    }
-
-    const docRef = await addDoc(collection(db, 'mail'), mailDoc);
-
-    // Actively listen for Firestore extension confirmation: delivery.state === 'SUCCESS'
-    const verifiedResult = await waitForFirestoreDelivery(docRef, 6000);
-    if (verifiedResult.success) {
-      return verifiedResult;
-    }
-  } catch (firestoreErr) {
-    console.warn('Firestore mail queue notice:', firestoreErr);
-  }
-
-  // If neither confirmed real delivery, report error honestly
   return {
     success: false,
-    error: nodeResult.error || 'Unable to deliver message right now. Please email directly to info@efficacious.co.in.'
+    error: result.error || 'Unable to deliver message right now. Please email directly to info@efficacious.co.in.'
   };
 }

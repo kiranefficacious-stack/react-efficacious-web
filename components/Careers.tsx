@@ -446,7 +446,7 @@ To / Recipient:   ${recipientEmail}
                                   <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{job.title}</h3>
                                   <div className="flex flex-wrap gap-3 text-sm text-slate-500 dark:text-slate-400">
                                       <span className="flex items-center gap-1"><Briefcase size={16} /> {job.experience}</span>
-                                      <span className="flex items-center gap-1"><MapPin size={16} /> Mumbai / Remote</span>
+                                      <span className="flex items-center gap-1"><MapPin size={16} /> {job.location || 'Mumbai (On-site)'}</span>
                                       <span className="flex items-center gap-1"><Clock size={16} /> {job.type}</span>
                                   </div>
                               </div>

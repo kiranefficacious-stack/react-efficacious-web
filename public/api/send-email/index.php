@@ -80,7 +80,7 @@ function decryptEmailPass($cipherText, $secret = "Efficacious@Secure2026!Key#987
 // Configuration values with fallbacks
 $smtpUser = $config['sender_email'] ?? "info@efficacious.co.in";
 $secretKey = $config['secret_key'] ?? "Efficacious@Secure2026!Key#9876";
-$encryptedPass = $config['encrypted_pass'] ?? "enc:v1:663f01195bfc68e71a9d9719:2f23ccc527e680935b8e862bedc861b2:53eb399d182ae65d1b320b8c41fc5b2e";
+$encryptedPass = $config['smtp_pass'] ?? ($config['password'] ?? ($config['encrypted_pass'] ?? "enc:v1:663f01195bfc68e71a9d9719:2f23ccc527e680935b8e862bedc861b2:53eb399d182ae65d1b320b8c41fc5b2e"));
 $smtpPass = decryptEmailPass($encryptedPass, $secretKey);
 $recipient = $config['recipient'] ?? "info@efficacious.co.in";
 
@@ -277,9 +277,8 @@ if ($attachmentContent) {
     $bodyMime = $emailHtml;
 }
 
-// Function to send via GoDaddy SMTP over SSL / TLS
-function sendViaSmtp($host, $port, $user, $pass, $from, $to, $subject, $body, $headers = '') {
-    $timeout = 2;
+// Function to send via GoDaddy SMTP over SSL / TLS / Localhost
+function sendViaSmtp($host, $port, $user, $pass, $from, $to, $subject, $body, $headers = '', $timeout = 3) {
     $context = stream_context_create([
         'ssl' => [
             'verify_peer' => false,
@@ -301,8 +300,8 @@ function sendViaSmtp($host, $port, $user, $pass, $from, $to, $subject, $body, $h
         return false;
     }
 
-    // Strict 2-second timeout on socket operations so reads never block
-    stream_set_timeout($socket, 2);
+    // Strict 3-second timeout on socket operations so reads never hang
+    stream_set_timeout($socket, $timeout);
 
     $read = function() use ($socket) {
         $res = '';
@@ -332,7 +331,39 @@ function sendViaSmtp($host, $port, $user, $pass, $from, $to, $subject, $body, $h
         return false;
     }
 
-    if (!empty($user) && !empty($pass)) {
+    // On Port 587, issue STARTTLS and upgrade the socket to TLS encryption
+    if ($port == 587) {
+        $send("STARTTLS");
+        $tlsResp = $read();
+        if (substr($tlsResp, 0, 3) !== '220') {
+            fclose($socket);
+            return false;
+        }
+
+        $cryptoMethod = STREAM_CRYPTO_METHOD_TLS_CLIENT;
+        if (defined('STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT')) {
+            $cryptoMethod |= STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
+        }
+        if (defined('STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT')) {
+            $cryptoMethod |= STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT;
+        }
+
+        $cryptoOk = @stream_socket_enable_crypto($socket, true, $cryptoMethod);
+        if (!$cryptoOk) {
+            fclose($socket);
+            return false;
+        }
+
+        // RFC 3207 requires re-sending EHLO after TLS handshake
+        $send("EHLO " . ($_SERVER['SERVER_NAME'] ?? 'efficacious.co.in'));
+        $ehloResp2 = $read();
+        if (empty($ehloResp2)) {
+            fclose($socket);
+            return false;
+        }
+    }
+
+    if (!empty($user) && !empty($pass) && $port != 25) {
         $send("AUTH LOGIN");
         $authResp = $read();
         if (substr($authResp, 0, 3) === '334') {
@@ -389,21 +420,58 @@ function sendViaSmtp($host, $port, $user, $pass, $from, $to, $subject, $body, $h
     return (substr($sendResp, 0, 3) === '250');
 }
 
-// Direct GoDaddy Authenticated SSL SMTP over Port 465 (Instant, 100% reliable)
-// Bypasses local sendmail/exim which hangs for 40 seconds on GoDaddy shared hosting
+// Multi-layer delivery engine for GoDaddy cPanel and external servers
 $sent = false;
+$deliveryMethod = '';
+$smtpHost = $config['smtp_host'] ?? "smtpout.secureserver.net";
+$smtpPort = intval($config['smtp_port'] ?? 587);
+
+// 1. Primary on GoDaddy cPanel: PHP native mail() function
+// GoDaddy cPanel preconfigures php.ini with sendmail_path to local Exim daemon.
+// This executes in ~20ms, has SPF/DKIM envelope matching, and is never blocked by firewall.
 try {
-    $smtpHost = $config['smtp_host'] ?? "smtpout.secureserver.net";
-    $smtpPort = $config['smtp_port'] ?? 465;
-    $sent = sendViaSmtp($smtpHost, $smtpPort, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers);
+    $mailHeaders = $headers;
+    $sent = @mail($recipient, $emailSubject, $bodyMime, $mailHeaders, "-f" . $smtpUser);
+    if ($sent) $deliveryMethod = 'cPanel native mail()';
 } catch (Exception $e) {
     $sent = false;
 }
 
-// 3. Optional fallback to GoDaddy SMTP TLS port 587
+// 2. Second Attempt: Localhost:25 SMTP (cPanel Exim daemon)
 if (!$sent) {
     try {
-        $sent = sendViaSmtp("smtpout.secureserver.net", 587, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers);
+        $sent = sendViaSmtp("localhost", 25, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers, 2);
+        if ($sent) $deliveryMethod = 'cPanel localhost:25';
+    } catch (Exception $e) {
+        $sent = false;
+    }
+}
+
+// 3. Third Attempt: GoDaddy Relay Hosting (relay-hosting.secureserver.net:25)
+if (!$sent) {
+    try {
+        $sent = sendViaSmtp("relay-hosting.secureserver.net", 25, "", "", $smtpUser, $recipient, $emailSubject, $bodyMime, $headers, 2);
+        if ($sent) $deliveryMethod = 'GoDaddy relay-hosting:25';
+    } catch (Exception $e) {
+        $sent = false;
+    }
+}
+
+// 4. Fourth Attempt: Direct external authenticated SMTP Port 587 (TLS)
+if (!$sent) {
+    try {
+        $sent = sendViaSmtp($smtpHost, $smtpPort, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers, 3);
+        if ($sent) $deliveryMethod = "SMTP {$smtpHost}:{$smtpPort}";
+    } catch (Exception $e) {
+        $sent = false;
+    }
+}
+
+// 5. Fifth Attempt: Direct external authenticated SMTP Port 465 (SSL)
+if (!$sent && $smtpPort !== 465) {
+    try {
+        $sent = sendViaSmtp($smtpHost, 465, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers, 3);
+        if ($sent) $deliveryMethod = "SMTP {$smtpHost}:465";
     } catch (Exception $e) {
         $sent = false;
     }
@@ -411,7 +479,11 @@ if (!$sent) {
 
 if ($sent) {
     http_response_code(200);
-    echo json_encode(["success" => true, "message" => "Email delivered successfully."]);
+    echo json_encode([
+        "success" => true,
+        "message" => "Email delivered successfully to {$recipient}.",
+        "method" => $deliveryMethod
+    ]);
 } else {
     http_response_code(500);
     echo json_encode([

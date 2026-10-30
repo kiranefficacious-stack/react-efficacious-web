@@ -6,13 +6,14 @@ import FormField from './FormField';
 import ConfirmDialog from './ConfirmDialog';
 import RichTextEditor from './RichTextEditor';
 import { sanitizeDescriptionHtml, extractPlainText } from '../../utils/sanitizeHtml';
-import { Plus, Edit2, Trash2, X, Briefcase } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Briefcase, MapPin } from 'lucide-react';
 
 interface CareerForm {
   title: string;
   experience: string;
   department: string;
   type: string;
+  location?: string;
   description: string;
   criteria: string[];
 }
@@ -28,6 +29,7 @@ const CareersManager: React.FC = () => {
     experience: '',
     department: '',
     type: 'Full Time',
+    location: 'Mumbai (On-site)',
     description: '',
     criteria: []
   });
@@ -67,11 +69,12 @@ const CareersManager: React.FC = () => {
     if (career) {
       setEditingId(career.id);
       setFormData({
-        title: career.title,
-        experience: career.experience,
-        department: career.department,
-        type: career.type,
-        description: career.description,
+        title: career.title || '',
+        experience: career.experience || '',
+        department: career.department || '',
+        type: career.type || 'Full Time',
+        location: career.location || 'Mumbai (On-site)',
+        description: career.description || '',
         criteria: career.criteria || []
       });
     } else {
@@ -81,6 +84,7 @@ const CareersManager: React.FC = () => {
         experience: '',
         department: '',
         type: 'Full Time',
+        location: 'Mumbai (On-site)',
         description: '',
         criteria: []
       });
@@ -98,6 +102,7 @@ const CareersManager: React.FC = () => {
       experience: '',
       department: '',
       type: 'Full Time',
+      location: 'Mumbai (On-site)',
       description: '',
       criteria: []
     });
@@ -218,6 +223,9 @@ const CareersManager: React.FC = () => {
                   <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full">
                     {career.type}
                   </span>
+                  <span className="px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-full flex items-center gap-1">
+                    <MapPin size={13} /> {career.location || 'Mumbai (On-site)'}
+                  </span>
                 </div>
 
                 {/* Criteria */}
@@ -309,19 +317,30 @@ const CareersManager: React.FC = () => {
                 />
               </div>
 
-              <FormField
-                label="Job Type"
-                name="type"
-                type="select"
-                value={formData.type}
-                onChange={(value) => setFormData({ ...formData, type: value })}
-                options={[
-                  { value: 'Full Time', label: 'Full Time' },
-                  { value: 'Part Time', label: 'Part Time' },
-                  { value: 'Contract', label: 'Contract' },
-                  { value: 'Remote', label: 'Remote' }
-                ]}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  label="Job Type"
+                  name="type"
+                  type="select"
+                  value={formData.type}
+                  onChange={(value) => setFormData({ ...formData, type: value })}
+                  options={[
+                    { value: 'Full Time', label: 'Full Time' },
+                    { value: 'Part Time', label: 'Part Time' },
+                    { value: 'Contract', label: 'Contract' },
+                    { value: 'Internship', label: 'Internship' }
+                  ]}
+                />
+
+                <FormField
+                  label="Location / Work Mode"
+                  name="location"
+                  value={formData.location || ''}
+                  onChange={(value) => setFormData({ ...formData, location: value })}
+                  placeholder="e.g., Mumbai (On-site), Navi Mumbai, Remote"
+                  helpText="e.g., Mumbai (On-site), Navi Mumbai HQ, Remote"
+                />
+              </div>
 
               <RichTextEditor
                 label="Description"

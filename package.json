@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:zip": "vite build && rm -f dist.zip && (cd dist && zip -r ../dist.zip . -x '*.DS_Store*' -x '__MACOSX*')",
+    "build:zip": "vite build && rm -f dist.zip && (cd dist && zip -r -X ../dist.zip . -x '*.DS_Store*' -x '__MACOSX*')",
     "preview": "vite preview"
   },
   "dependencies": {

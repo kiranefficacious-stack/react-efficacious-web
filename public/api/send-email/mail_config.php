@@ -27,9 +27,9 @@ return [
     'secret_key' => 'Efficacious@Secure2026!Key#9876',
     'encrypted_pass' => 'enc:v1:663f01195bfc68e71a9d9719:2f23ccc527e680935b8e862bedc861b2:53eb399d182ae65d1b320b8c41fc5b2e',
 
-    // SMTP Settings (Direct SSL to GoDaddy mail server)
+    // SMTP Settings (Direct TLS to GoDaddy mail server)
     'smtp_host' => 'smtpout.secureserver.net',
-    'smtp_port' => 465,
-    'smtp_timeout' => 3,
+    'smtp_port' => 587,
+    'smtp_timeout' => 5,
 ];
 

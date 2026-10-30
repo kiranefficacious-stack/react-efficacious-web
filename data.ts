@@ -463,6 +463,7 @@ export const initialData = {
       experience: "3-4 Years",
       department: "Sales",
       type: "Full Time",
+      location: "Mumbai (On-site)",
       description: "We are looking for a dynamic Marketing or Sales Executive.",
       criteria: ["3 to 4 years of ERP Sales Experience", "MBA (Marketing)"]
     }
