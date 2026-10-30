@@ -821,6 +821,13 @@ To / Recipient:   ${recipientEmail}
                                       </motion.div>
                                   )}
 
+                                  {isSubmitting && (
+                                      <div className="mb-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl text-amber-700 dark:text-amber-300 text-xs flex items-center gap-2 animate-pulse font-medium">
+                                          <Loader2 size={14} className="animate-spin shrink-0 text-amber-600 dark:text-amber-400" />
+                                          <span>Uploading resume & submitting application, please wait...</span>
+                                      </div>
+                                  )}
+
                                   <button 
                                       type="submit"
                                       disabled={isSubmitting}

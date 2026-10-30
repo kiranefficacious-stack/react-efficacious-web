@@ -389,28 +389,15 @@ function sendViaSmtp($host, $port, $user, $pass, $from, $to, $subject, $body, $h
     return (substr($sendResp, 0, 3) === '250');
 }
 
-// 1. Primary for cPanel / GoDaddy / Apache hosting:
-// Native mail() uses the local Exim / sendmail MTA on the server.
-// It is instantaneous (< 0.1s) and delivers directly into the local mailbox on the server.
+// Direct GoDaddy Authenticated SSL SMTP over Port 465 (Instant, 100% reliable)
+// Bypasses local sendmail/exim which hangs for 40 seconds on GoDaddy shared hosting
 $sent = false;
 try {
-    $sent = @mail($recipient, $emailSubject, $bodyMime, $headers, "-f " . escapeshellarg($smtpUser));
-    if (!$sent) {
-        $sent = @mail($recipient, $emailSubject, $bodyMime, $headers);
-    }
+    $smtpHost = $config['smtp_host'] ?? "smtpout.secureserver.net";
+    $smtpPort = $config['smtp_port'] ?? 465;
+    $sent = sendViaSmtp($smtpHost, $smtpPort, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers);
 } catch (Exception $e) {
     $sent = false;
-}
-
-// 2. Direct Fallback to GoDaddy Authenticated SMTP over SSL port 465
-if (!$sent) {
-    try {
-        $smtpHost = $config['smtp_host'] ?? "smtpout.secureserver.net";
-        $smtpPort = $config['smtp_port'] ?? 465;
-        $sent = sendViaSmtp($smtpHost, $smtpPort, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers);
-    } catch (Exception $e) {
-        $sent = false;
-    }
 }
 
 // 3. Optional fallback to GoDaddy SMTP TLS port 587

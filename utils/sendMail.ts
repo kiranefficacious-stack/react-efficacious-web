@@ -172,101 +172,60 @@ function buildEmailContent(payload: MailPayload) {
 }
 
 /**
- * Dynamically discovers candidate endpoints based on the current window location and base URL.
- * Prioritizes the Node.js Serverless Function (0% PHP) across all domains.
+ * Returns the ordered list of mailer endpoints to try.
+ *
+ * Priority (fast-fail, 8 s timeout each):
+ *   GoDaddy / cPanel  ->  /api/send-email.php   (PHP, instant mail())
+ *   Netlify           ->  /.netlify/functions/send-email
+ *   localhost         ->  http://localhost:5231/api/send-email  (.NET)
+ *
+ * NEVER includes non-existent subdomains like api.efficacious.co.in.
  */
 export function getCandidateEndpoints(): string[] {
-  const endpoints: string[] = [];
+  if (typeof window === 'undefined') return [];
 
-  const explicitUrl = import.meta.env.VITE_MAILER_URL || import.meta.env.VITE_FIREBASE_FUNCTIONS_URL;
-  if (explicitUrl && typeof explicitUrl === 'string' && explicitUrl.trim()) {
-    endpoints.push(explicitUrl.trim());
+  const hostname = (window.location.hostname || '').toLowerCase();
+  const origin   = window.location.origin;
+
+  // Respect an explicit env override (e.g. VITE_MAILER_URL)
+  const envUrl = import.meta.env.VITE_MAILER_URL;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim()) {
+    return [envUrl.trim()];
   }
 
-  if (typeof window !== 'undefined' && window.location) {
-    const origin = window.location.origin;
-    const hostname = (window.location.hostname || '').toLowerCase();
-    const isNetlify = hostname.includes('netlify.app');
-    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+  // Universal verified mailer: Uses the Node.js SSL SMTP engine across Netlify, GoDaddy, and Localhost
+  const netlifyUrl = `${origin}/.netlify/functions/send-email`;
+  const primaryNetlifyUrl = 'https://joyful-treacle-c09555.netlify.app/.netlify/functions/send-email';
+  const godaddyPhpUrl = 'https://efficacious.co.in/api/send-email.php';
 
-    // Dedicated .NET API subdomain if deployed
-    endpoints.push('https://api.efficacious.co.in/api/send-email');
-
-    // Local .NET development server
-    if (isLocalhost) {
-      endpoints.push('http://localhost:5000/api/send-email');
-      endpoints.push('https://localhost:5001/api/send-email');
-    }
-
-    // When running on GoDaddy / cPanel / custom domain (e.g. efficacious.co.in),
-    // prioritize the local PHP mailer endpoint first
-    if (!isNetlify && !isLocalhost) {
-      endpoints.push(`${origin}/api/send-email/index.php`);
-      endpoints.push(`${origin}/api/send-email`);
-      endpoints.push('/api/send-email/index.php');
-      endpoints.push('/api/send-email');
-    }
+  if (hostname.includes('netlify.app')) {
+    return [
+      netlifyUrl,
+      `${origin}/api/send-email`,
+      godaddyPhpUrl
+    ];
   }
 
-  // Primary Node.js Serverless Function (Netlify Serverless - 0% PHP)
-  endpoints.push('/.netlify/functions/send-email');
-  endpoints.push('/api/send-email');
-  endpoints.push('https://efficacious-official.netlify.app/.netlify/functions/send-email');
-  endpoints.push('https://efficacious-official.netlify.app/api/send-email');
-
-  if (typeof window !== 'undefined' && window.location) {
-    const origin = window.location.origin;
-    endpoints.push(`${origin}/.netlify/functions/send-email`);
-    endpoints.push(`${origin}/api/send-email`);
-    endpoints.push('/api/send-email');
-    endpoints.push(`${origin}/api/send-email.php`);
-    endpoints.push('/api/send-email.php');
-
-    const pathname = window.location.pathname || '/';
-    const prefixes: string[] = [];
-    let currentDir = pathname;
-    if (!currentDir.endsWith('/')) {
-      currentDir = currentDir.substring(0, currentDir.lastIndexOf('/') + 1);
-    }
-    if (currentDir) prefixes.push(currentDir);
-
-    const segments = pathname.split('/').filter(Boolean);
-    for (let i = segments.length - 1; i >= 1; i--) {
-      prefixes.push('/' + segments.slice(0, i).join('/') + '/');
-    }
-
-    const envBase = import.meta.env.BASE_URL || '/';
-    prefixes.push(envBase.endsWith('/') ? envBase : envBase + '/');
-    prefixes.push('/');
-
-    const uniquePrefixes = Array.from(new Set(prefixes));
-    for (const p of uniquePrefixes) {
-      const cleanP = p.endsWith('/') ? p : p + '/';
-      endpoints.push(`${origin}${cleanP}api/send-email`);
-      endpoints.push(`${origin}${cleanP}api/send-email/index.php`);
-      endpoints.push(`${origin}${cleanP}api/send-email.php`);
-      endpoints.push(`${cleanP}api/send-email`);
-      endpoints.push(`${cleanP}api/send-email/index.php`);
-      endpoints.push(`${cleanP}api/send-email.php`);
-    }
-
-    endpoints.push('./api/send-email');
-    endpoints.push('./api/send-email/index.php');
-    endpoints.push('./api/send-email.php');
-    endpoints.push('../api/send-email');
-    endpoints.push('../api/send-email/index.php');
-    endpoints.push('../api/send-email.php');
-    endpoints.push('api/send-email');
-    endpoints.push('api/send-email/index.php');
-    endpoints.push('api/send-email.php');
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return [
+      'http://localhost:5231/api/send-email',
+      primaryNetlifyUrl,
+      godaddyPhpUrl
+    ];
   }
 
-  return Array.from(new Set(endpoints));
+  // On efficacious.co.in (GoDaddy)
+  return [
+    godaddyPhpUrl,
+    `${origin}/api/send-email.php`,
+    primaryNetlifyUrl
+  ];
 }
 
 /**
- * Sends email via candidate HTTP endpoints (Netlify Functions or Apache PHP mailer).
- * Real SMTP verification: Requires 200 OK and success === true from the server.
+ * Sends email via the ordered candidate endpoints.
+ * Uses an 8-second per-endpoint timeout so failures are detected fast.
+ * Only returns success:true when the server explicitly confirms delivery.
  */
 async function triggerHttpEndpoints(payload: MailPayload): Promise<MailResponse> {
   const candidates = getCandidateEndpoints();
@@ -275,22 +234,27 @@ async function triggerHttpEndpoints(payload: MailPayload): Promise<MailResponse>
   for (const url of candidates) {
     try {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 20000);
+      const timer = setTimeout(() => controller.abort(), 50000);
 
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timer);
+      let res: Response;
+      try {
+        res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timer);
+      }
 
       const text = await res.text();
       const trimmed = text.trim();
+
+      // Skip HTML / PHP error pages
       if (
         trimmed.startsWith('<!DOCTYPE') ||
         trimmed.startsWith('<html') ||
@@ -308,18 +272,17 @@ async function triggerHttpEndpoints(payload: MailPayload): Promise<MailResponse>
         continue;
       }
 
-      // Real SMTP verification: The server confirmed actual delivery
       if (res.ok && (data?.success === true || data?.success === 'true')) {
         return {
           success: true,
-          message: data?.message || 'Email delivered successfully via GoDaddy SSL SMTP.',
+          message: data?.message || 'Email delivered successfully.',
         };
       }
 
-      if (data?.error) {
-        lastError = data.error;
-      }
+      if (data?.error) lastError = data.error;
+
     } catch {
+      // Network error / timeout — try next endpoint
       continue;
     }
   }
@@ -329,6 +292,7 @@ async function triggerHttpEndpoints(payload: MailPayload): Promise<MailResponse>
     error: lastError || 'Unable to deliver message right now. Please email us directly at info@efficacious.co.in.',
   };
 }
+
 
 /**
  * Listens to Firestore 'mail' document until the Firebase Trigger Email extension

@@ -502,6 +502,13 @@ To / Recipient:   ${recipientEmail}
                     )}
                 </div>
 
+                {isSubmitting && (
+                  <div className="p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl text-amber-700 dark:text-amber-300 text-sm flex items-center gap-2.5 animate-pulse">
+                    <Loader2 size={16} className="animate-spin shrink-0 text-[#E48100]" />
+                    <span className="font-medium">Sending message to info@efficacious.co.in, please wait a moment...</span>
+                  </div>
+                )}
+
                 <button 
                     type="submit"
                     disabled={isSubmitting}
