@@ -7,6 +7,18 @@
 // Define guard constant for configuration
 define('EFFICACIOUS_MAILER', true);
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+$phpMailerAvailable = false;
+if (file_exists(__DIR__ . '/PHPMailer/PHPMailer.php')) {
+    require_once __DIR__ . '/PHPMailer/Exception.php';
+    require_once __DIR__ . '/PHPMailer/PHPMailer.php';
+    require_once __DIR__ . '/PHPMailer/SMTP.php';
+    $phpMailerAvailable = true;
+}
+
 // Disable error display in production output to ensure pure JSON response
 error_reporting(0);
 ini_set('display_errors', '0');
@@ -425,54 +437,108 @@ $sent = false;
 $deliveryMethod = '';
 $smtpHost = $config['smtp_host'] ?? "smtpout.secureserver.net";
 $smtpPort = intval($config['smtp_port'] ?? 587);
+$lastError = '';
 
-// 1. Primary on GoDaddy cPanel: PHP native mail() function
-// GoDaddy cPanel preconfigures php.ini with sendmail_path to local Exim daemon.
-// This executes in ~20ms, has SPF/DKIM envelope matching, and is never blocked by firewall.
-try {
-    $mailHeaders = $headers;
-    $sent = @mail($recipient, $emailSubject, $bodyMime, $mailHeaders, "-f" . $smtpUser);
-    if ($sent) $deliveryMethod = 'cPanel native mail()';
-} catch (Exception $e) {
-    $sent = false;
+// 1. Primary Attempt: Official PHPMailer on smtpout.secureserver.net:587 (STARTTLS)
+if ($phpMailerAvailable) {
+    try {
+        $mail = new PHPMailer(true);
+        $mail->isSMTP();
+        $mail->Host       = $smtpHost; // smtpout.secureserver.net
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $smtpUser; // info@efficacious.co.in
+        $mail->Password   = $smtpPass;
+        $mail->SMTPSecure = ($smtpPort == 465) ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = $smtpPort; // 587
+        $mail->Timeout    = 8;
+        $mail->CharSet    = 'UTF-8';
+        $mail->SMTPOptions = [
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            ]
+        ];
+
+        $mail->setFrom($smtpUser, 'Efficacious Website');
+        $mail->addAddress($recipient);
+        $mail->addReplyTo($email, $fullName);
+
+        $mail->isHTML(true);
+        $mail->Subject = $emailSubject;
+        $mail->Body    = $emailHtml;
+        $mail->AltBody = $emailText;
+
+        if (!empty($attachmentContent) && !empty($attachmentFilename)) {
+            $mail->addStringAttachment($attachmentContent, $attachmentFilename, 'base64', $attachmentType);
+        }
+
+        $mail->send();
+        $sent = true;
+        $deliveryMethod = "PHPMailer {$smtpHost}:{$smtpPort}";
+    } catch (\Throwable $e) {
+        $lastError = isset($mail) && $mail->ErrorInfo ? $mail->ErrorInfo : $e->getMessage();
+        // Fallback: PHPMailer Port 465 SSL
+        if ($smtpPort !== 465) {
+            try {
+                $mail465 = new PHPMailer(true);
+                $mail465->isSMTP();
+                $mail465->Host       = $smtpHost;
+                $mail465->SMTPAuth   = true;
+                $mail465->Username   = $smtpUser;
+                $mail465->Password   = $smtpPass;
+                $mail465->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                $mail465->Port       = 465;
+                $mail465->Timeout    = 8;
+                $mail465->CharSet    = 'UTF-8';
+                $mail465->SMTPOptions = [
+                    'ssl' => [
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                        'allow_self_signed' => true
+                    ]
+                ];
+
+                $mail465->setFrom($smtpUser, 'Efficacious Website');
+                $mail465->addAddress($recipient);
+                $mail465->addReplyTo($email, $fullName);
+
+                $mail465->isHTML(true);
+                $mail465->Subject = $emailSubject;
+                $mail465->Body    = $emailHtml;
+                $mail465->AltBody = $emailText;
+
+                if (!empty($attachmentContent) && !empty($attachmentFilename)) {
+                    $mail465->addStringAttachment($attachmentContent, $attachmentFilename, 'base64', $attachmentType);
+                }
+
+                $mail465->send();
+                $sent = true;
+                $deliveryMethod = "PHPMailer {$smtpHost}:465";
+            } catch (\Throwable $e2) {
+                $lastError = isset($mail465) && $mail465->ErrorInfo ? $mail465->ErrorInfo : $e2->getMessage();
+            }
+        }
+    }
 }
 
-// 2. Second Attempt: Localhost:25 SMTP (cPanel Exim daemon)
+// 2. Secondary Attempt: Native cPanel mail() function (if external SMTP is blocked by host firewall)
+if (!$sent) {
+    try {
+        $mailHeaders = $headers;
+        $sent = @mail($recipient, $emailSubject, $bodyMime, $mailHeaders, "-f" . $smtpUser);
+        if ($sent) $deliveryMethod = 'cPanel native mail()';
+    } catch (\Throwable $e) {
+        $sent = false;
+    }
+}
+
+// 3. Third Attempt: cPanel localhost:25 Exim
 if (!$sent) {
     try {
         $sent = sendViaSmtp("localhost", 25, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers, 2);
         if ($sent) $deliveryMethod = 'cPanel localhost:25';
-    } catch (Exception $e) {
-        $sent = false;
-    }
-}
-
-// 3. Third Attempt: GoDaddy Relay Hosting (relay-hosting.secureserver.net:25)
-if (!$sent) {
-    try {
-        $sent = sendViaSmtp("relay-hosting.secureserver.net", 25, "", "", $smtpUser, $recipient, $emailSubject, $bodyMime, $headers, 2);
-        if ($sent) $deliveryMethod = 'GoDaddy relay-hosting:25';
-    } catch (Exception $e) {
-        $sent = false;
-    }
-}
-
-// 4. Fourth Attempt: Direct external authenticated SMTP Port 587 (TLS)
-if (!$sent) {
-    try {
-        $sent = sendViaSmtp($smtpHost, $smtpPort, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers, 3);
-        if ($sent) $deliveryMethod = "SMTP {$smtpHost}:{$smtpPort}";
-    } catch (Exception $e) {
-        $sent = false;
-    }
-}
-
-// 5. Fifth Attempt: Direct external authenticated SMTP Port 465 (SSL)
-if (!$sent && $smtpPort !== 465) {
-    try {
-        $sent = sendViaSmtp($smtpHost, 465, $smtpUser, $smtpPass, $smtpUser, $recipient, $emailSubject, $bodyMime, $headers, 3);
-        if ($sent) $deliveryMethod = "SMTP {$smtpHost}:465";
-    } catch (Exception $e) {
+    } catch (\Throwable $e) {
         $sent = false;
     }
 }
@@ -488,6 +554,6 @@ if ($sent) {
     http_response_code(500);
     echo json_encode([
         "success" => false, 
-        "error" => "Unable to deliver message right now. Please email directly to info@efficacious.co.in."
+        "error" => "Unable to deliver message right now. " . ($lastError ? "SMTP error: {$lastError}" : "Please email directly to info@efficacious.co.in.")
     ]);
 }
