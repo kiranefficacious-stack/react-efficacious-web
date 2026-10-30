@@ -34,48 +34,6 @@ async function getEmailCredentials(envPass = '', envUser = ''): Promise<{ user: 
   const fallbackUser = envUser || process.env.EMAIL_USER || 'info@efficacious.co.in';
   const fallbackPass = envPass || process.env.EMAIL_PASS || 'enc:v1:663f01195bfc68e71a9d9719:2f23ccc527e680935b8e862bedc861b2:53eb399d182ae65d1b320b8c41fc5b2e';
 
-  try {
-    const tokenPath = path.join(os.homedir(), '.config', 'configstore', 'firebase-tools.json');
-    if (fs.existsSync(tokenPath)) {
-      const data = JSON.parse(fs.readFileSync(tokenPath, 'utf8'));
-      const token = data.tokens?.access_token;
-      if (token) {
-        const secretRes = await new Promise<any>((resolve) => {
-          const req = https.request(
-            {
-              hostname: 'firestore.googleapis.com',
-              path: '/v1/projects/efficacious-website-live/databases/(default)/documents/system_secrets/email_credentials',
-              method: 'GET',
-              headers: { Authorization: `Bearer ${token}` }
-            },
-            (res) => {
-              let body = '';
-              res.on('data', (c) => (body += c));
-              res.on('end', () => {
-                try {
-                  resolve(JSON.parse(body));
-                } catch {
-                  resolve(null);
-                }
-              });
-            }
-          );
-          req.on('error', () => resolve(null));
-          req.end();
-        });
-
-        if (secretRes?.fields?.pass?.stringValue) {
-          return {
-            user: secretRes.fields.user?.stringValue || fallbackUser,
-            pass: decryptPassword(secretRes.fields.pass.stringValue)
-          };
-        }
-      }
-    }
-  } catch (err) {
-    console.warn('Could not read credentials from Firestore:', err);
-  }
-
   return {
     user: fallbackUser,
     pass: decryptPassword(fallbackPass)
@@ -88,6 +46,12 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3000,
         host: '0.0.0.0',
+        proxy: {
+          '/api': {
+            target: 'http://localhost:5231',
+            changeOrigin: true
+          }
+        }
       },
       plugins: [
         react(),

@@ -9,9 +9,6 @@
  *    - Never assumes document creation equals email delivery.
  */
 
-import { db } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
-
 export interface MailPayload {
   type?: 'career' | 'contact' | 'product_contact';
   product?: string;
@@ -192,37 +189,31 @@ export function getCandidateEndpoints(): string[] {
     return [envUrl.trim()];
   }
 
-  const netlifyFunctionUrl = `${origin}/.netlify/functions/send-email`;
-  const netlifyApiUrl = `${origin}/api/send-email`;
-  const liveNetlifyUrl = 'https://joyful-treacle-c09555.netlify.app/.netlify/functions/send-email';
-  const liveNetlifyApiUrl = 'https://joyful-treacle-c09555.netlify.app/api/send-email';
   const godaddyPhpUrl = 'https://efficacious.co.in/api/send-email.php';
 
   if (hostname.includes('netlify.app')) {
-    // Calls your live GoDaddy mailer directly so Netlify works with 100% certainty
+    // Calls live GoDaddy mailer directly so Netlify delivers without requiring serverless functions
     return [
       godaddyPhpUrl,
-      netlifyFunctionUrl,
-      netlifyApiUrl
+      `${origin}/api/send-email`,
+      `${origin}/.netlify/functions/send-email`
     ];
   }
 
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return [
+      'http://localhost:5231/api/send-email',
       `${origin}/api/send-email`,
       '/api/send-email',
-      godaddyPhpUrl,
-      liveNetlifyUrl
+      godaddyPhpUrl
     ];
   }
 
-  // On GoDaddy (efficacious.co.in) or custom domain
+  // On GoDaddy (efficacious.co.in, www.efficacious.co.in) or custom domain
   return [
     `${origin}/api/send-email.php`,
     `${origin}/api/send-email/index.php`,
-    `${origin}/api/send-email`,
-    godaddyPhpUrl,
-    liveNetlifyUrl
+    godaddyPhpUrl
   ];
 }
 
@@ -238,7 +229,7 @@ async function triggerHttpEndpoints(payload: MailPayload): Promise<MailResponse>
   for (const url of candidates) {
     try {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 10000);
+      const timer = setTimeout(() => controller.abort(), 25000);
 
       let res: Response;
       try {
@@ -304,63 +295,9 @@ async function triggerHttpEndpoints(payload: MailPayload): Promise<MailResponse>
 
 
 /**
- * Listens to Firestore 'mail' document until the Firebase Trigger Email extension
- * writes an explicit delivery confirmation: delivery.state === 'SUCCESS'.
- * NEVER fakes confirmation.
- */
-function waitForFirestoreDelivery(docRef: any, timeoutMs = 8000): Promise<MailResponse> {
-  return new Promise((resolve) => {
-    let timer: any = null;
-    let unsub: any = null;
-
-    const cleanup = () => {
-      if (timer) clearTimeout(timer);
-      if (typeof unsub === 'function') unsub();
-    };
-
-    timer = setTimeout(() => {
-      cleanup();
-      resolve({
-        success: false,
-        error: 'Firestore mail extension did not confirm delivery within timeout.'
-      });
-    }, timeoutMs);
-
-    unsub = onSnapshot(docRef, (snap: any) => {
-      const data = snap.data();
-      const delivery = data?.delivery;
-
-      if (delivery) {
-        if (delivery.state === 'SUCCESS') {
-          cleanup();
-          resolve({
-            success: true,
-            message: 'Email delivered successfully to info@efficacious.co.in.'
-          });
-        } else if (delivery.state === 'ERROR') {
-          cleanup();
-          resolve({
-            success: false,
-            error: delivery.error || 'Server rejected email delivery.'
-          });
-        }
-      }
-    }, (err: any) => {
-      cleanup();
-      resolve({
-        success: false,
-        error: err?.message || 'Firestore subscription error'
-      });
-    });
-  });
-}
-
-/**
- * Strictly Verified Universal Mail Dispatcher (0% PHP):
- * 1. Primary: Direct Node.js Serverless Function (Verified GoDaddy SSL SMTP on Port 465)
- *    - 0% PHP, works across domains via CORS
- * 2. Fallback: Firebase Trigger Email Extension (with onSnapshot verification)
- * 3. Never produces fake confirmations
+ * Strictly Verified Universal Mail Dispatcher (.NET API & MailKit):
+ * 1. Primary: Direct .NET API (Verified GoDaddy SSL SMTP on Port 465)
+ * 2. Never produces fake confirmations
  */
 export async function sendEmailNotification(payload: MailPayload): Promise<MailResponse> {
   // Direct verified GoDaddy SSL SMTP execution via serverless mailer

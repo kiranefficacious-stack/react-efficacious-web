@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const FirebaseLoader: React.FC = () => {
+const AppLoader: React.FC = () => {
   return (
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900">
       <motion.div
@@ -15,10 +15,10 @@ const FirebaseLoader: React.FC = () => {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="text-slate-600 dark:text-slate-400 font-medium tracking-wide animate-pulse"
       >
-        Connecting to the cloud...
+        Loading application data...
       </motion.p>
     </div>
   );
 };
 
-export default FirebaseLoader;
+export default AppLoader;

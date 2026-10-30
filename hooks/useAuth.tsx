@@ -1,9 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { api } from '../services/api';
+
+export interface AdminUser {
+  uid: string;
+  email: string;
+  displayName?: string;
+}
 
 interface AuthContextType {
-  user: User | null;
+  user: AdminUser | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
@@ -11,6 +16,8 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const AUTH_STORAGE_KEY = 'efficacious_admin_session';
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -27,56 +34,59 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    try {
+      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed?.uid && parsed?.email) {
+          setUser(parsed);
+        }
+      }
+    } catch {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    } finally {
       setLoading(false);
-    });
-
-    return () => unsubscribe();
+    }
   }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      return { success: true };
-    } catch (error: any) {
-      const code = error?.code;
-      let userFriendlyMessage = 'Invalid email or password. Please verify your credentials.';
-      if (code === 'auth/too-many-requests') {
-        userFriendlyMessage = 'Too many failed attempts. Please wait a few minutes before trying again.';
-      } else if (code === 'auth/network-request-failed') {
-        userFriendlyMessage = 'Network connection error. Please check your internet connection.';
-      } else if (code === 'auth/user-disabled') {
-        userFriendlyMessage = 'This account has been disabled. Please contact the administrator.';
+      const res = await api.login(email, password);
+      if (res.success && res.user) {
+        setUser(res.user);
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(res.user));
+        return { success: true };
       }
       return {
         success: false,
-        error: userFriendlyMessage
+        error: res.error || 'Invalid email or password.'
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        error: err.message || 'Unable to connect to authentication server.'
       };
     }
   };
 
-  const logoutAction = async () => {
-    try {
-        await signOut(auth);
-    } catch(e) {
-        if (import.meta.env.DEV) {
-            console.error("Error signing out", e);
-        }
-    }
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem(AUTH_STORAGE_KEY);
   };
 
-  const value: AuthContextType = {
-    user,
-    isAuthenticated: user !== null,
-    login,
-    logout: logoutAction,
-    loading
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{
+      user,
+      isAuthenticated: Boolean(user),
+      login,
+      logout,
+      loading
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

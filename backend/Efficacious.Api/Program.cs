@@ -6,13 +6,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddSingleton<Efficacious.Api.Services.EmailService>();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var dbFolder = Path.Combine(builder.Environment.ContentRootPath, "backend", "Efficacious.Api");
+var dbPath = Directory.Exists(dbFolder) ? Path.Combine(dbFolder, "Efficacious.db") : Path.Combine(AppContext.BaseDirectory, "Efficacious.db");
+
 builder.Services.AddDbContext<Efficacious.Api.Data.AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite($"Data Source={dbPath}"));
 
 builder.Services.AddCors(options =>
 {
@@ -27,43 +28,27 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Ensure all database tables exist automatically
+using (var scope = app.Services.CreateScope())
 {
-    app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var dbContext = scope.ServiceProvider.GetRequiredService<Efficacious.Api.Data.AppDbContext>();
+    dbContext.Database.EnsureCreated();
 }
 
 app.UseCors("AllowAll");
 
-app.UseHttpsRedirection();
-
-var summaries = new[]
+// Enable Swagger UI across all environments so both http://localhost:5231 and /swagger work immediately
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Efficacious API v1");
+    c.RoutePrefix = "swagger"; // Available at /swagger and /swagger/index.html
+});
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+// Redirect root / and /swagger directly to /swagger/index.html
+app.MapGet("/", () => Results.Redirect("/swagger/index.html"));
+app.MapGet("/swagger", () => Results.Redirect("/swagger/index.html"));
 
 app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

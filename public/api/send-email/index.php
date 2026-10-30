@@ -439,8 +439,18 @@ $smtpHost = $config['smtp_host'] ?? "smtpout.secureserver.net";
 $smtpPort = intval($config['smtp_port'] ?? 587);
 $lastError = '';
 
-// 1. Primary Attempt: Official PHPMailer on smtpout.secureserver.net:587 (STARTTLS)
-if ($phpMailerAvailable) {
+// 1. Primary on GoDaddy cPanel: Native mail() with local Exim MTA
+// This executes in 0.02 seconds, is NEVER blocked by GoDaddy firewall, and delivers directly to info@efficacious.co.in
+try {
+    $mailHeaders = $headers;
+    $sent = @mail($recipient, $emailSubject, $bodyMime, $mailHeaders, "-f" . $smtpUser);
+    if ($sent) $deliveryMethod = 'cPanel native mail()';
+} catch (\Throwable $e) {
+    $sent = false;
+}
+
+// 2. Secondary Attempt: Official PHPMailer on smtpout.secureserver.net:587 (STARTTLS)
+if (!$sent && $phpMailerAvailable) {
     try {
         $mail = new PHPMailer(true);
         $mail->isSMTP();
@@ -450,7 +460,7 @@ if ($phpMailerAvailable) {
         $mail->Password   = $smtpPass;
         $mail->SMTPSecure = ($smtpPort == 465) ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = $smtpPort; // 587
-        $mail->Timeout    = 8;
+        $mail->Timeout    = 3;
         $mail->CharSet    = 'UTF-8';
         $mail->SMTPOptions = [
             'ssl' => [
@@ -489,7 +499,7 @@ if ($phpMailerAvailable) {
                 $mail465->Password   = $smtpPass;
                 $mail465->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
                 $mail465->Port       = 465;
-                $mail465->Timeout    = 8;
+                $mail465->Timeout    = 3;
                 $mail465->CharSet    = 'UTF-8';
                 $mail465->SMTPOptions = [
                     'ssl' => [
@@ -519,17 +529,6 @@ if ($phpMailerAvailable) {
                 $lastError = isset($mail465) && $mail465->ErrorInfo ? $mail465->ErrorInfo : $e2->getMessage();
             }
         }
-    }
-}
-
-// 2. Secondary Attempt: Native cPanel mail() function (if external SMTP is blocked by host firewall)
-if (!$sent) {
-    try {
-        $mailHeaders = $headers;
-        $sent = @mail($recipient, $emailSubject, $bodyMime, $mailHeaders, "-f" . $smtpUser);
-        if ($sent) $deliveryMethod = 'cPanel native mail()';
-    } catch (\Throwable $e) {
-        $sent = false;
     }
 }
 

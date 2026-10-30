@@ -1,12 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { db } from '../../lib/firebase';
-import { 
-  collection, query, orderBy, onSnapshot, doc, updateDoc, 
-  deleteDoc, addDoc, getDocs, Timestamp, serverTimestamp, setDoc
-} from 'firebase/firestore';
+import { api } from '../../services/api';
 import { 
   MessageSquare, Users, Settings, Search, Trash2, Edit2, 
-  Plus, Check, X, Send, Bot, User, Clock, Share2
+  Plus, Check, X, Send, Bot, User, Clock, Share2, RefreshCw
 } from 'lucide-react';
 
 const ChatManager: React.FC = () => {
@@ -43,90 +39,129 @@ const ChatManager: React.FC = () => {
   const [confirmClear, setConfirmClear] = useState(false);
   const [shareCopiedId, setShareCopiedId] = useState<string | null>(null);
 
+  // Fetch Settings on mount
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'system', 'chatSettings'), (docSnap) => {
-      if (docSnap.exists()) {
-        setIsLiveSupportActive(docSnap.data().isLiveSupportActive !== false);
-      } else {
-        // Create document if it doesn't exist
-        setDoc(doc(db, 'system', 'chatSettings'), { isLiveSupportActive: true });
+    const fetchSettings = async () => {
+      try {
+        const settings = await api.getChatSettings();
+        if (settings && typeof settings.isLiveSupportActive === 'boolean') {
+          setIsLiveSupportActive(settings.isLiveSupportActive);
+        }
+      } catch (err) {
+        console.error('Failed to load chat settings:', err);
       }
-    });
-    return () => unsub();
+    };
+    fetchSettings();
   }, []);
 
   const toggleLiveSupport = async () => {
-    await setDoc(doc(db, 'system', 'chatSettings'), { isLiveSupportActive: !isLiveSupportActive }, { merge: true });
+    const nextVal = !isLiveSupportActive;
+    setIsLiveSupportActive(nextVal);
+    try {
+      await api.saveChatSettings({ isLiveSupportActive: nextVal });
+    } catch (err) {
+      console.error('Failed to update live support setting:', err);
+    }
   };
 
-  // 1. Fetch Chat Sessions
-  useEffect(() => {
-    if (activeTab !== 'live') return;
-    const q = query(collection(db, 'chat_sessions'), orderBy('lastMessageTime', 'desc'));
-    const unsub = onSnapshot(q, (snap) => {
-      const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((d: any) => d.status !== 'deleted');
-      setSessions(data);
+  // 1. Fetch Chat Sessions (with polling for live chats)
+  const fetchSessions = async () => {
+    try {
+      const data = await api.getChatSessions();
+      const active = (data || []).filter((d: any) => d.status !== 'deleted');
+      setSessions(active);
 
       // Notification logic
-      if (data.length > prevSessionsLengthRef.current && prevSessionsLengthRef.current > 0) {
-          playNotificationSound();
+      if (active.length > prevSessionsLengthRef.current && prevSessionsLengthRef.current > 0) {
+        playNotificationSound();
       }
-      prevSessionsLengthRef.current = data.length;
-    });
-    return () => unsub();
+      prevSessionsLengthRef.current = active.length;
+    } catch (err) {
+      console.error('Failed to fetch chat sessions:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab !== 'live') return;
+    fetchSessions();
+    const interval = setInterval(fetchSessions, 4000);
+    return () => clearInterval(interval);
   }, [activeTab]);
 
-  // 2. Fetch Active Session Messages
+  // 2. Fetch Active Session Messages (with polling)
+  const fetchActiveMessages = async () => {
+    if (!activeSessionId) return;
+    try {
+      const session = await api.getChatSession(activeSessionId);
+      if (session) {
+        let msgs: any[] = [];
+        if (session.messagesJson) {
+          try {
+            msgs = typeof session.messagesJson === 'string' ? JSON.parse(session.messagesJson) : session.messagesJson;
+          } catch {}
+        }
+        setMessages(Array.isArray(msgs) ? msgs : []);
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+
+        // Mark as read for admin if needed
+        if (session.unreadAdmin > 0) {
+          api.updateChatSession(activeSessionId, { unreadAdmin: 0 }).catch(() => {});
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch session messages:', err);
+    }
+  };
+
   useEffect(() => {
     if (!activeSessionId) return;
-    const q = query(
-      collection(db, `chat_sessions/${activeSessionId}/messages`), 
-      orderBy('timestamp', 'asc')
-    );
-    const unsub = onSnapshot(q, (snap) => {
-      setMessages(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    });
-
-    // Mark as read
-    updateDoc(doc(db, 'chat_sessions', activeSessionId), { unreadAdmin: 0 }).catch(e => {});
-
-    return () => unsub();
+    fetchActiveMessages();
+    const interval = setInterval(fetchActiveMessages, 3000);
+    return () => clearInterval(interval);
   }, [activeSessionId]);
 
-  // 3. Fetch Q&A
+  // 3. Fetch Q&A Knowledge Base
+  const fetchQa = async () => {
+    try {
+      const list = await api.getQaList();
+      setQaList(list || []);
+    } catch (err) {
+      console.error('Failed to fetch QA list:', err);
+    }
+  };
+
   useEffect(() => {
-    if (activeTab !== 'qa') return;
-    const fetchQa = async () => {
-      const q = collection(db, 'chatbot_qa');
-      const snap = await getDocs(q);
-      setQaList(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    };
-    fetchQa();
+    if (activeTab === 'qa') {
+      fetchQa();
+    }
   }, [activeTab]);
 
   const handleSendReply = async () => {
     if (!replyText.trim() || !activeSessionId) return;
 
-    await addDoc(collection(db, `chat_sessions/${activeSessionId}/messages`), {
-      text: replyText,
-      sender: 'admin',
-      timestamp: serverTimestamp()
-    });
-
-    await updateDoc(doc(db, 'chat_sessions', activeSessionId), {
-      lastMessage: replyText,
-      lastMessageTime: serverTimestamp(),
-      unreadUser: 1, // trigger user UI
-      adminJoined: true // Rule 1: Signal the bot to stop auto-replying
-    });
-
+    const currentText = replyText;
     setReplyText('');
+
+    try {
+      await api.sendChatMessage(activeSessionId, {
+        text: currentText,
+        sender: 'admin'
+      });
+      await fetchActiveMessages();
+      await fetchSessions();
+    } catch (err) {
+      console.error('Failed to send reply:', err);
+      setReplyText(currentText);
+    }
   };
 
   const resolveChat = async (id: string) => {
-    await updateDoc(doc(db, 'chat_sessions', id), { status: 'resolved' });
-    // We intentionally keep activeSessionId so the admin can continue reading the history/details 
+    try {
+      await api.updateChatSession(id, { status: 'resolved' });
+      await fetchSessions();
+    } catch (err) {
+      console.error('Failed to resolve chat:', err);
+    }
   };
 
   const clearAllChats = async () => {
@@ -136,79 +171,71 @@ const ChatManager: React.FC = () => {
        return;
     }
     
-    // User confirmed
     setConfirmClear(false);
 
-    const resolvedSessions = sessions.filter(s => s.status === 'resolved');
-    
-    if (resolvedSessions.length === 0) {
-      alert("There are no inactive sessions to clear.");
-      return;
-    }
-      
+    try {
+      await api.clearInactiveSessions();
       if (sessions.find(s => s.id === activeSessionId)?.status === 'resolved') {
         setActiveSessionId(null);
       }
-
-      try {
-          // Permanently physically delete subcollections and session documents SEQUENTIALLY to prevent browser network stall
-          for (const d of resolvedSessions) {
-              const msgsSnap = await getDocs(collection(db, `chat_sessions/${d.id}/messages`));
-              const delMsgs = msgsSnap.docs.map(m => deleteDoc(m.ref));
-              await Promise.all(delMsgs);
-              await deleteDoc(doc(db, 'chat_sessions', d.id));
-          }
-      } catch (error: any) {
-          console.error("Error clearing inactive chats:", error);
-          alert("Failed to clear inactive chats: " + error.message);
-      }
+      await fetchSessions();
+    } catch (error: any) {
+      console.error("Error clearing inactive chats:", error);
+      alert("Failed to clear inactive chats: " + (error.message || 'Error'));
+    }
   };
 
   const toggleSessionBotActive = async (id: string, currentlyAdminJoined: boolean | undefined) => {
-      // If currentlyAdminJoined is true, setting it to false reactivates the bot!
-      await updateDoc(doc(db, 'chat_sessions', id), {
-         adminJoined: !currentlyAdminJoined 
+    try {
+      await api.updateChatSession(id, {
+        adminJoined: !currentlyAdminJoined 
       });
+      await fetchSessions();
+    } catch (err) {
+      console.error('Failed to toggle bot status:', err);
+    }
   };
 
   const shareChatLink = (id: string) => {
-      const url = `${window.location.origin}/#/direct-chat/${id}`;
-      navigator.clipboard.writeText(url).then(() => {
-          setShareCopiedId(id);
-          setTimeout(() => setShareCopiedId(null), 3000);
-      }).catch(err => {
-          console.error('Failed to copy link: ', err);
-      });
+    const url = `${window.location.origin}/#/direct-chat/${id}`;
+    navigator.clipboard.writeText(url).then(() => {
+        setShareCopiedId(id);
+        setTimeout(() => setShareCopiedId(null), 3000);
+    }).catch(err => {
+        console.error('Failed to copy link: ', err);
+    });
   };
 
   const hardDeleteSingleChat = async (id: string) => {
-      if (window.confirm("Permanently delete this user's history?")) {
-          // Permanently delete subcollection
-          const msgsSnap = await getDocs(collection(db, `chat_sessions/${id}/messages`));
-          const delMsgs = msgsSnap.docs.map(m => deleteDoc(m.ref));
-          await Promise.all(delMsgs);
-
-          // Permanently delete session
-          await deleteDoc(doc(db, 'chat_sessions', id));
-          if (activeSessionId === id) setActiveSessionId(null);
+    if (window.confirm("Permanently delete this user's history?")) {
+      try {
+        await api.deleteChatSession(id);
+        if (activeSessionId === id) setActiveSessionId(null);
+        await fetchSessions();
+      } catch (err: any) {
+        alert("Failed to delete chat: " + (err.message || 'Error'));
       }
+    }
   };
 
   // -- Q&A Functions --
   const saveNewQa = async () => {
     if (!newQa.questionKeywords.trim() || !newQa.answerText.trim()) return;
     
-    if (editingQaId) {
-        await updateDoc(doc(db, 'chatbot_qa', editingQaId), newQa);
-        setQaList(qaList.map(q => q.id === editingQaId ? { id: editingQaId, ...newQa } : q));
+    try {
+      if (editingQaId) {
+        await api.updateQa(editingQaId, newQa);
+        setQaList(qaList.map(q => q.id === editingQaId ? { ...q, ...newQa } : q));
         setEditingQaId(null);
-    } else {
-        const docRef = await addDoc(collection(db, 'chatbot_qa'), newQa);
-        setQaList([...qaList, { id: docRef.id, ...newQa }]);
+      } else {
+        const created = await api.createQa(newQa);
+        setQaList([created, ...qaList]);
+      }
+      setNewQa({ questionKeywords: '', answerText: '' });
+      setIsAddingQa(false);
+    } catch (err: any) {
+      alert("Failed to save Q&A rule: " + (err.message || 'Error'));
     }
-    
-    setNewQa({ questionKeywords: '', answerText: '' });
-    setIsAddingQa(false);
   };
 
   const startEditingQa = (qa: any) => {
@@ -219,10 +246,28 @@ const ChatManager: React.FC = () => {
 
   const deleteQa = async (id: string) => {
     if (window.confirm("Delete this Q&A pair?")) {
-      await deleteDoc(doc(db, 'chatbot_qa', id));
-      setQaList(qaList.filter(q => q.id !== id));
+      try {
+        await api.deleteQa(id);
+        setQaList(qaList.filter(q => q.id !== id));
+      } catch (err: any) {
+        alert("Failed to delete Q&A rule: " + (err.message || 'Error'));
+      }
     }
   };
+
+  const formatTimestamp = (ts: any) => {
+    if (!ts) return '';
+    try {
+      if (typeof ts === 'string') return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      if (ts.toDate) return new Date(ts.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      if (ts.seconds) return new Date(ts.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return '';
+    }
+  };
+
+  const activeSession = sessions.find(s => s.id === activeSessionId);
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 h-[calc(100vh-8rem)] flex flex-col overflow-hidden">
@@ -300,9 +345,11 @@ const ChatManager: React.FC = () => {
                 >
                   <div className="flex flex-col gap-1 items-start mb-1">
                     <div className="flex justify-between items-center w-full">
-                      <span className="font-bold text-sm text-slate-800 dark:text-slate-100">{session.userName}</span>
+                      <span className="font-bold text-sm text-slate-800 dark:text-slate-100">
+                        {session.customerName || session.userName || 'Visitor'}
+                      </span>
                       <span className="text-[10px] text-slate-400">
-                        {session.lastMessageTime ? new Date(session.lastMessageTime.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                        {formatTimestamp(session.lastMessageTime)}
                       </span>
                     </div>
                     {session.status === 'resolved' && (
@@ -319,11 +366,11 @@ const ChatManager: React.FC = () => {
                     )}
                   </div>
                   <div className="text-xs text-slate-500 truncate mb-1">
-                    {session.userContact}
+                    {session.mobile || session.email || session.userContact || 'No contact provided'}
                   </div>
                   <div className="flex justify-between items-center mt-2">
                     <span className="text-xs text-slate-500 truncate w-3/4 opacity-80 italic">
-                      {typeof session.lastMessage === 'string' ? session.lastMessage : JSON.stringify(session.lastMessage)}
+                      {typeof session.lastMessage === 'string' ? session.lastMessage : JSON.stringify(session.lastMessage || '')}
                     </span>
                     {session.unreadAdmin > 0 && (
                       <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10 animate-bounce">
@@ -350,30 +397,30 @@ const ChatManager: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-slate-800 dark:text-white leading-tight">
-                        {sessions.find(s => s.id === activeSessionId)?.userName}
+                        {activeSession?.customerName || activeSession?.userName || 'Visitor'}
                       </h3>
                       <p className="text-xs text-slate-500">
-                        {sessions.find(s => s.id === activeSessionId)?.userContact}
+                        {activeSession?.mobile || activeSession?.email || activeSession?.userContact || 'Visitor'}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="flex flex-col items-end mr-2 border-r border-slate-200 dark:border-slate-800 pr-4">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">{sessions.find(s => s.id === activeSessionId)?.userName}'s AI Bot Assistant</span>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">{activeSession?.customerName || 'Visitor'}'s AI Assistant</span>
                         <div className="flex items-center gap-2">
-                           <span className={`text-[10px] font-bold ${!sessions.find(s => s.id === activeSessionId)?.adminJoined ? 'text-brand-600' : 'text-slate-400'}`}>
-                             {!sessions.find(s => s.id === activeSessionId)?.adminJoined ? 'ACTIVE' : 'PAUSED'}
+                           <span className={`text-[10px] font-bold ${!activeSession?.adminJoined ? 'text-brand-600' : 'text-slate-400'}`}>
+                             {!activeSession?.adminJoined ? 'ACTIVE' : 'PAUSED'}
                            </span>
                            <button 
-                             onClick={() => toggleSessionBotActive(activeSessionId, sessions.find(s => s.id === activeSessionId)?.adminJoined)}
-                             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${!sessions.find(s => s.id === activeSessionId)?.adminJoined ? 'bg-brand-500' : 'bg-slate-300 dark:bg-slate-700'}`}
+                             onClick={() => toggleSessionBotActive(activeSessionId, activeSession?.adminJoined)}
+                             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${!activeSession?.adminJoined ? 'bg-brand-500' : 'bg-slate-300 dark:bg-slate-700'}`}
                              title="Toggle AI Bot for this user"
                            >
-                             <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${!sessions.find(s => s.id === activeSessionId)?.adminJoined ? 'translate-x-5' : 'translate-x-1'}`} />
+                             <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${!activeSession?.adminJoined ? 'translate-x-5' : 'translate-x-1'}`} />
                            </button>
                         </div>
                     </div>
-                    {sessions.find(s => s.id === activeSessionId)?.status !== 'resolved' && (
+                    {activeSession?.status !== 'resolved' && (
                       <>
                         <button 
                           onClick={() => shareChatLink(activeSessionId)}
@@ -394,7 +441,7 @@ const ChatManager: React.FC = () => {
                         </button>
                       </>
                     )}
-                    {sessions.find(s => s.id === activeSessionId)?.status === 'resolved' && (
+                    {activeSession?.status === 'resolved' && (
                       <span className="text-xs font-bold text-slate-500 bg-slate-200 dark:bg-slate-800 px-3 py-1.5 rounded-full flex items-center gap-1 border border-slate-300 dark:border-slate-700 shadow-inner">
                         <Check size={14} /> Resolved
                       </span>
@@ -415,7 +462,7 @@ const ChatManager: React.FC = () => {
                          <p className="text-sm">{typeof msg.text === 'string' ? msg.text : JSON.stringify(msg.text)}</p>
                          <div className={`text-[9px] mt-1 text-right ${msg.sender === 'admin' ? 'text-brand-200' : 'text-slate-400'}`}>
                            {msg.sender === 'bot' && <span className="mr-1 inline-block">🤖 Bot</span>}
-                           {msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString() : '...'}
+                           {formatTimestamp(msg.timestamp)}
                          </div>
                       </div>
                     </div>
@@ -431,7 +478,7 @@ const ChatManager: React.FC = () => {
                       onChange={e => setReplyText(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && handleSendReply()}
                       placeholder="Type a message to reply..."
-                      disabled={sessions.find(s => s.id === activeSessionId)?.status === 'resolved'}
+                      disabled={activeSession?.status === 'resolved'}
                       className="flex-1 p-3 bg-slate-100 dark:bg-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 text-sm disabled:opacity-50"
                     />
                     <button 

@@ -10,8 +10,6 @@ import { useContent } from '../hooks/useContent';
 import { sanitizeDescriptionHtml } from '../utils/sanitizeHtml';
 import emailjs from '@emailjs/browser';
 import { sendEmailNotification } from '../utils/sendMail';
-import { db } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const motion = m as any;
 
@@ -215,27 +213,7 @@ ${formData.message.trim() || 'No cover letter provided'}
 To / Recipient:   ${recipientEmail}
 `.trim();
 
-    // 1. Save directly to Firestore database
-    let savedToDatabase = false;
-    try {
-      await addDoc(collection(db, 'career_applications'), {
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        mobile: formData.mobile.trim(),
-        address: formData.address.trim() || 'Not specified',
-        position: formData.position || 'Open Role',
-        message: formData.message.trim() || 'No cover letter provided',
-        resumeName: selectedFile ? selectedFile.name : 'No file attached',
-        resumeSize: selectedFile ? `${(selectedFile.size / 1024).toFixed(1)} KB` : 'N/A',
-        createdAt: serverTimestamp(),
-        submittedAt: new Date().toISOString()
-      });
-      savedToDatabase = true;
-    } catch (fsErr) {
-      console.warn('Firestore career save warning:', fsErr);
-    }
-
-    // 2. Email Notification Endpoint (Universal Mailer: auto-resolves base URLs, PHP, and dev server)
+    // Email Notification & Persistence (.NET API automatically saves candidate application to SQLite and dispatches email)
     try {
       const mailRes = await sendEmailNotification({
         type: 'career',
