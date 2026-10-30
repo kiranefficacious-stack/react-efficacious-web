@@ -29,43 +29,55 @@ public class AuthController : ControllerBase
         var email = (request.Email ?? string.Empty).Trim().ToLowerInvariant();
         var password = (request.Password ?? string.Empty).Trim();
 
-        // Standard accepted passwords for easy admin access
-        var acceptedMasterPasswords = new[] { 
-            "admin123", 
-            "Efficacious@Secure2026!", 
-            "AdminPassword123!", 
-            "Admin@123", 
-            "admin" 
-        };
-
-        // 1. Check SQLite AdminUsers table
-        var dbUser = await _context.AdminUsers
-            .FirstOrDefaultAsync(u => (u.Email.ToLower() == email || (email == "admin" && u.Email.StartsWith("admin@"))) && u.IsActive == 1);
-
-        if (dbUser != null && (dbUser.PasswordHash == password || acceptedMasterPasswords.Contains(password)))
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
-            dbUser.LastLoginAt = DateTime.UtcNow.ToString("o");
-            await _context.SaveChangesAsync();
-
-            return Ok(new
+            return Unauthorized(new
             {
-                success = true,
-                token = Guid.NewGuid().ToString("N"),
-                user = new
-                {
-                    uid = dbUser.Id.ToString(),
-                    email = dbUser.Email,
-                    displayName = dbUser.DisplayName,
-                    role = dbUser.Role
-                }
+                success = false,
+                error = "Email and password are required."
             });
         }
 
-        // 2. Fallback to appsettings / master root admin
-        var isEmailMatch = (email == "admin@efficacious.co.in" || email == "info@efficacious.co.in" || email == "admin");
-        var isPassMatch = acceptedMasterPasswords.Contains(password);
+        // 1. Check SQLite AdminUsers table - strictly match email and stored password
+        var dbUser = await _context.AdminUsers
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == email && u.IsActive == 1);
 
-        if (isEmailMatch && isPassMatch)
+        if (dbUser != null)
+        {
+            if (dbUser.PasswordHash == password)
+            {
+                dbUser.LastLoginAt = DateTime.UtcNow.ToString("o");
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    success = true,
+                    token = Guid.NewGuid().ToString("N"),
+                    user = new
+                    {
+                        uid = dbUser.Id.ToString(),
+                        email = dbUser.Email,
+                        displayName = dbUser.DisplayName,
+                        role = dbUser.Role
+                    }
+                });
+            }
+            else
+            {
+                // Explicitly reject when password does not match
+                return Unauthorized(new
+                {
+                    success = false,
+                    error = "Invalid email or password. Please verify your admin credentials."
+                });
+            }
+        }
+
+        // 2. Strict fallback to appsettings.json if database user record is not found
+        var configuredEmail = (_configuration["Admin:Email"] ?? "admin@efficacious.co.in").Trim().ToLowerInvariant();
+        var configuredPass = (_configuration["Admin:Password"] ?? "Admin@123").Trim();
+
+        if (email == configuredEmail && password == configuredPass)
         {
             return Ok(new
             {
@@ -74,7 +86,7 @@ public class AuthController : ControllerBase
                 user = new
                 {
                     uid = "admin_user_01",
-                    email = email.Contains("@") ? email : "admin@efficacious.co.in",
+                    email = configuredEmail,
                     displayName = "Efficacious Administrator",
                     role = "SuperAdmin"
                 }
