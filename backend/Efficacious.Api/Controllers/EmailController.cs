@@ -34,6 +34,7 @@ public class EmailController : ControllerBase
     }
 
     [HttpGet("/api/inquiries")]
+    [HttpGet("/inquiries")]
     public async Task<IActionResult> GetInquiries()
     {
         var inquiries = await _context.ContactInquiries.OrderByDescending(i => i.CreatedAt).ToListAsync();
@@ -41,6 +42,7 @@ public class EmailController : ControllerBase
     }
 
     [HttpGet("/api/careers")]
+    [HttpGet("/careers")]
     public async Task<IActionResult> GetCareerApplications()
     {
         var apps = await _context.CareerApplications.OrderByDescending(a => a.CreatedAt).ToListAsync();

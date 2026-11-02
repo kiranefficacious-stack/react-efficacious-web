@@ -202,6 +202,7 @@ export function getCandidateEndpoints(): string[] {
 
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return [
+      'http://localhost:5231/send-email',
       'http://localhost:5231/api/send-email',
       `${origin}/api/send-email`,
       '/api/send-email',
