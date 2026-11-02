@@ -118,11 +118,14 @@ const TeamManager: React.FC = () => {
     handleCloseForm();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteDialog.id) {
-      deleteItem('team', deleteDialog.id);
-      showToast('success', 'Team member deleted successfully!');
+      const idToDelete = deleteDialog.id;
       setDeleteDialog({ isOpen: false, id: null });
+      const ok = await deleteItem('team', idToDelete);
+      if (ok) {
+        showToast('success', 'Team member deleted successfully!');
+      }
     }
   };
 

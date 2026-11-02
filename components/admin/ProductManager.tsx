@@ -239,21 +239,27 @@ const ProductManager: React.FC = () => {
     return '';
   };
 
-  const handleConfirmAction = () => {
+  const handleConfirmAction = async () => {
     if (!confirmAction) return;
 
     if (confirmAction.type === 'toggle') {
       const product = confirmAction.payload;
-      toggleProduct(product.id);
-      showToast(
-        'success',
-        `Product ${!product.enabled ? 'enabled' : 'disabled'} successfully!`
-      );
+      setConfirmAction(null);
+      const ok = await toggleProduct(product.id);
+      if (ok) {
+        showToast(
+          'success',
+          `Product ${!product.enabled ? 'enabled' : 'disabled'} successfully!`
+        );
+      }
     } else if (confirmAction.type === 'delete') {
-      deleteItem('products', confirmAction.payload.id);
-      showToast('success', 'Product deleted successfully!');
+      const productId = confirmAction.payload.id;
+      setConfirmAction(null);
+      const ok = await deleteItem('products', productId);
+      if (ok) {
+        showToast('success', 'Product deleted successfully!');
+      }
     }
-    setConfirmAction(null);
   };
 
   const handleToggleComingSoon = (product: any) => {

@@ -157,11 +157,14 @@ const CareersManager: React.FC = () => {
     handleCloseForm();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteDialog.id) {
-      deleteItem('careers', deleteDialog.id);
-      showToast('success', 'Job posting deleted successfully!');
+      const idToDelete = deleteDialog.id;
       setDeleteDialog({ isOpen: false, id: null });
+      const ok = await deleteItem('careers', idToDelete);
+      if (ok) {
+        showToast('success', 'Job posting deleted successfully!');
+      }
     }
   };
 

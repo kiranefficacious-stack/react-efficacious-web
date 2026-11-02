@@ -53,6 +53,22 @@ builder.Services.AddDbContext<Efficacious.Api.Data.AppDbContext>(options =>
         var sqliteConn = $"Data Source={dbPath}";
 
         Console.WriteLine($"[Database] Initializing SQLite connection ({sqliteConn})...");
+
+        // Test directory write access early to diagnose IIS file permissions
+        try
+        {
+            var dbDir = Path.GetDirectoryName(dbPath) ?? AppContext.BaseDirectory;
+            var testFile = Path.Combine(dbDir, ".perm_test");
+            File.WriteAllText(testFile, "test");
+            File.Delete(testFile);
+            Console.WriteLine($"[Database] Directory write permissions verified: {dbDir}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Database WARNING] SQLite directory is NOT writable by IIS / worker process: {ex.Message}");
+            Console.WriteLine("[Database WARNING] Please grant Modify & Write permissions to 'IIS_IUSRS' on this folder.");
+        }
+
         options.UseSqlite(sqliteConn);
     }
 });

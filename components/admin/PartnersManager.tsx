@@ -121,13 +121,16 @@ const PartnersManager: React.FC = () => {
     handleCloseForm();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteDialog.id) {
-      const updatedPartners = { ...data.partners };
-      updatedPartners.items = partners.filter((p: any) => p.id !== deleteDialog.id);
-      updateContent('partners', updatedPartners);
-      showToast('success', 'Partner deleted successfully!');
+      const idToDelete = deleteDialog.id;
       setDeleteDialog({ isOpen: false, id: null });
+      const updatedPartners = { ...data.partners };
+      updatedPartners.items = partners.filter((p: any) => p.id !== idToDelete);
+      const ok = await updateContent('partners', updatedPartners);
+      if (ok) {
+        showToast('success', 'Partner deleted successfully!');
+      }
     }
   };
 

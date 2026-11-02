@@ -92,7 +92,7 @@ const NewsManager: React.FC = () => {
     setErrors({});
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const validationErrors = validateForm(formData, validationRules);
@@ -103,25 +103,28 @@ const NewsManager: React.FC = () => {
     }
 
     if (editingId) {
-      updateItem('news', editingId, formData);
-      showToast('success', 'News item updated successfully!');
+      const ok = await updateItem('news', editingId, formData);
+      if (ok) showToast('success', 'News item updated successfully!');
     } else {
       const newItem = {
         id: Date.now(),
         ...formData
       };
-      addItem('news', newItem);
-      showToast('success', 'News item added successfully!');
+      const ok = await addItem('news', newItem);
+      if (ok) showToast('success', 'News item added successfully!');
     }
 
     handleCloseForm();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteDialog.id) {
-      deleteItem('news', deleteDialog.id);
-      showToast('success', 'News item deleted successfully!');
+      const idToDelete = deleteDialog.id;
       setDeleteDialog({ isOpen: false, id: null });
+      const ok = await deleteItem('news', idToDelete);
+      if (ok) {
+        showToast('success', 'News item deleted successfully!');
+      }
     }
   };
 

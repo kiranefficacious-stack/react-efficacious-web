@@ -138,7 +138,7 @@ const PortfolioManager: React.FC = () => {
     setProjectErrors({});
   };
 
-  const handleProjectSubmit = (e: React.FormEvent) => {
+  const handleProjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const valErrors = validateForm(projectFormData, projectValidationRules);
     if (Object.keys(valErrors).length > 0) {
@@ -148,27 +148,30 @@ const PortfolioManager: React.FC = () => {
     }
 
     if (editingProjectId) {
-      updateItem('portfolio', editingProjectId, projectFormData);
-      showToast('success', 'Portfolio project updated successfully!');
+      const ok = await updateItem('portfolio', editingProjectId, projectFormData);
+      if (ok) showToast('success', 'Portfolio project updated successfully!');
     } else {
       const newItem = { id: Date.now(), ...projectFormData };
-      addItem('portfolio', newItem);
-      showToast('success', 'Portfolio project added successfully!');
+      const ok = await addItem('portfolio', newItem);
+      if (ok) showToast('success', 'Portfolio project added successfully!');
     }
     handleCloseProjectForm();
   };
 
-  const handleDeleteProject = () => {
+  const handleDeleteProject = async () => {
     if (deleteProjectDialog.id) {
-      deleteItem('portfolio', deleteProjectDialog.id);
-      showToast('success', 'Portfolio project deleted successfully!');
+      const idToDelete = deleteProjectDialog.id;
       setDeleteProjectDialog({ isOpen: false, id: null });
+      const ok = await deleteItem('portfolio', idToDelete);
+      if (ok) {
+        showToast('success', 'Portfolio project deleted successfully!');
+      }
     }
   };
 
-  const handleRestoreDefaultProjects = () => {
-    updateContent('portfolio', initialData.portfolio || []);
-    showToast('success', 'Default portfolio projects restored!');
+  const handleRestoreDefaultProjects = async () => {
+    const ok = await updateContent('portfolio', initialData.portfolio || []);
+    if (ok) showToast('success', 'Default portfolio projects restored!');
   };
 
   // -------------------------------------------------------------
@@ -235,13 +238,16 @@ const PortfolioManager: React.FC = () => {
     handleCloseTestimonialForm();
   };
 
-  const handleDeleteTestimonial = () => {
+  const handleDeleteTestimonial = async () => {
     if (deleteTestimonialDialog.id) {
-      const currentList = Array.isArray(testimonials) ? [...testimonials] : [];
-      const updated = currentList.filter((item: any) => String(item.id) !== String(deleteTestimonialDialog.id));
-      updateContent('testimonials', updated);
-      showToast('success', 'Testimonial deleted successfully!');
+      const idToDelete = deleteTestimonialDialog.id;
       setDeleteTestimonialDialog({ isOpen: false, id: null });
+      const currentList = Array.isArray(testimonials) ? [...testimonials] : [];
+      const updated = currentList.filter((item: any) => String(item.id) !== String(idToDelete));
+      const ok = await updateContent('testimonials', updated);
+      if (ok) {
+        showToast('success', 'Testimonial deleted successfully!');
+      }
     }
   };
 
@@ -302,13 +308,16 @@ const PortfolioManager: React.FC = () => {
     handleCloseClientForm();
   };
 
-  const handleDeleteClient = () => {
+  const handleDeleteClient = async () => {
     if (deleteClientDialog.id) {
-      const currentList = Array.isArray(clients) ? [...clients] : [];
-      const updated = currentList.filter((item: any) => String(item.id) !== String(deleteClientDialog.id));
-      updateContent('clients', updated);
-      showToast('success', 'Client deleted successfully!');
+      const idToDelete = deleteClientDialog.id;
       setDeleteClientDialog({ isOpen: false, id: null });
+      const currentList = Array.isArray(clients) ? [...clients] : [];
+      const updated = currentList.filter((item: any) => String(item.id) !== String(idToDelete));
+      const ok = await updateContent('clients', updated);
+      if (ok) {
+        showToast('success', 'Client deleted successfully!');
+      }
     }
   };
 

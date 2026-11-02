@@ -44,6 +44,48 @@ public class ContentController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("status")]
+    public async Task<IActionResult> GetStatus()
+    {
+        var dbPath = Path.Combine(AppContext.BaseDirectory, "Efficacious.db");
+        var dirWritable = false;
+        string? errorDetail = null;
+
+        try
+        {
+            var testFile = Path.Combine(AppContext.BaseDirectory, ".perm_test");
+            await System.IO.File.WriteAllTextAsync(testFile, "test");
+            System.IO.File.Delete(testFile);
+            dirWritable = true;
+        }
+        catch (Exception ex)
+        {
+            errorDetail = $"Directory not writable by IIS worker: {ex.Message}";
+        }
+
+        int contentCount = 0;
+        try
+        {
+            contentCount = await _context.WebsiteContents.CountAsync();
+        }
+        catch (Exception ex)
+        {
+            errorDetail = (errorDetail != null ? errorDetail + " | " : "") + $"Database query error: {ex.Message}";
+        }
+
+        return Ok(new
+        {
+            status = dirWritable ? "Healthy" : "Permissions Issue",
+            baseDirectory = AppContext.BaseDirectory,
+            dbPath,
+            dbFileExists = System.IO.File.Exists(dbPath),
+            directoryWritable = dirWritable,
+            totalContentKeys = contentCount,
+            permissionGuidance = dirWritable ? "All permissions OK" : "Grant 'IIS_IUSRS' Modify & Write permissions on this directory so SQLite can save data and write WAL logs.",
+            error = errorDetail
+        });
+    }
+
     [HttpGet("{key}")]
     public async Task<IActionResult> GetContentByKey(string key)
     {
@@ -56,26 +98,40 @@ public class ContentController : ControllerBase
     [HttpPut("{key}")]
     public async Task<IActionResult> SaveContentByKey(string key, [FromBody] JsonElement payload)
     {
-        var json = JsonSerializer.Serialize(payload);
-        var existing = await _context.WebsiteContents.FindAsync(key);
+        try
+        {
+            var json = JsonSerializer.Serialize(payload);
+            var existing = await _context.WebsiteContents.FindAsync(key);
 
-        if (existing != null)
-        {
-            existing.DataJson = json;
-            existing.UpdatedAt = DateTime.UtcNow;
-        }
-        else
-        {
-            _context.WebsiteContents.Add(new WebsiteContent
+            if (existing != null)
             {
-                Key = key,
-                DataJson = json,
-                UpdatedAt = DateTime.UtcNow
+                existing.DataJson = json;
+                existing.UpdatedAt = DateTime.UtcNow;
+            }
+            else
+            {
+                _context.WebsiteContents.Add(new WebsiteContent
+                {
+                    Key = key,
+                    DataJson = json,
+                    UpdatedAt = DateTime.UtcNow
+                });
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { success = true, key });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ContentController ERROR] SaveContentByKey failed for '{key}': {ex.Message}");
+            return StatusCode(500, new
+            {
+                success = false,
+                error = ex.Message,
+                innerError = ex.InnerException?.Message,
+                detail = "Database write failed. Ensure the IIS Application Pool identity (IIS_IUSRS) has 'Modify' and 'Write' permissions on Efficacious.db and the API directory."
             });
         }
-
-        await _context.SaveChangesAsync();
-        return Ok(new { success = true, key });
     }
 
     // --- Dedicated Section Tables Endpoints ---

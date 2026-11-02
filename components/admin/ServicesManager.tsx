@@ -121,11 +121,14 @@ const ServicesManager: React.FC = () => {
     handleCloseForm();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteDialog.id) {
-      deleteItem('services', deleteDialog.id);
-      showToast('success', 'Service deleted successfully!');
+      const idToDelete = deleteDialog.id;
       setDeleteDialog({ isOpen: false, id: null });
+      const ok = await deleteItem('services', idToDelete);
+      if (ok) {
+        showToast('success', 'Service deleted successfully!');
+      }
     }
   };
 

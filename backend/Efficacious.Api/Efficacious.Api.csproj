@@ -23,4 +23,9 @@
     <PackageReference Include="MailKit" Version="4.18.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Efficacious.db" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Update="fix-permissions.bat" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

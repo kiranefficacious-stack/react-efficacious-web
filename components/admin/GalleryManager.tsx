@@ -110,11 +110,14 @@ const GalleryManager: React.FC = () => {
     handleCloseForm();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteDialog.id) {
-      deleteItem('gallery', deleteDialog.id);
-      showToast('success', 'Gallery image deleted successfully!');
+      const idToDelete = deleteDialog.id;
       setDeleteDialog({ isOpen: false, id: null });
+      const ok = await deleteItem('gallery', idToDelete);
+      if (ok) {
+        showToast('success', 'Gallery image deleted successfully!');
+      }
     }
   };
 

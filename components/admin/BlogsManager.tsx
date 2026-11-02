@@ -99,7 +99,7 @@ const BlogsManager: React.FC = () => {
     setErrors({});
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const validationErrors = validateForm(formData, validationRules);
@@ -110,22 +110,25 @@ const BlogsManager: React.FC = () => {
     }
 
     if (editingId) {
-      updateItem('blogs', editingId, formData);
-      showToast('success', 'Blog post updated successfully!');
+      const ok = await updateItem('blogs', editingId, formData);
+      if (ok) showToast('success', 'Blog post updated successfully!');
     } else {
       const newItem = { id: Date.now(), ...formData };
-      addItem('blogs', newItem);
-      showToast('success', 'Blog post added successfully!');
+      const ok = await addItem('blogs', newItem);
+      if (ok) showToast('success', 'Blog post added successfully!');
     }
 
     handleCloseForm();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteDialog.id) {
-      deleteItem('blogs', deleteDialog.id);
-      showToast('success', 'Blog post deleted successfully!');
+      const idToDelete = deleteDialog.id;
       setDeleteDialog({ isOpen: false, id: null });
+      const ok = await deleteItem('blogs', idToDelete);
+      if (ok) {
+        showToast('success', 'Blog post deleted successfully!');
+      }
     }
   };
 

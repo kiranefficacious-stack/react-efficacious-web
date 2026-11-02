@@ -49,8 +49,12 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    if (!res.ok) throw new Error(`Failed to save content for ${key}: HTTP ${res.status}`);
-    return parseJsonSafely(res);
+    const data = await parseJsonSafely(res);
+    if (!res.ok) {
+      const errMsg = data?.detail || data?.error || data?.message || `HTTP ${res.status}`;
+      throw new Error(errMsg);
+    }
+    return data;
   },
 
   // Admin Authentication

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { initialData } from '../data';
 import { api } from '../services/api';
+import { useToast } from './useToast';
 
 const ContentContext = createContext<any>(null);
 
@@ -11,6 +12,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [data, setData] = useState<any>(initialData);
   const [contentLoading, setContentLoading] = useState(true);
   const broadcastChannelRef = useRef<BroadcastChannel | null>(null);
+  const { showToast } = useToast();
 
   const loadContent = useCallback(async () => {
     try {
@@ -137,49 +139,64 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } catch {}
   };
 
-  const updateContent = async (section: string, newValue: any) => {
+  const updateContent = async (section: string, newValue: any): Promise<boolean> => {
+    const previousValue = data[section];
     setData((prev: any) => ({ ...prev, [section]: newValue }));
     notifyCrossTabSync(section, newValue);
     try {
       await api.saveContent(section, { data: newValue });
-    } catch (e) {
-      console.error(".NET API updateContent error:", e);
+      return true;
+    } catch (e: any) {
+      console.error(`.NET API updateContent error for ${section}:`, e);
+      // Revert state on failure
+      setData((prev: any) => ({ ...prev, [section]: previousValue }));
+      notifyCrossTabSync(section, previousValue);
+      showToast('error', `Failed to save changes to server: ${e?.message || 'Server error'}. Changes reverted.`, 5000);
+      return false;
     }
   };
 
-  const addItem = async (section: string, item: any) => {
+  const addItem = async (section: string, item: any): Promise<boolean> => {
     const newItem = {
       id: item.id || Date.now(),
       ...item
     };
 
+    let previousArr: any[] = [];
     let updatedArr: any[] = [];
     setData((prev: any) => {
-      const currentArr = Array.isArray(prev[section]) ? [...prev[section]] : [];
-      currentArr.push(newItem);
-      updatedArr = currentArr;
-      return { ...prev, [section]: currentArr };
+      previousArr = Array.isArray(prev[section]) ? [...prev[section]] : [];
+      updatedArr = [...previousArr, newItem];
+      return { ...prev, [section]: updatedArr };
     });
 
     notifyCrossTabSync(section, updatedArr);
     try {
       await api.saveContent(section, { data: updatedArr });
-    } catch (e) {
-      console.error(".NET API addItem error:", e);
+      return true;
+    } catch (e: any) {
+      console.error(`.NET API addItem error for ${section}:`, e);
+      // Revert state on failure
+      setData((prev: any) => ({ ...prev, [section]: previousArr }));
+      notifyCrossTabSync(section, previousArr);
+      showToast('error', `Failed to save new item to server: ${e?.message || 'Server error'}. Changes reverted.`, 5000);
+      return false;
     }
   };
 
-  const editItem = async (section: string, id: number | string, updatedFields: any) => {
+  const editItem = async (section: string, id: number | string, updatedFields: any): Promise<boolean> => {
+    let previousArr: any[] = [];
     let updatedArr: any[] = [];
     setData((prev: any) => {
-      const currentArr = Array.isArray(prev[section]) ? [...prev[section]] : [];
-      const index = currentArr.findIndex((item: any) => String(item.id) === String(id));
+      previousArr = Array.isArray(prev[section]) ? [...prev[section]] : [];
+      const index = previousArr.findIndex((item: any) => String(item.id) === String(id));
       if (index !== -1) {
-        currentArr[index] = { ...currentArr[index], ...updatedFields };
-        updatedArr = currentArr;
-        return { ...prev, [section]: currentArr };
+        const copy = [...previousArr];
+        copy[index] = { ...copy[index], ...updatedFields };
+        updatedArr = copy;
+        return { ...prev, [section]: updatedArr };
       }
-      updatedArr = currentArr;
+      updatedArr = previousArr;
       return prev;
     });
 
@@ -187,40 +204,55 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
       notifyCrossTabSync(section, updatedArr);
       try {
         await api.saveContent(section, { data: updatedArr });
-      } catch (e) {
-        console.error(".NET API editItem error:", e);
+        return true;
+      } catch (e: any) {
+        console.error(`.NET API editItem error for ${section}:`, e);
+        // Revert state on failure
+        setData((prev: any) => ({ ...prev, [section]: previousArr }));
+        notifyCrossTabSync(section, previousArr);
+        showToast('error', `Failed to update item on server: ${e?.message || 'Server error'}. Changes reverted.`, 5000);
+        return false;
       }
     }
+    return false;
   };
 
-  const deleteItem = async (section: string, id: number | string) => {
+  const deleteItem = async (section: string, id: number | string): Promise<boolean> => {
+    let previousArr: any[] = [];
     let updatedArr: any[] = [];
     setData((prev: any) => {
-      const currentArr = Array.isArray(prev[section]) ? [...prev[section]] : [];
-      const newArr = currentArr.filter((item: any) => String(item.id) !== String(id));
-      updatedArr = newArr;
-      return { ...prev, [section]: newArr };
+      previousArr = Array.isArray(prev[section]) ? [...prev[section]] : [];
+      updatedArr = previousArr.filter((item: any) => String(item.id) !== String(id));
+      return { ...prev, [section]: updatedArr };
     });
 
     notifyCrossTabSync(section, updatedArr);
     try {
       await api.saveContent(section, { data: updatedArr });
-    } catch (e) {
-      console.error(".NET API deleteItem error:", e);
+      return true;
+    } catch (e: any) {
+      console.error(`.NET API deleteItem error for ${section}:`, e);
+      // Revert state immediately so item is restored on screen
+      setData((prev: any) => ({ ...prev, [section]: previousArr }));
+      notifyCrossTabSync(section, previousArr);
+      showToast('error', `Server rejected deletion (${e?.message || 'Server error'}). Item restored.`, 5000);
+      return false;
     }
   };
 
-  const toggleProduct = async (id: number | string) => {
+  const toggleProduct = async (id: number | string): Promise<boolean> => {
+    let previousArr: any[] = [];
     let updatedArr: any[] = [];
     setData((prev: any) => {
-      const currentArr = Array.isArray(prev['products']) ? [...prev['products']] : [];
-      const index = currentArr.findIndex((item: any) => String(item.id) === String(id));
+      previousArr = Array.isArray(prev['products']) ? [...prev['products']] : [];
+      const index = previousArr.findIndex((item: any) => String(item.id) === String(id));
       if (index !== -1) {
-        currentArr[index].enabled = !currentArr[index].enabled;
-        updatedArr = currentArr;
-        return { ...prev, ['products']: currentArr };
+        const copy = [...previousArr];
+        copy[index] = { ...copy[index], enabled: !copy[index].enabled };
+        updatedArr = copy;
+        return { ...prev, ['products']: updatedArr };
       }
-      updatedArr = currentArr;
+      updatedArr = previousArr;
       return prev;
     });
 
@@ -228,10 +260,17 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
       notifyCrossTabSync('products', updatedArr);
       try {
         await api.saveContent('products', { data: updatedArr });
-      } catch (e) {
+        return true;
+      } catch (e: any) {
         console.error(".NET API toggleProduct error:", e);
+        // Revert state on failure
+        setData((prev: any) => ({ ...prev, ['products']: previousArr }));
+        notifyCrossTabSync('products', previousArr);
+        showToast('error', `Failed to update product status on server: ${e?.message || 'Server error'}. Changes reverted.`, 5000);
+        return false;
       }
     }
+    return false;
   };
 
   return (
@@ -257,12 +296,12 @@ export const useContent = () => {
     return {
       data: initialData,
       contentLoading: false,
-      updateContent: async () => {},
-      addItem: async () => {},
-      editItem: async () => {},
-      updateItem: async () => {},
-      deleteItem: async () => {},
-      toggleProduct: async () => {},
+      updateContent: async () => false,
+      addItem: async () => false,
+      editItem: async () => false,
+      updateItem: async () => false,
+      deleteItem: async () => false,
+      toggleProduct: async () => false,
       refreshContent: async () => {}
     };
   }
