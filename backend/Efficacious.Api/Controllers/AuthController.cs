@@ -27,78 +27,105 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var email = (request.Email ?? string.Empty).Trim().ToLowerInvariant();
-        var password = (request.Password ?? string.Empty).Trim();
-
-        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+        try
         {
-            return Unauthorized(new
+            var email = (request?.Email ?? string.Empty).Trim().ToLowerInvariant();
+            var password = (request?.Password ?? string.Empty).Trim();
+
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
-                success = false,
-                error = "Email and password are required."
-            });
-        }
+                return Unauthorized(new
+                {
+                    success = false,
+                    error = "Email and password are required."
+                });
+            }
 
-        // 1. Check SQLite AdminUsers table - strictly match email and stored password
-        var dbUser = await _context.AdminUsers
-            .FirstOrDefaultAsync(u => u.Email.ToLower() == email && u.IsActive == 1);
-
-        if (dbUser != null)
-        {
-            if (dbUser.PasswordHash == password)
+            // 1. Check SQLite AdminUsers table
+            try
             {
-                dbUser.LastLoginAt = DateTime.UtcNow.ToString("o");
-                await _context.SaveChangesAsync();
+                var dbUser = await _context.AdminUsers
+                    .FirstOrDefaultAsync(u => u.Email.ToLower() == email && u.IsActive == 1);
 
+                if (dbUser != null)
+                {
+                    if (dbUser.PasswordHash == password)
+                    {
+                        try
+                        {
+                            dbUser.LastLoginAt = DateTime.UtcNow.ToString("o");
+                            await _context.SaveChangesAsync();
+                        }
+                        catch (Exception saveEx)
+                        {
+                            // Non-critical: allow login even if SQLite DB file has read-only permissions on IIS
+                            Console.WriteLine($"[Auth] Notice: Could not update LastLoginAt: {saveEx.Message}");
+                        }
+
+                        return Ok(new
+                        {
+                            success = true,
+                            token = Guid.NewGuid().ToString("N"),
+                            user = new
+                            {
+                                uid = dbUser.Id.ToString(),
+                                email = dbUser.Email,
+                                displayName = dbUser.DisplayName,
+                                role = dbUser.Role
+                            }
+                        });
+                    }
+                    else
+                    {
+                        // Explicitly reject when password does not match
+                        return Unauthorized(new
+                        {
+                            success = false,
+                            error = "Invalid email or password. Please verify your admin credentials."
+                        });
+                    }
+                }
+            }
+            catch (Exception dbEx)
+            {
+                Console.WriteLine($"[Auth] Database user lookup failed, falling back to configuration: {dbEx.Message}");
+            }
+
+            // 2. Strict fallback to appsettings.json if database user record is not found or DB has issues
+            var configuredEmail = (_configuration["Admin:Email"] ?? "admin@efficacious.co.in").Trim().ToLowerInvariant();
+            var configuredPass = (_configuration["Admin:Password"] ?? "Admin@123").Trim();
+
+            if (email == configuredEmail && password == configuredPass)
+            {
                 return Ok(new
                 {
                     success = true,
                     token = Guid.NewGuid().ToString("N"),
                     user = new
                     {
-                        uid = dbUser.Id.ToString(),
-                        email = dbUser.Email,
-                        displayName = dbUser.DisplayName,
-                        role = dbUser.Role
+                        uid = "admin_user_01",
+                        email = configuredEmail,
+                        displayName = "Efficacious Administrator",
+                        role = "SuperAdmin"
                     }
                 });
             }
-            else
-            {
-                // Explicitly reject when password does not match
-                return Unauthorized(new
-                {
-                    success = false,
-                    error = "Invalid email or password. Please verify your admin credentials."
-                });
-            }
-        }
 
-        // 2. Strict fallback to appsettings.json if database user record is not found
-        var configuredEmail = (_configuration["Admin:Email"] ?? "admin@efficacious.co.in").Trim().ToLowerInvariant();
-        var configuredPass = (_configuration["Admin:Password"] ?? "Admin@123").Trim();
-
-        if (email == configuredEmail && password == configuredPass)
-        {
-            return Ok(new
+            return Unauthorized(new
             {
-                success = true,
-                token = Guid.NewGuid().ToString("N"),
-                user = new
-                {
-                    uid = "admin_user_01",
-                    email = configuredEmail,
-                    displayName = "Efficacious Administrator",
-                    role = "SuperAdmin"
-                }
+                success = false,
+                error = "Invalid email or password. Please verify your admin credentials."
             });
         }
-
-        return Unauthorized(new
+        catch (Exception ex)
         {
-            success = false,
-            error = "Invalid email or password. Please verify your admin credentials."
-        });
+            Console.WriteLine($"[Auth] Critical login error: {ex}");
+            return StatusCode(500, new
+            {
+                success = false,
+                error = "Authentication server error: " + ex.Message
+            });
+        }
     }
 
     [HttpGet("verify")]

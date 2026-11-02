@@ -5,23 +5,42 @@
  */
 
 const isLocal = typeof window !== 'undefined' && 
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.endsWith('.local'));
+
+const getLiveApiBase = () => {
+  if (typeof window !== 'undefined') {
+    if (window.location.hostname === 'wp.efficacious.co.in' || window.location.hostname.endsWith('efficacious.co.in')) {
+      return `${window.location.protocol}//${window.location.host}/api`;
+    }
+  }
+  return 'http://wp.efficacious.co.in/api';
+};
 
 export const API_BASE = (typeof window !== 'undefined' && (window as any).__EFFICACIOUS_API_URL__)
-  || (isLocal ? (import.meta.env.VITE_API_URL || 'http://localhost:5231/api') : 'http://wp.efficacious.co.in/api');
+  || (isLocal ? (import.meta.env.VITE_API_URL || 'http://localhost:5231/api') : getLiveApiBase());
+
+async function parseJsonSafely(res: Response): Promise<any> {
+  const text = await res.text();
+  if (!text || !text.trim()) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { rawText: text };
+  }
+}
 
 export const api = {
   // Website Content
   async getContent(): Promise<Record<string, any>> {
     const res = await fetch(`${API_BASE}/content`);
     if (!res.ok) throw new Error(`Failed to fetch content: HTTP ${res.status}`);
-    return res.json();
+    return parseJsonSafely(res);
   },
 
   async getContentByKey(key: string): Promise<any> {
     const res = await fetch(`${API_BASE}/content/${key}`);
     if (!res.ok) throw new Error(`Failed to fetch content for ${key}: HTTP ${res.status}`);
-    return res.json();
+    return parseJsonSafely(res);
   },
 
   async saveContent(key: string, payload: any): Promise<any> {
@@ -31,7 +50,7 @@ export const api = {
       body: JSON.stringify(payload)
     });
     if (!res.ok) throw new Error(`Failed to save content for ${key}: HTTP ${res.status}`);
-    return res.json();
+    return parseJsonSafely(res);
   },
 
   // Admin Authentication
@@ -42,9 +61,12 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-      const data = await res.json();
+      const data = await parseJsonSafely(res);
       if (!res.ok) {
-        return { success: false, error: data.error || 'Invalid credentials' };
+        return { 
+          success: false, 
+          error: data.error || data.message || (res.status === 401 ? 'Invalid email or password. Please verify your admin credentials.' : `Server error (HTTP ${res.status})`)
+        };
       }
       return data;
     } catch (err: any) {
@@ -56,13 +78,13 @@ export const api = {
   async getChatSessions(): Promise<any[]> {
     const res = await fetch(`${API_BASE}/chat/sessions`);
     if (!res.ok) return [];
-    return res.json();
+    return parseJsonSafely(res);
   },
 
   async getChatSession(sessionId: string): Promise<any> {
     const res = await fetch(`${API_BASE}/chat/sessions/${sessionId}`);
     if (!res.ok) return null;
-    return res.json();
+    return parseJsonSafely(res);
   },
 
   async updateChatSession(sessionId: string, updates: { status?: string; adminJoined?: boolean; unreadAdmin?: number; unreadUser?: number }): Promise<any> {
@@ -71,21 +93,21 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates)
     });
-    return res.json();
+    return parseJsonSafely(res);
   },
 
   async deleteChatSession(sessionId: string): Promise<any> {
     const res = await fetch(`${API_BASE}/chat/sessions/${sessionId}`, {
       method: 'DELETE'
     });
-    return res.json();
+    return parseJsonSafely(res);
   },
 
   async clearInactiveSessions(): Promise<any> {
     const res = await fetch(`${API_BASE}/chat/sessions/inactive/clear`, {
       method: 'DELETE'
     });
-    return res.json();
+    return parseJsonSafely(res);
   },
 
   async sendChatMessage(sessionId: string, message: { text: string; sender?: string; userName?: string; userEmail?: string; userMobile?: string }): Promise<any> {
@@ -94,14 +116,14 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(message)
     });
-    return res.json();
+    return parseJsonSafely(res);
   },
 
   // Chatbot Q&A Knowledge Base
   async getQaList(): Promise<any[]> {
     const res = await fetch(`${API_BASE}/chat/qa`);
     if (!res.ok) return [];
-    return res.json();
+    return parseJsonSafely(res);
   },
 
   async createQa(data: { questionKeywords: string; answerText: string }): Promise<any> {
@@ -110,7 +132,7 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    return res.json();
+    return parseJsonSafely(res);
   },
 
   async updateQa(id: string, data: { questionKeywords: string; answerText: string }): Promise<any> {
@@ -119,21 +141,21 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    return res.json();
+    return parseJsonSafely(res);
   },
 
   async deleteQa(id: string): Promise<any> {
     const res = await fetch(`${API_BASE}/chat/qa/${id}`, {
       method: 'DELETE'
     });
-    return res.json();
+    return parseJsonSafely(res);
   },
 
   // Chat Settings
   async getChatSettings(): Promise<{ isLiveSupportActive: boolean }> {
     const res = await fetch(`${API_BASE}/chat/settings`);
     if (!res.ok) return { isLiveSupportActive: true };
-    return res.json();
+    return parseJsonSafely(res);
   },
 
   async saveChatSettings(settings: { isLiveSupportActive: boolean }): Promise<any> {
@@ -142,6 +164,6 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(settings)
     });
-    return res.json();
+    return parseJsonSafely(res);
   }
 };
