@@ -6,6 +6,7 @@ import {
   Twitter, Linkedin, ArrowRight, BookOpen, Share2,
 } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
+import { initialData } from '../data';
 import Contact from '../components/Contact';
 
 /* ── colour helper ───────────────────────────────────── */
@@ -30,10 +31,12 @@ const BlogDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data, contentLoading } = useContent();
-  const blogs: any[] = data?.blogs || [];
+  const blogs: any[] = (data?.blogs && Array.isArray(data.blogs) && data.blogs.length > 0)
+    ? data.blogs
+    : (initialData.blogs || []);
 
-  const post = blogs.find((b: any) => b.id === Number(id));
-  const otherPosts = blogs.filter((b: any) => b.id !== Number(id)).slice(0, 3);
+  const post = blogs.find((b: any) => String(b.id) === String(id));
+  const otherPosts = blogs.filter((b: any) => String(b.id) !== String(id)).slice(0, 3);
 
   /* reading progress state */
   const [readPct, setReadPct] = useState(0);

@@ -4,22 +4,15 @@ import PageHero from '../components/PageHero';
 import Contact from '../components/Contact';
 import { ArrowRight, Calendar } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
+import { initialData } from '../data';
 import { useNavigate } from 'react-router-dom';
 
 const NewsList: React.FC = () => {
   const { data, contentLoading } = useContent();
   const navigate = useNavigate();
-  const newsItems = data?.news || [];
-
-  React.useEffect(() => {
-    if (!contentLoading && newsItems.length === 0) {
-      navigate('/', { replace: true });
-    }
-  }, [contentLoading, newsItems, navigate]);
-
-  if (!contentLoading && newsItems.length === 0) {
-    return null;
-  }
+  const newsItems: any[] = (data?.news && Array.isArray(data.news) && data.news.length > 0)
+    ? data.news
+    : (initialData.news || []);
 
   const [activeFilter, setActiveFilter] = useState("All");
 

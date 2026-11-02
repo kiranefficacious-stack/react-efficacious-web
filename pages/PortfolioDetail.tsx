@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, ChevronRight, BarChart3, Clock, Users, Quote } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
+import { initialData } from '../data';
 import Contact from '../components/Contact';
 
 const PortfolioDetail: React.FC = () => {
@@ -10,16 +11,20 @@ const PortfolioDetail: React.FC = () => {
   const navigate = useNavigate();
   const { data, contentLoading } = useContent();
   
+  const portfolioList: any[] = (data?.portfolio && Array.isArray(data.portfolio) && data.portfolio.length > 0)
+    ? data.portfolio
+    : (initialData.portfolio || []);
+
   // Find project or redirect if not found
-  const project = data.portfolio?.find((p: any) => p.id === Number(id));
+  const project = portfolioList.find((p: any) => String(p.id) === String(id));
 
   useEffect(() => {
-    if (!contentLoading && (!data?.portfolio || data.portfolio.length === 0 || !project)) {
-      navigate('/', { replace: true });
+    if (!contentLoading && !project) {
+      navigate('/portfolio', { replace: true });
     }
-  }, [contentLoading, data?.portfolio, project, navigate]);
+  }, [contentLoading, project, navigate]);
 
-  if (!contentLoading && (!data?.portfolio || data.portfolio.length === 0 || !project)) return null;
+  if (!contentLoading && !project) return null;
 
   // We are creating fallback specific case study details mapping since the mock data only has basic fields
   const challengeText = "The client struggled with fragmented operations, manual documentation processes, and a lack of real-time visibility across branches. They needed a unified, robust system capable of scaling alongside their rapidly growing user base while maintaining strict security standards.";

@@ -10,17 +10,9 @@ import { useNavigate } from 'react-router-dom';
 const Portfolio: React.FC = () => {
   const { data, contentLoading } = useContent();
   const navigate = useNavigate();
-  const projects = data?.portfolio || [];
-
-  React.useEffect(() => {
-    if (!contentLoading && projects.length === 0) {
-      navigate('/', { replace: true });
-    }
-  }, [contentLoading, projects, navigate]);
-
-  if (!contentLoading && projects.length === 0) {
-    return null;
-  }
+  const projects: any[] = (data?.portfolio && Array.isArray(data.portfolio) && data.portfolio.length > 0)
+    ? data.portfolio
+    : (initialData.portfolio || []);
 
   const [activeFilter, setActiveFilter] = useState("All");
 

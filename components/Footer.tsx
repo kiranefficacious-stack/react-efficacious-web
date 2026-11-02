@@ -2,10 +2,11 @@ import React from 'react';
 import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useContent } from '../hooks/useContent';
+import { initialData } from '../data';
 
 const Footer: React.FC = () => {
   const { data } = useContent();
-  const { contact } = data;
+  const contact = data?.contact || initialData.contact;
   
   // Hook to get the current URL path
   const location = useLocation();

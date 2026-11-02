@@ -4,21 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import Contact from '../components/Contact';
 import { Calendar, User, ArrowRight, Clock, Search, Sparkles } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
+import { initialData } from '../data';
 
 const Blogs: React.FC = () => {
   const { data, contentLoading } = useContent();
   const navigate = useNavigate();
-  const blogs: any[] = data?.blogs || [];
-
-  React.useEffect(() => {
-    if (!contentLoading && blogs.length === 0) {
-      navigate('/', { replace: true });
-    }
-  }, [contentLoading, blogs, navigate]);
-
-  if (!contentLoading && blogs.length === 0) {
-    return null;
-  }
+  const blogs: any[] = (data?.blogs && Array.isArray(data.blogs) && data.blogs.length > 0)
+    ? data.blogs
+    : (initialData.blogs || []);
 
   const featuredPost = blogs.length > 0 ? blogs[0] : null;
 

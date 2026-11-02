@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion as m } from 'framer-motion';
 import { MapPin, Mail, Phone, Send, User, MessageSquare, FileText, Smartphone, Home, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
+import { initialData } from '../data';
 import emailjs from '@emailjs/browser';
 import { sendEmailNotification } from '../utils/sendMail';
 
@@ -9,7 +10,7 @@ const motion = m as any;
 
 const Contact: React.FC = () => {
   const { data } = useContent();
-  const { contact } = data;
+  const contact = data?.contact || initialData.contact;
 
   const [formData, setFormData] = useState({
     name: '',

@@ -4,6 +4,7 @@ import { ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useContent } from '../hooks/useContent';
+import { initialData } from '../data';
 
 const motion = m as any;
 
@@ -22,7 +23,9 @@ const getColorClasses = (color: string) => {
 
 const Services: React.FC = () => {
   const { data } = useContent();
-  const services = data.services;
+  const services: any[] = (data?.services && Array.isArray(data.services) && data.services.length > 0)
+    ? data.services
+    : (initialData.services || []);
 
   return (
     <section id="services" className="py-20 bg-slate-50 dark:bg-dark-bg relative overflow-hidden transition-colors duration-300">

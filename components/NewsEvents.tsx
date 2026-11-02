@@ -5,12 +5,15 @@ import { Calendar, ArrowRight } from 'lucide-react';
 const motion = m as any;
 
 import { useContent } from '../hooks/useContent';
+import { initialData } from '../data';
 import { useNavigate } from 'react-router-dom';
 
 const NewsEvents: React.FC = () => {
   const { data } = useContent();
   const navigate = useNavigate();
-  const newsItems = data?.news || [];
+  const newsItems: any[] = (data?.news && Array.isArray(data.news) && data.news.length > 0)
+    ? data.news
+    : (initialData.news || []);
 
   if (!newsItems || newsItems.length === 0) {
     return null;

@@ -84,7 +84,7 @@ const Products: React.FC = () => {
               >
                 {/* Card Container with Gradient Border Effect */}
                 <div className="absolute -inset-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700 rounded-[2rem] opacity-70 blur-sm group-hover:opacity-100 transition-opacity duration-500" />
-                <div className={`absolute -inset-[1px] bg-gradient-to-r ${product.gradient} rounded-[2rem] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500`} />
+                <div className={`absolute -inset-[1px] bg-gradient-to-r ${product.gradient || 'from-brand-500 to-purple-500'} rounded-[2rem] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500`} />
                 
                 <div className={`relative h-full bg-white dark:bg-slate-900/90 backdrop-blur-xl rounded-[1.9rem] p-8 flex flex-col transition-all duration-300 ${
                   isComingSoon ? 'opacity-75 hover:opacity-100' : ''
@@ -92,10 +92,10 @@ const Products: React.FC = () => {
                   
                   {/* Icon Header */}
                   <div className="flex items-start justify-between mb-6">
-                      <div className={`w-14 h-14 rounded-2xl ${product.bgAccent} ${product.textAccent} flex items-center justify-center shadow-inner`}>
+                      <div className={`w-14 h-14 rounded-2xl ${product.bgAccent || 'bg-brand-50 dark:bg-brand-900/30'} ${product.textAccent || 'text-brand-600 dark:text-brand-400'} flex items-center justify-center shadow-inner`}>
                           {(() => {
-                            const IconComp = (LucideIcons as any)[product.iconName];
-                            return IconComp ? <IconComp className="w-8 h-8" /> : null;
+                            const IconComp = (LucideIcons as any)[product.iconName || 'Box'] || LucideIcons.Box;
+                            return <IconComp className="w-8 h-8" />;
                           })()}
                       </div>
                       <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-brand-500 group-hover:text-white transition-colors duration-300">

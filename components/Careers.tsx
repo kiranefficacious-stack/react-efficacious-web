@@ -7,6 +7,7 @@ import {
   FileCheck, MessageSquare, Coffee, AlertCircle, Loader2, X
 } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
+import { initialData } from '../data';
 import { sanitizeDescriptionHtml } from '../utils/sanitizeHtml';
 import emailjs from '@emailjs/browser';
 import { sendEmailNotification } from '../utils/sendMail';
@@ -15,7 +16,9 @@ const motion = m as any;
 
 const Careers: React.FC = () => {
   const { data } = useContent();
-  const openings = data.careers;
+  const openings: any[] = (data?.careers && Array.isArray(data.careers) && data.careers.length > 0)
+    ? data.careers
+    : (initialData.careers || []);
   const [expandedJob, setExpandedJob] = useState<number | null>(null);
 
   const recruitmentSteps = [

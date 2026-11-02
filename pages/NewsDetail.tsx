@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Calendar, Share2, Facebook, Twitter, Linkedin } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
+import { initialData } from '../data';
 import Contact from '../components/Contact';
 
 const NewsDetail: React.FC = () => {
@@ -10,16 +11,20 @@ const NewsDetail: React.FC = () => {
   const navigate = useNavigate();
   const { data, contentLoading } = useContent();
   
+  const newsList: any[] = (data?.news && Array.isArray(data.news) && data.news.length > 0)
+    ? data.news
+    : (initialData.news || []);
+
   // Find news item or redirect if not found
-  const article = data?.news?.find((n: any) => n.id === Number(id));
+  const article = newsList.find((n: any) => String(n.id) === String(id));
 
   useEffect(() => {
-    if (!contentLoading && (!data?.news || data.news.length === 0 || !article)) {
-      navigate('/', { replace: true });
+    if (!contentLoading && (!article)) {
+      navigate('/news', { replace: true });
     }
-  }, [contentLoading, data?.news, article, navigate]);
+  }, [contentLoading, article, navigate]);
 
-  if (!contentLoading && (!data?.news || data.news.length === 0 || !article)) return null;
+  if (!contentLoading && !article) return null;
 
   // Formatting specific style parsing based on given mock data format
   const baseColor = article.color?.split(' ')[0]?.replace('text-', '') || 'brand-600';
