@@ -170,7 +170,7 @@ const MemberCard: React.FC<{ member: any; index: number }> = ({ member, index })
                   border-slate-100 dark:border-slate-700/50 pt-4 w-full">
       {member.description}
     </p>
-    {member.linkedin && (
+    {member.linkedin && member.linkedin.trim() !== '' && member.linkedin.trim() !== '#' && (
       <a
         href={member.linkedin}
         target="_blank"

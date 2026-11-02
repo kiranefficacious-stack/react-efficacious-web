@@ -2,33 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
-import { Lock, Mail, Eye, EyeOff, Shield, AlertCircle } from 'lucide-react';
-
-const MAX_ATTEMPTS = 5;
-const LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
-
-interface ThrottleState {
-  attempts: number;
-  lockoutUntil: number | null;
-}
-
-const getStoredThrottle = (): ThrottleState => {
-  try {
-    const raw = localStorage.getItem('efficacious_admin_throttle');
-    if (raw) return JSON.parse(raw);
-  } catch (e) {
-    // fallback
-  }
-  return { attempts: 0, lockoutUntil: null };
-};
-
-const saveThrottle = (state: ThrottleState) => {
-  try {
-    localStorage.setItem('efficacious_admin_throttle', JSON.stringify(state));
-  } catch (e) {
-    // ignore
-  }
-};
+import { Lock, Mail, Eye, EyeOff, Shield } from 'lucide-react';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -41,32 +15,14 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
-  const [lockoutRemaining, setLockoutRemaining] = useState<number>(0);
-  const [failedAttempts, setFailedAttempts] = useState<number>(0);
 
-  // Check lockout on mount and tick every second if active
   useEffect(() => {
-    const checkLockout = () => {
-      const state = getStoredThrottle();
-      if (state.lockoutUntil && state.lockoutUntil > Date.now()) {
-        setLockoutRemaining(Math.ceil((state.lockoutUntil - Date.now()) / 1000));
-        setFailedAttempts(state.attempts);
-      } else {
-        if (state.lockoutUntil && state.lockoutUntil <= Date.now()) {
-          // Lockout expired, reset attempts
-          saveThrottle({ attempts: 0, lockoutUntil: null });
-        }
-        setLockoutRemaining(0);
-        setFailedAttempts(state.attempts || 0);
-      }
-    };
-
-    checkLockout();
-    const interval = setInterval(checkLockout, 1000);
-    return () => clearInterval(interval);
+    try {
+      localStorage.removeItem('efficacious_admin_throttle');
+    } catch {
+      // ignore
+    }
   }, []);
-
-  const isLockedOut = lockoutRemaining > 0;
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -90,44 +46,21 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isLockedOut) {
-      showToast('error', `Account temporarily locked. Please wait ${Math.ceil(lockoutRemaining / 60)} minutes.`);
-      return;
-    }
-
     if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
-
     const result = await login(email, password);
-
     setIsLoading(false);
 
     if (result.success) {
-      saveThrottle({ attempts: 0, lockoutUntil: null });
-      setFailedAttempts(0);
-      setLockoutRemaining(0);
       showToast('success', 'Login successful! Welcome back.');
       const from = (location.state as any)?.from?.pathname || '/admin';
       const safeTarget = typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') ? from : '/admin';
       navigate(safeTarget, { replace: true });
     } else {
-      const state = getStoredThrottle();
-      const newAttempts = (state.attempts || 0) + 1;
-      let newLockout: number | null = null;
-
-      if (newAttempts >= MAX_ATTEMPTS) {
-        newLockout = Date.now() + LOCKOUT_MS;
-        setLockoutRemaining(Math.ceil(LOCKOUT_MS / 1000));
-        showToast('error', 'Too many failed attempts. Login locked for 15 minutes.');
-      } else {
-        showToast('error', result.error || 'Login failed. Please check your credentials.');
-      }
-
-      saveThrottle({ attempts: newAttempts, lockoutUntil: newLockout });
-      setFailedAttempts(newAttempts);
+      showToast('error', result.error || 'Login failed. Please check your credentials.');
     }
   };
 
@@ -156,24 +89,6 @@ const Login: React.FC = () => {
 
         {/* Card */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-          {/* Lockout Warning Banner */}
-          {isLockedOut ? (
-            <div className="p-4 bg-red-50 dark:bg-red-950/50 border-b border-red-200 dark:border-red-900/50 flex items-center gap-3 text-red-700 dark:text-red-300">
-              <AlertCircle className="w-5 h-5 flex-shrink-0" />
-              <div className="text-sm">
-                <p className="font-semibold">Account Temporarily Locked</p>
-                <p className="text-xs text-red-600 dark:text-red-400">
-                  Too many failed attempts. Try again in {Math.floor(lockoutRemaining / 60)}m {lockoutRemaining % 60}s.
-                </p>
-              </div>
-            </div>
-          ) : failedAttempts >= 3 ? (
-            <div className="p-3 bg-amber-50 dark:bg-amber-950/50 border-b border-amber-200 dark:border-amber-900/50 flex items-center gap-2 text-amber-800 dark:text-amber-200 text-xs">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>Warning: {MAX_ATTEMPTS - failedAttempts} attempt{MAX_ATTEMPTS - failedAttempts === 1 ? '' : 's'} remaining before security lockout.</span>
-            </div>
-          ) : null}
-
           <form onSubmit={handleSubmit} autoComplete="on" className="p-8 space-y-6">
             {/* Email Field */}
             <div>
@@ -203,7 +118,7 @@ const Login: React.FC = () => {
                       : 'border-slate-300 dark:border-slate-600'
                   }`}
                   placeholder="admin@efficacious.co.in"
-                  disabled={isLoading || isLockedOut}
+                  disabled={isLoading}
                 />
               </div>
               {errors.email && (
@@ -238,13 +153,13 @@ const Login: React.FC = () => {
                       : 'border-slate-300 dark:border-slate-600'
                   }`}
                   placeholder="••••••••"
-                  disabled={isLoading || isLockedOut}
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                  disabled={isLoading || isLockedOut}
+                  disabled={isLoading}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -257,18 +172,13 @@ const Login: React.FC = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading || isLockedOut}
+              disabled={isLoading}
               className="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   Signing in...
-                </>
-              ) : isLockedOut ? (
-                <>
-                  <Lock size={20} />
-                  Locked ({lockoutRemaining}s)
                 </>
               ) : (
                 <>

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import {
-  MapPin, Phone, Mail, Facebook, Twitter, Linkedin, Youtube,
+  MapPin, Phone, Mail, Facebook, Twitter, Linkedin, Youtube, Instagram,
   ArrowUpRight, GraduationCap, Shield, BookOpen,
   ChevronRight
 } from 'lucide-react';
@@ -27,11 +27,12 @@ const solutions = [
 ];
 
 const socials = [
-  { icon: Facebook,  href: '#', label: 'Facebook'  },
-  { icon: Twitter,   href: '#', label: 'Twitter / X' },
-  { icon: Linkedin,  href: '#', label: 'LinkedIn'  },
-  { icon: Youtube,   href: '#', label: 'YouTube'   },
-];
+  { icon: Linkedin,  href: 'https://www.linkedin.com/in/efficacious-india-limited-9aaa87287/', label: 'LinkedIn'  },
+  { icon: Facebook,  href: 'https://www.facebook.com/efficacioustech', label: 'Facebook'  },
+  { icon: Instagram, href: 'https://www.instagram.com/esmart_efficacious', label: 'Instagram' },
+  { icon: Twitter,   href: '', label: 'Twitter / X' },
+  { icon: Youtube,   href: '', label: 'YouTube'   },
+].filter(s => s.href && s.href.trim() !== '' && s.href.trim() !== '#' && !s.href.startsWith('javascript:'));
 
 function scrollTo(href: string) {
   const id = href.replace('#', '');
@@ -123,18 +124,22 @@ export function Footer() {
             </div>
 
             {/* Socials */}
-            <div className="flex gap-3">
-              {socials.map(({ icon: Icon, href, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  className="w-9 h-9 rounded-full bg-slate-800 hover:bg-primary-600 border border-slate-700 hover:border-primary-500 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-200"
-                >
-                  <Icon className="w-4 h-4" />
-                </a>
-              ))}
-            </div>
+            {socials.length > 0 && (
+              <div className="flex gap-3">
+                {socials.map(({ icon: Icon, href, label }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    aria-label={label}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-full bg-slate-800 hover:bg-primary-600 border border-slate-700 hover:border-primary-500 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-200"
+                  >
+                    <Icon className="w-4 h-4" />
+                  </a>
+                ))}
+              </div>
+            )}
           </motion.div>
 
           {/* Column 2 — Quick Links */}

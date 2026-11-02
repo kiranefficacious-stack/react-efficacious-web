@@ -1,8 +1,14 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useContent } from '../hooks/useContent';
 import { initialData } from '../data';
+
+const isValidSocialLink = (url?: string) => {
+  if (!url) return false;
+  const trimmed = url.trim();
+  return trimmed !== '' && trimmed !== '#' && !trimmed.startsWith('javascript:');
+};
 
 const Footer: React.FC = () => {
   const { data } = useContent();
@@ -18,6 +24,11 @@ const Footer: React.FC = () => {
   if (isAdminRoute) {
     return null;
   }
+
+  const hasAnySocial = isValidSocialLink(contact?.socials?.linkedin) ||
+    isValidSocialLink(contact?.socials?.twitter) ||
+    isValidSocialLink(contact?.socials?.facebook) ||
+    isValidSocialLink(contact?.socials?.instagram);
 
   return (
     <footer className="bg-slate-900 text-slate-300 py-16">
@@ -35,17 +46,54 @@ const Footer: React.FC = () => {
             <p className="text-sm leading-relaxed mb-6">
               Empowering organizations with smart ERP solutions. We believe in efficiency, security, and seamless innovation.
             </p>
-            <div className="flex gap-4">
-              <a href={contact.socials.linkedin || "#"} className="hover:text-[#E99400] transition-colors" target="_blank" rel="noopener noreferrer">
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a href={contact.socials.twitter || "#"} className="hover:text-[#E99400] transition-colors" target="_blank" rel="noopener noreferrer">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href={contact.socials.facebook || "#"} className="hover:text-[#E99400] transition-colors" target="_blank" rel="noopener noreferrer">
-                <Facebook className="w-5 h-5" />
-              </a>
-            </div>
+            {hasAnySocial && (
+              <div className="flex gap-4">
+                {isValidSocialLink(contact?.socials?.linkedin) && (
+                  <a
+                    href={contact.socials.linkedin}
+                    className="hover:text-[#E99400] transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="LinkedIn"
+                  >
+                    <Linkedin className="w-5 h-5" />
+                  </a>
+                )}
+                {isValidSocialLink(contact?.socials?.twitter) && (
+                  <a
+                    href={contact.socials.twitter}
+                    className="hover:text-[#E99400] transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Twitter"
+                  >
+                    <Twitter className="w-5 h-5" />
+                  </a>
+                )}
+                {isValidSocialLink(contact?.socials?.facebook) && (
+                  <a
+                    href={contact.socials.facebook}
+                    className="hover:text-[#E99400] transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Facebook"
+                  >
+                    <Facebook className="w-5 h-5" />
+                  </a>
+                )}
+                {isValidSocialLink(contact?.socials?.instagram) && (
+                  <a
+                    href={contact.socials.instagram}
+                    className="hover:text-[#E99400] transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Instagram"
+                  >
+                    <Instagram className="w-5 h-5" />
+                  </a>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Quick Links */}
@@ -96,11 +144,54 @@ const Footer: React.FC = () => {
           <p className="text-sm text-slate-500">
             © {new Date().getFullYear()} Efficacious India Limited. All rights reserved.
           </p>
-          <div className="flex items-center gap-6">
-            <a href={contact.socials.linkedin || "#"} className="text-slate-400 hover:text-[#E99400] transition-colors" target="_blank" rel="noopener noreferrer"><Linkedin size={20} /></a>
-            <a href={contact.socials.twitter || "#"} className="text-slate-400 hover:text-[#E99400] transition-colors" target="_blank" rel="noopener noreferrer"><Twitter size={20} /></a>
-            <a href={contact.socials.facebook || "#"} className="text-slate-400 hover:text-[#E99400] transition-colors" target="_blank" rel="noopener noreferrer"><Facebook size={20} /></a>
-          </div>
+          {hasAnySocial && (
+            <div className="flex items-center gap-6">
+              {isValidSocialLink(contact?.socials?.linkedin) && (
+                <a
+                  href={contact.socials.linkedin}
+                  className="text-slate-400 hover:text-[#E99400] transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin size={20} />
+                </a>
+              )}
+              {isValidSocialLink(contact?.socials?.twitter) && (
+                <a
+                  href={contact.socials.twitter}
+                  className="text-slate-400 hover:text-[#E99400] transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Twitter"
+                >
+                  <Twitter size={20} />
+                </a>
+              )}
+              {isValidSocialLink(contact?.socials?.facebook) && (
+                <a
+                  href={contact.socials.facebook}
+                  className="text-slate-400 hover:text-[#E99400] transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                >
+                  <Facebook size={20} />
+                </a>
+              )}
+              {isValidSocialLink(contact?.socials?.instagram) && (
+                <a
+                  href={contact.socials.instagram}
+                  className="text-slate-400 hover:text-[#E99400] transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                >
+                  <Instagram size={20} />
+                </a>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </footer>

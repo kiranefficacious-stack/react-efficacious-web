@@ -33,6 +33,9 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
             return {
               ...initP,
               ...p,
+              testimonials: (p.testimonials && Array.isArray(p.testimonials))
+                ? p.testimonials
+                : (initP?.testimonials || []),
               appStoreLink: (p.appStoreLink && p.appStoreLink !== '#') 
                 ? p.appStoreLink 
                 : (initP?.appStoreLink && initP?.appStoreLink !== '#' ? initP.appStoreLink : ''),

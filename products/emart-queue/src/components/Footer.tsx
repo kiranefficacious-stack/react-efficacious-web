@@ -1,7 +1,7 @@
 import logo from '../assets/logo.png';
 import { motion } from 'framer-motion';
 import {
-  Mail, MapPin, Phone, Twitter, Linkedin, Github, Instagram,
+  Mail, MapPin, Phone, Twitter, Linkedin, Github, Instagram, Facebook,
   ArrowRight, QrCode
 } from 'lucide-react';
 
@@ -35,11 +35,11 @@ const navLinks = {
 };
 
 const socials = [
-  { icon: Twitter,   label: 'Twitter',   href: '#' },
-  { icon: Linkedin,  label: 'LinkedIn',  href: '#' },
-  { icon: Instagram, label: 'Instagram', href: '#' },
-  { icon: Github,    label: 'GitHub',    href: '#' },
-];
+  { icon: Linkedin,  label: 'LinkedIn',  href: 'https://www.linkedin.com/in/efficacious-india-limited-9aaa87287/' },
+  { icon: Facebook,  label: 'Facebook',  href: 'https://www.facebook.com/efficacioustech' },
+  { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/esmart_efficacious' },
+  { icon: Twitter,   label: 'Twitter',   href: '' },
+].filter(s => s.href && s.href.trim() !== '' && s.href.trim() !== '#' && !s.href.startsWith('javascript:'));
 
 export function Footer({ onPrivacyClick, onTermsClick }: FooterProps) {
   return (
@@ -84,18 +84,22 @@ export function Footer({ onPrivacyClick, onTermsClick }: FooterProps) {
             </ul>
 
             {/* Socials */}
-            <div className="flex items-center gap-3">
-              {socials.map(({ icon: Icon, label, href }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-primary-600/20 border border-slate-700 hover:border-primary-500/50 flex items-center justify-center text-slate-400 hover:text-primary-400 transition-all"
-                >
-                  <Icon size={15} />
-                </a>
-              ))}
-            </div>
+            {socials.length > 0 && (
+              <div className="flex items-center gap-3">
+                {socials.map(({ icon: Icon, label, href }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    aria-label={label}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-primary-600/20 border border-slate-700 hover:border-primary-500/50 flex items-center justify-center text-slate-400 hover:text-primary-400 transition-all"
+                  >
+                    <Icon size={15} />
+                  </a>
+                ))}
+              </div>
+            )}
           </motion.div>
 
           {/* Nav Columns */}

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import { useProductTestimonials } from '../../../../hooks/useProductTestimonials';
 
 interface Testimonial {
   id: string;
@@ -96,9 +97,36 @@ export default function TestimonialsCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const dynamicTestimonials = useProductTestimonials('eSmart Restaurant', TESTIMONIALS);
+
+  const normalizedTestimonials = (dynamicTestimonials || []).map((t: any, idx: number) => {
+    const authorName = t.name || t.author || 'Client';
+    const initials = t.initials || authorName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
+    const gradients = [
+      'from-orange-400 to-red-500',
+      'from-teal-400 to-secondary',
+      'from-blue-500 to-indigo-600',
+      'from-purple-400 to-pink-500',
+      'from-amber-400 to-orange-500'
+    ];
+    return {
+      id: String(t.id || idx),
+      name: authorName,
+      role: t.role || 'Owner / Manager',
+      restaurant: t.restaurant || t.organization || 'Restaurant Partner',
+      city: t.city || 'India',
+      category: (t.category || 'all').toLowerCase(),
+      quote: t.quote,
+      stars: typeof t.stars === 'number' ? t.stars : 5,
+      metric: t.metric || '5★ Experience',
+      initials,
+      gradient: t.gradient || gradients[idx % gradients.length]
+    };
+  });
+
   const filteredTestimonials = activeFilter === 'all' 
-    ? TESTIMONIALS 
-    : TESTIMONIALS.filter(t => t.category === activeFilter);
+    ? normalizedTestimonials 
+    : normalizedTestimonials.filter((t: any) => t.category === activeFilter || t.category === 'all');
 
   // Sync scroll indicator dots on manual scroll / swipe
   const handleScroll = () => {

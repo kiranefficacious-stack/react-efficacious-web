@@ -7,9 +7,10 @@ export const initialData = {
     phone: "+91 8454943806",
     website: "https://efficacious.co.in",
     socials: {
-      linkedin: "#",
-      twitter: "#",
-      facebook: "#"
+      linkedin: "https://www.linkedin.com/in/efficacious-india-limited-9aaa87287/",
+      twitter: "",
+      facebook: "https://www.facebook.com/efficacioustech",
+      instagram: "https://www.instagram.com/esmart_efficacious"
     }
   },
   services: [
@@ -549,6 +550,38 @@ export const initialData = {
         { label: "Schools Onboarded", value: "50+" },
         { label: "Parents Connected", value: "1M+" },
         { label: "Uptime Guaranteed", value: "99.9%" }
+      ],
+      testimonials: [
+        {
+          id: 1,
+          name: "Mrs. Sunita Sen",
+          role: "Principal",
+          school: "Delhi Public School, Sector 45",
+          organization: "Delhi Public School, Sector 45",
+          quote: "eSMARTs has completely transformed how we manage our daily operations. The automated attendance and real-time GPS tracking for transport give our parents immense peace of mind.",
+          avatar: "https://media.istockphoto.com/id/2171382633/vector/user-profile-icon-anonymous-person-symbol-blank-avatar-graphic-vector-illustration.jpg?s=612x612&w=0&k=20&c=ZwOF6NfOR0zhYC44xOX06ryIPAUhDvAajrPsaZ6v1-w=",
+          stars: 5
+        },
+        {
+          id: 2,
+          name: "Dr. Anil Deshmukh",
+          role: "School Administrator",
+          school: "St. Xavier's High School, Mumbai",
+          organization: "St. Xavier's High School, Mumbai",
+          quote: "The dashboards provide incredible visibility into student performance and financials. It's an all-in-one platform that saves our administrative staff hours of work every single day.",
+          avatar: "https://media.istockphoto.com/id/2171382633/vector/user-profile-icon-anonymous-person-symbol-blank-avatar-graphic-vector-illustration.jpg?s=612x612&w=0&k=20&c=ZwOF6NfOR0zhYC44xOX06ryIPAUhDvAajrPsaZ6v1-w=",
+          stars: 5
+        },
+        {
+          id: 3,
+          name: "Mrs. Priya Iyer",
+          role: "Head of Operations",
+          school: "Pinnacle International School, Bengaluru",
+          organization: "Pinnacle International School, Bengaluru",
+          quote: "Implementation was seamless, and the mobile app is a game-changer. Our teachers can now communicate with parents instantly, fostering a much stronger school community.",
+          avatar: "https://media.istockphoto.com/id/2171382633/vector/user-profile-icon-anonymous-person-symbol-blank-avatar-graphic-vector-illustration.jpg?s=612x612&w=0&k=20&c=ZwOF6NfOR0zhYC44xOX06ryIPAUhDvAajrPsaZ6v1-w=",
+          stars: 5
+        }
       ]
     },
 
@@ -640,6 +673,78 @@ export const initialData = {
         { label: "Table Turnover", value: "+30%" },
         { label: "Food Cost Reduction", value: "15%" },
         { label: "Order Errors", value: "0%" }
+      ],
+      testimonials: [
+        {
+          id: 1,
+          name: "Rohit Sharma",
+          role: "Owner",
+          restaurant: "The Spice Route",
+          organization: "The Spice Route",
+          city: "Pune",
+          category: "finedine",
+          quote: "We used to struggle during weekend rushes — wrong orders, lost KOTs, billing errors. Since switching to e-Smart Restaurant our table turnover time has dropped by 20 minutes and billing mistakes are almost zero.",
+          stars: 5,
+          metric: "20 Min Faster Tables",
+          initials: "RS",
+          gradient: "from-orange-400 to-red-500"
+        },
+        {
+          id: 2,
+          name: "Meera Nair",
+          role: "Founder",
+          restaurant: "The Daily Bean Cafe",
+          organization: "The Daily Bean Cafe",
+          city: "Bengaluru",
+          category: "cafe",
+          quote: "Our staff loves how intuitive the POS is. Training a new steward takes less than 10 minutes. The split billing and UPI integration have made our checkout process incredibly smooth and error-free.",
+          stars: 5,
+          metric: "10-Min Staff Training",
+          initials: "MN",
+          gradient: "from-teal-400 to-secondary"
+        },
+        {
+          id: 3,
+          name: "Vikram Rathore",
+          role: "Managing Director",
+          restaurant: "Royal Biryani House",
+          organization: "Royal Biryani House",
+          city: "Hyderabad",
+          category: "chain",
+          quote: "Managing inventory across 14 outlets was a nightmare. With e-Smart's central dashboard, I can track real-time stock levels, check consolidated sales reports, and update menus across all outlets with one click.",
+          stars: 5,
+          metric: "14 Outlets Synced",
+          initials: "VR",
+          gradient: "from-blue-500 to-indigo-600"
+        },
+        {
+          id: 4,
+          name: "Ananya Sen",
+          role: "Owner",
+          restaurant: "Sweet Treats Bakery",
+          organization: "Sweet Treats Bakery",
+          city: "Kolkata",
+          category: "qsr",
+          quote: "The advanced menu management and pre-order tracking features have changed how we operate. We can track custom cake orders, advance payments, and deliveries without any manual errors or paperwork.",
+          stars: 5,
+          metric: "Zero Missed Orders",
+          initials: "AS",
+          gradient: "from-purple-400 to-pink-500"
+        },
+        {
+          id: 5,
+          name: "Rajesh Patel",
+          role: "Founder",
+          restaurant: "Spice Kitchen Express",
+          organization: "Spice Kitchen Express",
+          city: "Ahmedabad",
+          category: "chain",
+          quote: "Our online orders from Zomato, Swiggy, and our own website now land directly on the POS screen. No more manual entry from three separate tablets. Kitchen efficiency is up by 40% and dispatch is super fast.",
+          stars: 5,
+          metric: "+40% Kitchen Speed",
+          initials: "RP",
+          gradient: "from-amber-400 to-orange-500"
+        }
       ]
     },
     {
@@ -690,6 +795,38 @@ export const initialData = {
         { label: "Wait Time Reduction", value: "70%" },
         { label: "Service Categories", value: "50+" },
         { label: "Physical Queues", value: "Zero" }
+      ],
+      testimonials: [
+        {
+          id: 1,
+          name: "Sarah Jenkins",
+          author: "Sarah Jenkins",
+          role: "Branch Manager, Metro Financial",
+          organization: "Metro Financial",
+          quote: "Implementing E-Smart Queue completely transformed our branch. Lobby congestion is down by 80%, and our tellers can actually prepare for specialized consultations before the client even walks through the doors.",
+          avatar: "https://i.pravatar.cc/150?u=sarah",
+          stars: 5
+        },
+        {
+          id: 2,
+          name: "Marcus Chen",
+          author: "Marcus Chen",
+          role: "Hub Coordinator, Apex Logistics",
+          organization: "Apex Logistics",
+          quote: "Managing dock doors used to be a nightmare of idle trucks and angry drivers. Now, carriers book their slots in real-time, scan their QR code at the gate, and keep the supply chain moving smoothly.",
+          avatar: "https://i.pravatar.cc/150?u=marcus",
+          stars: 5
+        },
+        {
+          id: 3,
+          name: "Elena Rodriguez",
+          author: "Elena Rodriguez",
+          role: "Everyday User",
+          organization: "Everyday Citizen User",
+          quote: "I used to take half a day off work just to renew my license or visit the clinic. With this app, I book my slot, show up exactly at my time, scan my code, and I'm instantly next in line. It's a lifesaver.",
+          avatar: "https://i.pravatar.cc/150?u=elena",
+          stars: 5
+        }
       ]
     }
   ],

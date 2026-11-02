@@ -30,12 +30,12 @@ const FOOTER_LINKS = {
 };
 
 const SOCIAL = [
-  { icon: Twitter, href: '#', label: 'Twitter' },
-  { icon: Linkedin, href: '#', label: 'LinkedIn' },
-  { icon: Instagram, href: '#', label: 'Instagram' },
-  { icon: Facebook, href: '#', label: 'Facebook' },
-  { icon: Youtube, href: '#', label: 'YouTube' },
-];
+  { icon: Linkedin,  href: 'https://www.linkedin.com/in/efficacious-india-limited-9aaa87287/', label: 'LinkedIn' },
+  { icon: Facebook,  href: 'https://www.facebook.com/efficacioustech', label: 'Facebook' },
+  { icon: Instagram, href: 'https://www.instagram.com/esmart_efficacious', label: 'Instagram' },
+  { icon: Twitter,   href: '', label: 'Twitter' },
+  { icon: Youtube,   href: '', label: 'YouTube' },
+].filter(s => s.href && s.href.trim() !== '' && s.href.trim() !== '#' && !s.href.startsWith('javascript:'));
 
 export default function Footer() {
   return (
@@ -51,18 +51,22 @@ export default function Footer() {
             <p className="text-sm text-gray-400 leading-relaxed mb-5 max-w-sm">
               Cloud-based billing & POS software for restaurants, cafés, cloud kitchens, and multi-outlet chains across India.
             </p>
-            <div className="flex gap-3 mb-8">
-              {SOCIAL.map(({ icon: Icon, href, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  className="w-9 h-9 rounded-full border border-gray-700 flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
-                >
-                  <Icon className="w-4 h-4" />
-                </a>
-              ))}
-            </div>
+            {SOCIAL.length > 0 && (
+              <div className="flex gap-3 mb-8">
+                {SOCIAL.map(({ icon: Icon, href, label }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    aria-label={label}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-full border border-gray-700 flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
+                  >
+                    <Icon className="w-4 h-4" />
+                  </a>
+                ))}
+              </div>
+            )}
 
             {/* Download App badges */}
             <div className="space-y-3">
