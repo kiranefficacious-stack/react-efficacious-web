@@ -8,7 +8,7 @@ const isLocal = typeof window !== 'undefined' &&
   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
 export const API_BASE = (typeof window !== 'undefined' && (window as any).__EFFICACIOUS_API_URL__)
-  || (isLocal ? (import.meta.env.VITE_API_URL || 'http://localhost:5231/api') : '/api');
+  || (isLocal ? (import.meta.env.VITE_API_URL || 'http://localhost:5231/api') : 'http://wp.efficacious.co.in/api');
 
 export const api = {
   // Website Content

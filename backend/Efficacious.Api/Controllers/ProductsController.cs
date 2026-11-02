@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Efficacious.Api.Controllers;
 
 [Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 public class ProductsController : ControllerBase
 {

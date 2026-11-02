@@ -15,6 +15,7 @@ public class MigrateRequest
 }
 
 [Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 public class MigrationController : ControllerBase
 {

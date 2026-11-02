@@ -12,6 +12,7 @@ public class NewsletterDto
 }
 
 [Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 public class ContentController : ControllerBase
 {

@@ -30,6 +30,7 @@ public class QaItemDto
 }
 
 [Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 public class ChatController : ControllerBase
 {
