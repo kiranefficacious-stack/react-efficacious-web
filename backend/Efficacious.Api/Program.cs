@@ -40,11 +40,17 @@ builder.Services.AddDbContext<Efficacious.Api.Data.AppDbContext>(options =>
             Console.WriteLine("[Database] SQL Server placeholder detected in config. Automatically falling back to bundled SQLite database (Efficacious.db)...");
         }
 
-        var dbFolder = Path.Combine(builder.Environment.ContentRootPath, "backend", "Efficacious.Api");
-        var dbPath = Directory.Exists(dbFolder) ? Path.Combine(dbFolder, "Efficacious.db") : Path.Combine(AppContext.BaseDirectory, "Efficacious.db");
-        var sqliteConn = (!string.IsNullOrWhiteSpace(connectionString) && connectionString.Contains(".db", StringComparison.OrdinalIgnoreCase))
-            ? connectionString
-            : $"Data Source={dbPath}";
+        // Robust absolute path resolution for zero-config IIS & Linux deployment
+        var dbPath = Path.Combine(AppContext.BaseDirectory, "Efficacious.db");
+        if (!File.Exists(dbPath))
+        {
+            var contentRootDb = Path.Combine(builder.Environment.ContentRootPath, "Efficacious.db");
+            var devDb = Path.Combine(builder.Environment.ContentRootPath, "backend", "Efficacious.Api", "Efficacious.db");
+            if (File.Exists(contentRootDb)) dbPath = contentRootDb;
+            else if (File.Exists(devDb)) dbPath = devDb;
+        }
+
+        var sqliteConn = $"Data Source={dbPath}";
 
         Console.WriteLine($"[Database] Initializing SQLite connection ({sqliteConn})...");
         options.UseSqlite(sqliteConn);
