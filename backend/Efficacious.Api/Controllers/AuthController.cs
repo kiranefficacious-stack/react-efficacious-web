@@ -10,7 +10,6 @@ public class LoginRequest
     public string Password { get; set; } = string.Empty;
 }
 
-[Route("api/[controller]")]
 [Route("[controller]")]
 [ApiController]
 public class AuthController : ControllerBase

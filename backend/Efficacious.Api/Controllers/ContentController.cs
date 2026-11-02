@@ -11,7 +11,6 @@ public class NewsletterDto
     public string Email { get; set; } = string.Empty;
 }
 
-[Route("api/[controller]")]
 [Route("[controller]")]
 [ApiController]
 public class ContentController : ControllerBase

@@ -98,6 +98,20 @@ using (var scope = app.Services.CreateScope())
 
 app.UseCors("AllowAll");
 
+// Normalize any double /api/api path so it never happens
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value ?? "";
+    if (path.StartsWith("/api/api", StringComparison.OrdinalIgnoreCase))
+    {
+        context.Request.Path = path.Substring(4);
+    }
+    await next();
+});
+
+// Support /api path prefix cleanly on both local and live
+app.UsePathBase("/api");
+
 // Enable Swagger UI across all environments so both http://localhost:5231 and /swagger work immediately
 app.UseSwagger();
 app.UseSwaggerUI(c =>

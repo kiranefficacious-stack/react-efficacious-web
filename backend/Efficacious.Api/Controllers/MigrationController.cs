@@ -14,7 +14,6 @@ public class MigrateRequest
     public bool TruncateTargetTables { get; set; } = true;
 }
 
-[Route("api/[controller]")]
 [Route("[controller]")]
 [ApiController]
 public class MigrationController : ControllerBase

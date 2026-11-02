@@ -29,7 +29,6 @@ public class QaItemDto
     public string AnswerText { get; set; } = string.Empty;
 }
 
-[Route("api/[controller]")]
 [Route("[controller]")]
 [ApiController]
 public class ChatController : ControllerBase
