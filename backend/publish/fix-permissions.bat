@@ -20,3 +20,4 @@ echo Permissions successfully granted!
 echo SQLite can now create WAL logs and persist writes without HTTP 500.
 echo ==============================================================
 pause
+
