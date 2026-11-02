@@ -13,11 +13,12 @@ builder.Services.AddSwaggerGen();
 var dbProvider = (builder.Configuration["DatabaseProvider"] ?? "Sqlite").Trim();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
 
-var isSqlServer = dbProvider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase) ||
+var isSqlServer = (dbProvider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase) ||
                   (!string.IsNullOrWhiteSpace(connectionString) &&
                    (connectionString.Contains("Server=", StringComparison.OrdinalIgnoreCase) ||
                     connectionString.Contains("Data Source=tcp:", StringComparison.OrdinalIgnoreCase) ||
-                    connectionString.Contains("Initial Catalog=", StringComparison.OrdinalIgnoreCase)));
+                    connectionString.Contains("Initial Catalog=", StringComparison.OrdinalIgnoreCase))))
+                  && !connectionString.Contains("YOUR_SQL_SERVER_HOST", StringComparison.OrdinalIgnoreCase);
 
 builder.Services.AddDbContext<Efficacious.Api.Data.AppDbContext>(options =>
 {
@@ -34,6 +35,11 @@ builder.Services.AddDbContext<Efficacious.Api.Data.AppDbContext>(options =>
     }
     else
     {
+        if (connectionString.Contains("YOUR_SQL_SERVER_HOST", StringComparison.OrdinalIgnoreCase))
+        {
+            Console.WriteLine("[Database] SQL Server placeholder detected in config. Automatically falling back to bundled SQLite database (Efficacious.db)...");
+        }
+
         var dbFolder = Path.Combine(builder.Environment.ContentRootPath, "backend", "Efficacious.Api");
         var dbPath = Directory.Exists(dbFolder) ? Path.Combine(dbFolder, "Efficacious.db") : Path.Combine(AppContext.BaseDirectory, "Efficacious.db");
         var sqliteConn = (!string.IsNullOrWhiteSpace(connectionString) && connectionString.Contains(".db", StringComparison.OrdinalIgnoreCase))
