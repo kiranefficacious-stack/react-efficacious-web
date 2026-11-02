@@ -9,11 +9,15 @@ import { initialData } from '../data';
 import { useNavigate } from 'react-router-dom';
 
 const NewsEvents: React.FC = () => {
-  const { data } = useContent();
+  const { data, contentLoading } = useContent();
   const navigate = useNavigate();
-  const newsItems: any[] = (data?.news && Array.isArray(data.news) && data.news.length > 0)
-    ? data.news
-    : (initialData.news || []);
+
+  // If still loading or admin has 0 news, hide the News section completely
+  if (contentLoading) {
+    return null;
+  }
+
+  const newsItems: any[] = Array.isArray(data?.news) ? data.news : [];
 
   if (!newsItems || newsItems.length === 0) {
     return null;

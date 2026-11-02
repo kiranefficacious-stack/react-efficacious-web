@@ -1,34 +1,6 @@
 
 export const initialData = {
-  news: [
-    {
-      id: 1,
-      category: "Product Launch",
-      date: "March 15, 2024",
-      title: "Introducing AI Analytics for eSmart School",
-      excerpt: "Revolutionizing education management with predictive insights and student performance tracking powered by advanced AI algorithms.",
-      image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=800",
-      color: "text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400"
-    },
-    {
-      id: 2,
-      category: "Events",
-      date: "April 10, 2024",
-      title: "Global Education Summit 2024",
-      excerpt: "Join us at the annual summit where we showcase our latest innovations in educational technology and campus security systems.",
-      image: "https://images.unsplash.com/photo-1544531586-fde5298cdd40?auto=format&fit=crop&q=80&w=800",
-      color: "text-purple-600 bg-purple-50 dark:bg-purple-900/20 dark:text-purple-400"
-    },
-    {
-      id: 3,
-      category: "Awards",
-      date: "February 28, 2024",
-      title: "Best Education ERP Provider 2023",
-      excerpt: "Efficacious has been recognized as the leading ERP provider for educational institutions in the Maharashtra region.",
-      image: "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit=crop&q=80&w=800",
-      color: "text-amber-600 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400"
-    }
-  ],
+  news: [],
   contact: {
     office: "Ground Floor, Plot No. 7, Sushma Niwas, Road No. 6, Sector-1, New Panvel, Raigad, Maharashtra - 410206.",
     email: "info@efficacious.co.in",

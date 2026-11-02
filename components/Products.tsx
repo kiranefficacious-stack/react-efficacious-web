@@ -69,8 +69,12 @@ const Products: React.FC = () => {
             const localProduct = (initialData.products as any[]).find(
               (lp: any) => String(lp.id) === String(product.id) || lp.title.toLowerCase() === product.title.toLowerCase()
             );
-            const href = (product.href && product.href !== '/products/' ? product.href : localProduct?.href) || product.href || '/products';
-            const newTab = product.newTab !== undefined ? product.newTab : (localProduct?.newTab || false);
+            let href = (product.href && product.href !== '/products/' ? product.href : localProduct?.href) || product.href || '/products';
+            if (product.title?.toLowerCase().includes('health') || String(product.id) === '2' || href.includes('esmart-health')) {
+              href = 'https://www.e-smarthealth.co.in/';
+            }
+            const isExternal = href.startsWith('http://') || href.startsWith('https://');
+            const newTab = isExternal ? true : (product.newTab !== undefined ? product.newTab : (localProduct?.newTab || false));
             const isComingSoon = Boolean(product.comingSoon !== undefined ? product.comingSoon : (localProduct?.comingSoon ?? false));
 
             return (

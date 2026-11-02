@@ -51,8 +51,12 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
     .filter((p: any) => p.enabled && !excludedTitles.includes(p.title?.toLowerCase()))
     .map((p: any) => {
       const localProduct = (initialData.products as any[]).find((lp: any) => String(lp.id) === String(p.id) || lp.title?.toLowerCase() === p.title?.toLowerCase());
-      const href = (p.href && p.href !== '/products/' ? p.href : localProduct?.href) || p.href || '/products';
-      const newTab = p.newTab !== undefined ? p.newTab : (localProduct?.newTab || false);
+      let href = (p.href && p.href !== '/products/' ? p.href : localProduct?.href) || p.href || '/products';
+      if (p.title?.toLowerCase().includes('health') || String(p.id) === '2' || href.includes('esmart-health')) {
+        href = 'https://www.e-smarthealth.co.in/';
+      }
+      const isExternal = href.startsWith('http://') || href.startsWith('https://');
+      const newTab = isExternal ? true : (p.newTab !== undefined ? p.newTab : (localProduct?.newTab || false));
       const isComingSoon = Boolean(p.comingSoon !== undefined ? p.comingSoon : (localProduct?.comingSoon ?? false));
       const iconKey = p.iconName || localProduct?.iconName;
       const IconComp = (LucideIcons as any)[iconKey];
@@ -235,7 +239,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                                         </>
                                       );
 
-                                      return item.newTab ? (
+                                      return (item.newTab || item.href.startsWith('http')) ? (
                                         <a
                                           key={idx}
                                           href={item.href}
@@ -372,7 +376,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                                     item.comingSoon ? "opacity-60 hover:opacity-100" : ""
                                   }`;
 
-                                  return item.newTab ? (
+                                  return (item.newTab || item.href.startsWith('http')) ? (
                                     <a
                                       key={idx}
                                       href={item.href}

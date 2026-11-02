@@ -10,9 +10,7 @@ import { useNavigate } from 'react-router-dom';
 const NewsList: React.FC = () => {
   const { data, contentLoading } = useContent();
   const navigate = useNavigate();
-  const newsItems: any[] = (data?.news && Array.isArray(data.news) && data.news.length > 0)
-    ? data.news
-    : (initialData.news || []);
+  const newsItems: any[] = Array.isArray(data?.news) ? data.news : [];
 
   const [activeFilter, setActiveFilter] = useState("All");
 

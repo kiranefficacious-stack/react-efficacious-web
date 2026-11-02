@@ -34,11 +34,7 @@ import ManagementConsultant from './pages/ManagementConsultant';
 import ITOutsourcing from './pages/ITOutsourcing';
 import KnowledgeProcessOptimization from './pages/KnowledgeProcessOptimization';
 import PVCCardPrinting from './pages/PVCCardPrinting';
-import ESmartSchool from './pages/ESmartSchool';
-import ESmartRestaurant from './pages/ESmartRestaurant';
-import ESmartHealth from './pages/ESmartHealth';
 import ESmartTeam from './pages/ESmartTeam';
-import ESmartQueue from './pages/ESmartQueue';
 import ChannelPartners from './pages/ChannelPartners';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
@@ -68,9 +64,9 @@ const EMartQueueRedirect = () => {
 };
 
 const ESmartHealthRedirect = () => {
-  useEffect(() => {
-    window.location.replace('https://www.e-smarthealth.co.in/');
-  }, []);
+  if (typeof window !== 'undefined') {
+    window.location.href = 'https://www.e-smarthealth.co.in/';
+  }
   return null;
 };
 

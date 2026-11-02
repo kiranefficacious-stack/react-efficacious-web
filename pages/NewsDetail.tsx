@@ -11,9 +11,7 @@ const NewsDetail: React.FC = () => {
   const navigate = useNavigate();
   const { data, contentLoading } = useContent();
   
-  const newsList: any[] = (data?.news && Array.isArray(data.news) && data.news.length > 0)
-    ? data.news
-    : (initialData.news || []);
+  const newsList: any[] = Array.isArray(data?.news) ? data.news : [];
 
   // Find news item or redirect if not found
   const article = newsList.find((n: any) => String(n.id) === String(id));

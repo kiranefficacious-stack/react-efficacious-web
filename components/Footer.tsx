@@ -65,7 +65,7 @@ const Footer: React.FC = () => {
             <h4 className="text-white font-bold mb-6 uppercase text-sm tracking-widest">Solutions</h4>
             <ul className="space-y-4 text-sm">
               <li><Link to="/products/esmart-school" className="hover:text-[#E99400]">eSmart School</Link></li>
-              <li><Link to="/products/esmart-health" className="hover:text-[#E99400]">eSmart Health</Link></li>
+              <li><a href="https://www.e-smarthealth.co.in/" target="_blank" rel="noopener noreferrer" className="hover:text-[#E99400]">eSmart Health</a></li>
               <li><Link to="/products/esmart-restaurant" className="hover:text-[#E99400]">eSmart Restaurant</Link></li>
               <li><Link to="/products/emart-queue" className="hover:text-[#E99400]">eSmart Queue</Link></li>
               <li><Link to="/services" className="hover:text-[#E99400]">All Services</Link></li>
