@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import LoadingScreen from './LoadingScreen';
+import InactivityModal from './admin/InactivityModal';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -20,7 +21,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <InactivityModal />
+    </>
+  );
 };
 
 export default ProtectedRoute;

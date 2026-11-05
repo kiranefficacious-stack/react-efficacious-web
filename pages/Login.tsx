@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
-import { Lock, Mail, Eye, EyeOff, Shield } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, Shield, AlertTriangle, Clock } from 'lucide-react';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -14,15 +14,22 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [inactivityNotice, setInactivityNotice] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   useEffect(() => {
     try {
       localStorage.removeItem('efficacious_admin_throttle');
+      const reason = sessionStorage.getItem('efficacious_logout_reason');
+      if (reason === 'inactivity') {
+        sessionStorage.removeItem('efficacious_logout_reason');
+        setInactivityNotice(true);
+        showToast('warning', 'Session timed out: You were automatically logged out due to inactivity.', 6000);
+      }
     } catch {
       // ignore
     }
-  }, []);
+  }, [showToast]);
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -89,6 +96,17 @@ const Login: React.FC = () => {
 
         {/* Card */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+          {inactivityNotice && (
+            <div className="m-6 mb-0 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 flex items-start gap-3 text-amber-800 dark:text-amber-200 text-sm">
+              <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-amber-900 dark:text-amber-100">Session Timed Out</p>
+                <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5 leading-relaxed">
+                  You were automatically logged out because no activity was detected for 15 minutes. Please sign in again to continue.
+                </p>
+              </div>
+            </div>
+          )}
           <form onSubmit={handleSubmit} autoComplete="on" className="p-8 space-y-6">
             {/* Email Field */}
             <div>
