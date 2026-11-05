@@ -1,6 +1,7 @@
 import React from 'react';
-import { Heart, Target, Zap, Users, Award, TrendingUp } from 'lucide-react';
+import { Heart, Target, Zap, Users, Award, TrendingUp, Linkedin } from 'lucide-react';
 import CTABand from '../components/CTABand';
+import { useTeamMembers, TeamMember } from '../../../../hooks/useTeamMembers';
 
 const MILESTONES = [
   { year: '2018', title: 'Founded in Navi Mumbai', desc: 'Efficacious India Limited started with a vision to digitise restaurant operations for Indian food businesses.' },
@@ -17,14 +18,22 @@ const VALUES = [
   { icon: Users, title: 'Team that cares', desc: 'Our support team is made up of people who have worked in or with restaurants. We understand your pressure.' },
 ];
 
-const TEAM = [
-  { initials: 'AK', name: 'Amit Kumar', role: 'Co-Founder & CEO', bio: 'Former restaurant software consultant with 10+ years of product experience in the hospitality sector.' },
-  { initials: 'PM', name: 'Priya Mehta', role: 'Co-Founder & CTO', bio: 'Engineering leader passionate about building resilient, offline-first systems for Bharat businesses.' },
-  { initials: 'RS', name: 'Rahul Singh', role: 'Head of Customer Success', bio: 'Ensures every restaurant onboards smoothly and gets maximum value from day one.' },
-  { initials: 'NJ', name: 'Nisha Joshi', role: 'Head of Sales', bio: 'Helps restaurant owners find the right plan and grows our network of restaurant partners.' },
+const FALLBACK_TEAM: TeamMember[] = [
+  { initials: 'KA', name: 'Kamal Agrawal', role: 'Founder & CEO', description: 'Visionary leader and core finance professional with a passion for innovative IT solutions.' },
+  { initials: 'KK', name: 'Kiran Kshirsagar', role: 'Senior Flutter Android + iOS App Developer', description: 'Expert in building robust, high-performance cross-platform mobile experiences.' },
+  { initials: 'PP', name: 'Pranav Patil', role: 'Sr. Software Developer', description: 'Specializes in highly scalable backend architectures, database optimization, and secure integrations.' },
+  { initials: 'RC', name: 'Rahul Chauhan', role: 'Sr. .Net Developer', description: 'Passionate about clean code, high-performance web services, and robust cloud infrastructure.' },
 ];
 
+const getInitials = (name?: string) => {
+  if (!name) return 'ET';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  return name.slice(0, 2).toUpperCase();
+};
+
 export default function About() {
+  const dynamicTeam = useTeamMembers(FALLBACK_TEAM);
   return (
     <main className="bg-warm">
       {/* Hero */}
@@ -117,19 +126,61 @@ export default function About() {
       {/* Team */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold text-charcoal mb-10 font-sora text-center">
-          Meet the team {/* SAMPLE — replace with real team members and photos */}
+          Meet the team
         </h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {TEAM.map(({ initials, name, role, bio }) => (
-            <div key={name} className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg transition-shadow text-center">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-300 to-primary text-white font-bold text-xl flex items-center justify-center mx-auto mb-4 font-sora">
-                {initials}
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center">
+          {dynamicTeam.map((member, idx) => {
+            const initials = member.initials || getInitials(member.name);
+            const bioText = member.description || member.bio || '';
+            return (
+              <div
+                key={member.id || member.name || idx}
+                className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg transition-all duration-300 text-center flex flex-col items-center group"
+              >
+                {member.image ? (
+                  <div className="w-20 h-20 rounded-full mb-4 overflow-hidden border-2 border-orange-100 shadow-sm relative group-hover:scale-105 transition-transform duration-300 bg-orange-50">
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                        const fallback = (e.target as HTMLElement).parentElement?.querySelector('.initials-fallback');
+                        if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                      }}
+                    />
+                    <div className="initials-fallback hidden w-full h-full bg-gradient-to-br from-orange-300 to-primary text-white font-bold text-xl items-center justify-center font-sora">
+                      {initials}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-300 to-primary text-white font-bold text-xl flex items-center justify-center mb-4 font-sora shadow-sm group-hover:scale-105 transition-transform duration-300">
+                    {initials}
+                  </div>
+                )}
+                
+                <h3 className="font-bold text-charcoal text-base mb-1 font-sora">{member.name}</h3>
+                <p className="text-primary text-xs font-semibold mb-3">{member.role}</p>
+                {bioText && (
+                  <p className="text-gray-500 text-sm leading-relaxed mb-4 flex-1 line-clamp-4">
+                    {bioText}
+                  </p>
+                )}
+
+                {member.linkedin && member.linkedin !== '#' && (
+                  <a
+                    href={member.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-auto inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-blue-600 font-medium transition-colors"
+                  >
+                    <Linkedin size={14} />
+                    <span>LinkedIn</span>
+                  </a>
+                )}
               </div>
-              <h3 className="font-bold text-charcoal mb-1 font-sora">{name}</h3>
-              <p className="text-primary text-xs font-semibold mb-3">{role}</p>
-              <p className="text-gray-500 text-sm leading-relaxed">{bio}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
