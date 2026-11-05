@@ -134,7 +134,6 @@ const Careers: React.FC = () => {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFileError('');
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const err = validateFile(file);
@@ -142,8 +141,11 @@ const Careers: React.FC = () => {
         setFileError(err);
         setSelectedFile(null);
       } else {
+        setFileError('');
         setSelectedFile(file);
       }
+    } else if (!selectedFile) {
+      setFileError('Please upload your CV / Resume (PDF or DOCX)');
     }
   };
 
@@ -151,7 +153,6 @@ const Careers: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    setFileError('');
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
       const err = validateFile(file);
@@ -159,6 +160,7 @@ const Careers: React.FC = () => {
         setFileError(err);
         setSelectedFile(null);
       } else {
+        setFileError('');
         setSelectedFile(file);
       }
     }
@@ -176,7 +178,13 @@ const Careers: React.FC = () => {
     });
 
     const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0 || fileError) {
+    let currentFileError = fileError;
+    if (!selectedFile) {
+      currentFileError = 'Please upload your CV / Resume (PDF or DOCX)';
+      setFileError(currentFileError);
+    }
+
+    if (Object.keys(validationErrors).length > 0 || currentFileError) {
       setErrors(validationErrors);
       return;
     }
@@ -706,7 +714,7 @@ To / Recipient:   ${recipientEmail}
 
                               <div className="space-y-1.5">
                                   <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1 flex items-center justify-between">
-                                      <span>Upload CV / Resume</span>
+                                      <span>Upload CV / Resume <span className="text-red-500">*</span></span>
                                       <span className="text-xs text-slate-400">PDF, DOCX up to 5MB</span>
                                   </label>
                                   <div 
@@ -744,6 +752,7 @@ To / Recipient:   ${recipientEmail}
                                                         e.stopPropagation();
                                                         setSelectedFile(null);
                                                         if (fileInputRef.current) fileInputRef.current.value = '';
+                                                        setFileError('Please upload your CV / Resume (PDF or DOCX)');
                                                       }}
                                                       className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-500 hover:text-red-500"
                                                       title="Remove file"
