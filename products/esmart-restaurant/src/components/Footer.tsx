@@ -124,37 +124,53 @@ export default function Footer() {
 
         {/* Contact strip */}
         <div className="border-t border-gray-800 pt-8 mb-8">
-          <div className="grid sm:grid-cols-3 gap-4 text-sm text-gray-400">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-400">
+            <div className="text-left">
               <span className="text-gray-300 font-medium">Sales:</span>{' '}
               <a href="tel:+918454943806" className="hover:text-white transition-colors">+91 84549 43806</a>
             </div>
-            <div>
+            <div className="text-left sm:text-center">
               <span className="text-gray-300 font-medium">Support:</span>{' '}
               <a href="mailto:info@efficacious.co.in" className="hover:text-white transition-colors">info@efficacious.co.in</a>
             </div>
-            <div>
+            <div className="text-left sm:text-right">
               Sushma Niwas, Road No. 6, Sector-1, New Panvel, Navi Mumbai — 410206
             </div>
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
-          <p>© {new Date().getFullYear()} Efficacious India Limited. All rights reserved.</p>
-          <div className="flex gap-6">
-            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
-            <Link to="/refund" className="hover:text-white transition-colors">Refund Policy</Link>
-          </div>
-        </div>
+        <div className="border-t border-gray-800 pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-4 text-xs text-gray-500">
+            <p className="text-left">
+              © {new Date().getFullYear()} Efficacious India Limited. All rights reserved.
+            </p>
 
-        {/* Cross-sell */}
-        <div className="mt-6 text-center text-xs text-gray-600">
-          More from Efficacious India:{' '}
-          <a href="#" className="text-gray-500 hover:text-gray-300 transition-colors mx-2">e-Smart Health</a>
-          ·
-          <a href="#" className="text-gray-500 hover:text-gray-300 transition-colors mx-2">School App</a>
+            <div className="text-left md:text-center flex items-center md:justify-center gap-2 flex-wrap">
+              <span className="text-gray-500">More from Efficacious India:</span>
+              <a
+                href="https://www.e-smarthealth.co.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors font-medium"
+              >
+                e-Smart Health
+              </a>
+              <span className="text-gray-600">·</span>
+              <a
+                href="/products/esmart-school/"
+                className="text-gray-400 hover:text-white transition-colors font-medium"
+              >
+                School App
+              </a>
+            </div>
+
+            <div className="flex flex-wrap gap-6 md:justify-end text-left md:text-right">
+              <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+              <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+              <Link to="/refund" className="hover:text-white transition-colors">Refund Policy</Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
