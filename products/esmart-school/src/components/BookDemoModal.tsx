@@ -238,10 +238,16 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
                     <div className="w-20 h-20 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
                       <CheckCircle2 className="w-10 h-10 text-emerald-500" />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Request Sent!</h3>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs">
-                      Thank you, <strong>{form.name}</strong>! Our team will reach out to <strong>{form.email}</strong> within 24 hours.
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Demo Request Received!</h3>
+                    <p className="text-slate-600 dark:text-slate-300 text-sm max-w-sm leading-relaxed">
+                      Thank you, <strong>{form.name}</strong>! A confirmation email has been sent to <strong className="text-primary-600 dark:text-primary-400">{form.email}</strong>.
                     </p>
+                    <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl p-3.5 text-xs text-amber-900 dark:text-amber-200 max-w-sm text-left">
+                      <p className="font-bold text-[#9a3412] dark:text-[#ea580c] mb-1">Please wait, our team will contact you soon!</p>
+                      <p className="text-amber-700 dark:text-amber-300 leading-relaxed">
+                        Our education specialist will contact you at <strong>{form.phone}</strong> to schedule your personalized live demo.
+                      </p>
+                    </div>
                     <button
                       onClick={reset}
                       className="mt-2 bg-primary-600 hover:bg-primary-700 text-white font-bold px-8 py-3 rounded-xl transition-colors"

@@ -14,6 +14,7 @@ export function ContactUs() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submittedData, setSubmittedData] = useState<{ name: string; email: string; phone?: string; schoolName?: string } | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,6 +50,12 @@ export function ContactUs() {
       });
 
       if (result.success) {
+        setSubmittedData({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          schoolName: formData.schoolName.trim(),
+        });
         setSubmitSuccess(true);
         setFormData({ name: '', email: '', phone: '', schoolName: '', details: '', message: '' });
       } else {
@@ -121,12 +128,20 @@ export function ContactUs() {
             className="bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200 dark:border-slate-800 shadow-xl"
           >
             {submitSuccess && (
-              <div className="mb-6 p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-start gap-3">
-                <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-bold text-emerald-900 dark:text-emerald-200 text-sm">Message Sent Successfully!</h4>
-                  <p className="text-emerald-700 dark:text-emerald-300 text-xs mt-1 leading-relaxed">
-                    Thank you for your interest in eSMARTs. Your inquiry has been sent directly to <strong>info@efficacious.co.in</strong>. Our team will contact you shortly.
+              <div className="mb-6 p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-bold text-emerald-900 dark:text-emerald-200 text-sm">Message Sent Successfully!</h4>
+                    <p className="text-emerald-700 dark:text-emerald-300 text-xs mt-1 leading-relaxed">
+                      Thank you, <strong>{submittedData?.name}</strong>. A confirmation email has been sent to <strong>{submittedData?.email}</strong>.
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4 p-3.5 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-xl text-xs text-amber-900 dark:text-amber-200">
+                  <p className="font-bold text-[#9a3412] dark:text-[#ea580c] mb-1">Please wait, our team will contact you soon!</p>
+                  <p className="text-amber-700 dark:text-amber-300 leading-relaxed">
+                    A dedicated education solutions specialist will call you at <strong>{submittedData?.phone}</strong> to discuss customized features for <strong>{submittedData?.schoolName || 'your school'}</strong>.
                   </p>
                 </div>
               </div>

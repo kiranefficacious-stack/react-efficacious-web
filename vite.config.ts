@@ -290,22 +290,68 @@ export default defineConfig(({ mode }) => {
                       // Also dispatch confirmation copy to user's email if valid
                       if (email && email.includes('@') && email.toLowerCase() !== creds.user.toLowerCase() && activeTransporter) {
                         try {
-                          const userSubject = isProduct
-                            ? `We've Received Your Demo Request for ${prodName} - Efficacious India`
-                            : `Thank you for contacting Efficacious India`;
+                          let userSubject = '';
+                          let userHeading = '';
+                          let userGreetingText = '';
+                          let userWaitMessage = '';
+                          let userSummaryHtml = '';
+                          let userPlainText = '';
+
+                          if (isCareer) {
+                            userSubject = `Application Received: ${position || 'Career Opportunity'} - Efficacious India`;
+                            userHeading = 'Job Application Received';
+                            userGreetingText = `Thank you for applying for the position of <strong>${position || 'Open Role'}</strong> at Efficacious India Limited. We have successfully received your application${resumeName ? ` and resume (<strong>${resumeName}</strong>)` : ''}.`;
+                            userWaitMessage = `Our talent acquisition team is reviewing your profile and qualifications. If your background matches our current requirements, our HR team will contact you at <strong>${contactPhone || 'your contact number'}</strong> to schedule an interview.`;
+                            userSummaryHtml = `
+                              <tr><td style="padding: 6px 0; color: #64748b; width: 140px; font-weight: 600;">Position Applied:</td><td style="padding: 6px 0; color: #E48100; font-weight: bold;">${position || 'Open Role'}</td></tr>
+                              <tr><td style="padding: 6px 0; color: #64748b; font-weight: 600;">Candidate:</td><td style="padding: 6px 0; color: #0f172a;">${fullName}</td></tr>
+                              <tr><td style="padding: 6px 0; color: #64748b; font-weight: 600;">Email:</td><td style="padding: 6px 0; color: #0f172a;">${email}</td></tr>
+                              ${contactPhone ? `<tr><td style="padding: 6px 0; color: #64748b; font-weight: 600;">Mobile:</td><td style="padding: 6px 0; color: #0f172a;">${contactPhone}</td></tr>` : ''}
+                              ${resumeName ? `<tr><td style="padding: 6px 0; color: #64748b; font-weight: 600;">Resume Attached:</td><td style="padding: 6px 0; color: #0f172a;">${resumeName}</td></tr>` : ''}
+                            `;
+                            userPlainText = `Dear ${fullName},\n\nThank you for applying for ${position || 'the open position'} at Efficacious India Limited. Our HR team is reviewing your profile and will contact you soon at ${contactPhone || email}.\n\nWarm regards,\nEfficacious India Limited`;
+                          } else if (isProduct) {
+                            userSubject = `We've Received Your Demo Request for ${prodName} - Efficacious India`;
+                            userHeading = 'Demo Request Received';
+                            userGreetingText = `Thank you for your interest in <strong>${prodName}</strong>. We have received your request${orgName ? ` for <strong>${orgName}</strong>` : ''}.`;
+                            userWaitMessage = `Our product specialist will reach out to you at <strong>${contactPhone || 'your contact number'}</strong>${time ? ` during your preferred time (${time})` : ' within 2 business hours'} to schedule your personalized live walkthrough.`;
+                            userSummaryHtml = `
+                              <tr><td style="padding: 6px 0; color: #64748b; width: 140px; font-weight: 600;">Product:</td><td style="padding: 6px 0; color: #E48100; font-weight: bold;">${prodName}</td></tr>
+                              <tr><td style="padding: 6px 0; color: #64748b; font-weight: 600;">Contact:</td><td style="padding: 6px 0; color: #0f172a;">${fullName}</td></tr>
+                              ${orgName ? `<tr><td style="padding: 6px 0; color: #64748b; font-weight: 600;">Organization:</td><td style="padding: 6px 0; color: #0f172a;">${orgName}</td></tr>` : ''}
+                              ${contactPhone ? `<tr><td style="padding: 6px 0; color: #64748b; font-weight: 600;">Phone:</td><td style="padding: 6px 0; color: #0f172a;">${contactPhone}</td></tr>` : ''}
+                              ${time ? `<tr><td style="padding: 6px 0; color: #64748b; font-weight: 600;">Preferred Time:</td><td style="padding: 6px 0; color: #0f172a;">${time}</td></tr>` : ''}
+                            `;
+                            userPlainText = `Dear ${fullName},\n\nThank you for requesting a demo of ${prodName}. Our team will contact you soon at ${contactPhone || email} to schedule your demo.\n\nWarm regards,\nEfficacious India Limited`;
+                          } else {
+                            userSubject = `We've Received Your Inquiry - Efficacious India Limited`;
+                            userHeading = 'Inquiry Received';
+                            userGreetingText = `Thank you for contacting Efficacious India Limited. We have received your message${subject ? ` regarding <strong>${subject}</strong>` : ''}.`;
+                            userWaitMessage = `Our team has received your message and a dedicated representative will review your inquiry and get in touch with you at <strong>${contactPhone || email}</strong> shortly.`;
+                            userSummaryHtml = `
+                              <tr><td style="padding: 6px 0; color: #64748b; width: 140px; font-weight: 600;">Name:</td><td style="padding: 6px 0; color: #0f172a; font-weight: bold;">${fullName}</td></tr>
+                              <tr><td style="padding: 6px 0; color: #64748b; font-weight: 600;">Email:</td><td style="padding: 6px 0; color: #0f172a;">${email}</td></tr>
+                              ${contactPhone ? `<tr><td style="padding: 6px 0; color: #64748b; font-weight: 600;">Phone:</td><td style="padding: 6px 0; color: #0f172a;">${contactPhone}</td></tr>` : ''}
+                              ${subject ? `<tr><td style="padding: 6px 0; color: #64748b; font-weight: 600;">Subject:</td><td style="padding: 6px 0; color: #0f172a;">${subject}</td></tr>` : ''}
+                            `;
+                            userPlainText = `Dear ${fullName},\n\nThank you for reaching out to Efficacious India Limited. We have received your inquiry and our team will contact you soon at ${contactPhone || email}.\n\nWarm regards,\nEfficacious India Limited`;
+                          }
 
                           const userHtml = `<div style="font-family: Arial, sans-serif; max-width: 600px; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;">
   <div style="border-bottom: 2px solid #E48100; padding-bottom: 12px; margin-bottom: 16px;">
-    <h2 style="color: #0f172a; margin: 0; font-size: 20px;">Demo Request Received</h2>
+    <h2 style="color: #0f172a; margin: 0; font-size: 20px;">${userHeading}</h2>
     <p style="color: #64748b; font-size: 13px; margin: 4px 0 0 0;">Efficacious India Limited</p>
   </div>
   <p style="font-size: 14px; color: #334155; line-height: 1.6;">Dear <strong>${fullName}</strong>,</p>
-  <p style="font-size: 14px; color: #334155; line-height: 1.6;">Thank you for your interest in <strong>${prodName}</strong>. We have received your demo request${orgName ? ` for <strong>${orgName}</strong>` : ''}.</p>
+  <p style="font-size: 14px; color: #334155; line-height: 1.6;">${userGreetingText}</p>
   <div style="background: #fff7ed; border-left: 4px solid #E48100; padding: 14px; margin: 16px 0; border-radius: 4px;">
     <p style="margin: 0; font-size: 13px; color: #9a3412; font-weight: bold;">Please wait, our team will contact you soon!</p>
-    <p style="margin: 4px 0 0 0; font-size: 13px; color: #7c2d12;">Our specialist will reach out to you at <strong>${contactPhone || 'your contact number'}</strong>${time ? ` during your preferred time (${time})` : ' within 2 business hours'} to schedule your personalized live walkthrough.</p>
+    <p style="margin: 4px 0 0 0; font-size: 13px; color: #7c2d12;">${userWaitMessage}</p>
   </div>
-  <p style="font-size: 13px; color: #64748b; line-height: 1.6;">If you have any questions or need immediate assistance, feel free to reply directly to this email or call our team at <strong>+91 84549 43806</strong>.</p>
+  <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+    ${userSummaryHtml}
+  </table>
+  <p style="font-size: 13px; color: #64748b; line-height: 1.6; margin-top: 16px;">If you have any questions or need immediate assistance, feel free to reply directly to this email or call our team at <strong>+91 84549 43806</strong>.</p>
   <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8;">
     Warm regards,<br/>
     <strong>Efficacious India Limited Team</strong><br/>
@@ -318,7 +364,7 @@ export default defineConfig(({ mode }) => {
                             to: email,
                             replyTo: creds.user,
                             subject: userSubject,
-                            text: `Dear ${fullName},\n\nThank you for requesting a demo of ${prodName}. Our team will contact you soon at ${contactPhone} to schedule your demo.\n\nWarm regards,\nEfficacious India Limited`,
+                            text: userPlainText,
                             html: userHtml
                           });
                           console.log(`Confirmation email dispatched successfully to client: ${email}`);

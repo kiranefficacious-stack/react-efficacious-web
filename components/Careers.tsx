@@ -41,6 +41,7 @@ const Careers: React.FC = () => {
   const [dragActive, setDragActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submittedCandidate, setSubmittedCandidate] = useState<{ name: string; email: string; mobile?: string; position?: string } | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -285,6 +286,12 @@ To / Recipient:   ${recipientEmail}
     }
 
     if (emailDelivered) {
+      setSubmittedCandidate({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        mobile: formData.mobile.trim(),
+        position: formData.position,
+      });
       setSubmitStatus('success');
       setStatusMessage('Thank you! Your application has been submitted successfully.');
       setFormData({ name: '', email: '', mobile: '', address: '', position: '', message: '' });
@@ -792,19 +799,25 @@ To / Recipient:   ${recipientEmail}
                                       <motion.div 
                                           initial={{ opacity: 0, scale: 0.95 }}
                                           animate={{ opacity: 1, scale: 1 }}
-                                          className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white dark:bg-slate-800 rounded-2xl border border-emerald-500 text-center p-6 shadow-2xl"
+                                          className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white dark:bg-slate-800 rounded-2xl border border-emerald-500 text-center p-6 sm:p-8 shadow-2xl overflow-y-auto"
                                       >
                                           <div className="w-14 h-14 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-3">
                                               <CheckCircle2 size={32} />
                                           </div>
-                                          <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Application Sent Successfully!</h4>
-                                          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mb-4">
-                                              Thank you for applying. Your application has been recorded and our HR team will review your profile shortly.
+                                          <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Application Sent Successfully!</h4>
+                                          <p className="text-sm text-slate-600 dark:text-slate-300 max-w-sm mb-4 leading-relaxed">
+                                              Thank you, <strong>{submittedCandidate?.name}</strong>. A confirmation email has been sent to <strong className="text-brand-500">{submittedCandidate?.email}</strong>.
                                           </p>
+                                          <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl p-3.5 text-xs text-amber-900 dark:text-amber-200 max-w-sm mb-5 text-left">
+                                              <p className="font-bold mb-1 text-sm text-[#9a3412] dark:text-[#ea580c]">Please wait, our team will contact you soon!</p>
+                                              <p className="text-amber-700 dark:text-amber-300 leading-relaxed">
+                                                  Our HR team is reviewing your application for <strong>{submittedCandidate?.position}</strong>. We will reach out to you at <strong>{submittedCandidate?.mobile || submittedCandidate?.email}</strong> to schedule an interview.
+                                              </p>
+                                          </div>
                                           <button 
                                             type="button"
                                             onClick={() => setSubmitStatus('idle')}
-                                            className="px-4 py-2 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-xs font-bold rounded-lg uppercase tracking-wider hover:bg-brand-100 transition-colors"
+                                            className="px-5 py-2.5 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-xs font-bold rounded-xl uppercase tracking-wider hover:bg-brand-100 transition-colors cursor-pointer"
                                           >
                                             Submit Another Application
                                           </button>

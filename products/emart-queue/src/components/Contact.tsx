@@ -12,7 +12,7 @@ export function Contact() {
     message: ''
   });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-
+  const [submittedData, setSubmittedData] = useState<{ name: string; email: string; company?: string } | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -40,6 +40,11 @@ export function Contact() {
       });
 
       if (result.success) {
+        setSubmittedData({
+          name: fullName,
+          email: formData.email.trim(),
+          company: formData.company.trim(),
+        });
         setStatus('success');
         setFormData({ firstName: '', lastName: '', email: '', company: '', message: '' });
       } else {
@@ -130,12 +135,20 @@ export function Contact() {
             <h3 className="text-2xl font-bold mb-6">Partner with Us</h3>
             
             {status === 'success' ? (
-              <div className="bg-emerald-50 text-emerald-800 p-6 rounded-xl border border-emerald-200">
-                <h4 className="font-bold text-lg mb-2">Request Sent Successfully!</h4>
-                <p>Thank you for reaching out. Our team will contact you shortly.</p>
+              <div className="bg-emerald-50 text-emerald-800 p-6 sm:p-8 rounded-2xl border border-emerald-200">
+                <h4 className="font-bold text-xl mb-2 text-emerald-950">Request Sent Successfully!</h4>
+                <p className="text-sm text-emerald-800 mb-4 leading-relaxed">
+                  Thank you, <strong>{submittedData?.name}</strong>. A confirmation email has been sent to <strong>{submittedData?.email}</strong>.
+                </p>
+                <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-xs text-amber-900 mb-5 text-left">
+                  <p className="font-bold text-[#9a3412] mb-1">Please wait, our team will contact you soon!</p>
+                  <p className="text-amber-700 leading-relaxed">
+                    A queue management specialist will reach out to you at <strong>{submittedData?.email}</strong> shortly to discuss your workflow.
+                  </p>
+                </div>
                 <button 
                   onClick={() => setStatus('idle')}
-                  className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
+                  className="px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-colors cursor-pointer"
                 >
                   Send another request
                 </button>

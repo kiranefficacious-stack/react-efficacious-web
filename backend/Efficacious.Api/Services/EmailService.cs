@@ -253,7 +253,7 @@ public class EmailService
             await client.AuthenticateAsync(smtpUser, smtpPass);
             await client.SendAsync(message);
 
-            await TrySendUserConfirmationAsync(client, smtpUser, recipient, fullName, email, contactPhone, orgName, request.Time ?? string.Empty, request.Product ?? "e-Smart Restaurant");
+            await TrySendUserConfirmationAsync(client, smtpUser, recipient, fullName, email, contactPhone, request);
 
             await client.DisconnectAsync(true);
 
@@ -274,7 +274,7 @@ public class EmailService
                 await client.AuthenticateAsync(smtpUser, smtpPass);
                 await client.SendAsync(message);
 
-                await TrySendUserConfirmationAsync(client, smtpUser, recipient, fullName, email, contactPhone, orgName, request.Time ?? string.Empty, request.Product ?? "e-Smart Restaurant");
+                await TrySendUserConfirmationAsync(client, smtpUser, recipient, fullName, email, contactPhone, request);
 
                 await client.DisconnectAsync(true);
 
@@ -296,31 +296,87 @@ public class EmailService
         }
     }
 
-    private async Task TrySendUserConfirmationAsync(SmtpClient client, string smtpUser, string recipient, string fullName, string email, string contactPhone, string orgName, string time, string prodName)
+    private async Task TrySendUserConfirmationAsync(SmtpClient client, string smtpUser, string recipient, string fullName, string email, string contactPhone, EmailRequest request)
     {
         if (string.IsNullOrWhiteSpace(email) || !email.Contains('@') || email.Equals(recipient, StringComparison.OrdinalIgnoreCase))
             return;
 
         try
         {
+            bool isCareer = (request.Type?.Equals("career", StringComparison.OrdinalIgnoreCase) ?? false) || !string.IsNullOrWhiteSpace(request.Position);
+            bool isProduct = !string.IsNullOrWhiteSpace(request.Product) || (request.Type?.Equals("product_contact", StringComparison.OrdinalIgnoreCase) ?? false);
+            string prodName = request.Product ?? (request.Type?.Equals("product_contact", StringComparison.OrdinalIgnoreCase) ?? false ? "Smart ERP Solution" : "");
+            string orgName = request.SchoolName ?? request.Restaurant ?? request.Company ?? string.Empty;
+
+            string userSubject;
+            string userHeading;
+            string userGreetingText;
+            string userWaitMessage;
+            string userSummaryHtml;
+            string userPlainText;
+
+            if (isCareer)
+            {
+                userSubject = $"Application Received: {(string.IsNullOrWhiteSpace(request.Position) ? "Career Opportunity" : request.Position)} - Efficacious India";
+                userHeading = "Job Application Received";
+                userGreetingText = $"Thank you for applying for the position of <strong>{(string.IsNullOrWhiteSpace(request.Position) ? "Open Role" : request.Position)}</strong> at Efficacious India Limited. We have received your application{(string.IsNullOrWhiteSpace(request.ResumeName) ? "" : $" and resume (<strong>{request.ResumeName}</strong>)")}.";
+                userWaitMessage = $"Our talent acquisition team is reviewing your profile and credentials. If your qualifications match our current openings, our HR team will contact you at <strong>{(string.IsNullOrWhiteSpace(contactPhone) ? "your contact number" : contactPhone)}</strong> to schedule an interview.";
+                userSummaryHtml = $@"
+                  <tr><td style=""padding: 6px 0; color: #64748b; width: 140px; font-weight: 600;"">Position Applied:</td><td style=""padding: 6px 0; color: #E48100; font-weight: bold;"">{(string.IsNullOrWhiteSpace(request.Position) ? "Open Role" : request.Position)}</td></tr>
+                  <tr><td style=""padding: 6px 0; color: #64748b; font-weight: 600;"">Candidate:</td><td style=""padding: 6px 0; color: #0f172a;"">{fullName}</td></tr>
+                  <tr><td style=""padding: 6px 0; color: #64748b; font-weight: 600;"">Email:</td><td style=""padding: 6px 0; color: #0f172a;"">{email}</td></tr>
+                  {(string.IsNullOrWhiteSpace(contactPhone) ? "" : $@"<tr><td style=""padding: 6px 0; color: #64748b; font-weight: 600;"">Mobile:</td><td style=""padding: 6px 0; color: #0f172a;"">{contactPhone}</td></tr>")}
+                  {(string.IsNullOrWhiteSpace(request.ResumeName) ? "" : $@"<tr><td style=""padding: 6px 0; color: #64748b; font-weight: 600;"">Resume:</td><td style=""padding: 6px 0; color: #0f172a;"">{request.ResumeName}</td></tr>")}";
+                userPlainText = $"Dear {fullName},\n\nThank you for applying for {(string.IsNullOrWhiteSpace(request.Position) ? "the open position" : request.Position)} at Efficacious India Limited. Our HR team is reviewing your profile and will contact you soon at {(string.IsNullOrWhiteSpace(contactPhone) ? email : contactPhone)}.\n\nWarm regards,\nEfficacious India Limited";
+            }
+            else if (isProduct)
+            {
+                userSubject = $"We've Received Your Demo Request for {prodName} - Efficacious India";
+                userHeading = "Demo Request Received";
+                userGreetingText = $"Thank you for your interest in <strong>{prodName}</strong>. We have received your request{(string.IsNullOrWhiteSpace(orgName) ? "" : $" for <strong>{orgName}</strong>")}.";
+                userWaitMessage = $"Our product specialist will reach out to you at <strong>{(string.IsNullOrWhiteSpace(contactPhone) ? "your contact number" : contactPhone)}</strong>{(string.IsNullOrWhiteSpace(request.Time) ? " within 2 business hours" : $" during your preferred time ({request.Time})")} to schedule your personalized live walkthrough.";
+                userSummaryHtml = $@"
+                  <tr><td style=""padding: 6px 0; color: #64748b; width: 140px; font-weight: 600;"">Product:</td><td style=""padding: 6px 0; color: #E48100; font-weight: bold;"">{prodName}</td></tr>
+                  <tr><td style=""padding: 6px 0; color: #64748b; font-weight: 600;"">Contact:</td><td style=""padding: 6px 0; color: #0f172a;"">{fullName}</td></tr>
+                  {(string.IsNullOrWhiteSpace(orgName) ? "" : $@"<tr><td style=""padding: 6px 0; color: #64748b; font-weight: 600;"">Organization:</td><td style=""padding: 6px 0; color: #0f172a;"">{orgName}</td></tr>")}
+                  {(string.IsNullOrWhiteSpace(contactPhone) ? "" : $@"<tr><td style=""padding: 6px 0; color: #64748b; font-weight: 600;"">Phone:</td><td style=""padding: 6px 0; color: #0f172a;"">{contactPhone}</td></tr>")}";
+                userPlainText = $"Dear {fullName},\n\nThank you for requesting a demo of {prodName}. Our team will contact you soon at {(string.IsNullOrWhiteSpace(contactPhone) ? email : contactPhone)} to schedule your demo.\n\nWarm regards,\nEfficacious India Limited";
+            }
+            else
+            {
+                userSubject = $"We've Received Your Inquiry - Efficacious India Limited";
+                userHeading = "Inquiry Received";
+                userGreetingText = $"Thank you for contacting Efficacious India Limited. We have received your message{(string.IsNullOrWhiteSpace(request.Subject) ? "" : $" regarding <strong>{request.Subject}</strong>")}.";
+                userWaitMessage = $"Our support and solutions team has received your inquiry. A representative will review your message and contact you at <strong>{(string.IsNullOrWhiteSpace(contactPhone) ? email : contactPhone)}</strong> shortly.";
+                userSummaryHtml = $@"
+                  <tr><td style=""padding: 6px 0; color: #64748b; width: 140px; font-weight: 600;"">Name:</td><td style=""padding: 6px 0; color: #0f172a; font-weight: bold;"">{fullName}</td></tr>
+                  <tr><td style=""padding: 6px 0; color: #64748b; font-weight: 600;"">Email:</td><td style=""padding: 6px 0; color: #0f172a;"">{email}</td></tr>
+                  {(string.IsNullOrWhiteSpace(contactPhone) ? "" : $@"<tr><td style=""padding: 6px 0; color: #64748b; font-weight: 600;"">Phone:</td><td style=""padding: 6px 0; color: #0f172a;"">{contactPhone}</td></tr>")}
+                  {(string.IsNullOrWhiteSpace(request.Subject) ? "" : $@"<tr><td style=""padding: 6px 0; color: #64748b; font-weight: 600;"">Subject:</td><td style=""padding: 6px 0; color: #0f172a;"">{request.Subject}</td></tr>")}";
+                userPlainText = $"Dear {fullName},\n\nThank you for reaching out to Efficacious India Limited. We have received your inquiry and our team will contact you soon at {(string.IsNullOrWhiteSpace(contactPhone) ? email : contactPhone)}.\n\nWarm regards,\nEfficacious India Limited";
+            }
+
             var userMsg = new MimeMessage();
             userMsg.From.Add(new MailboxAddress("Efficacious Team", smtpUser));
             userMsg.To.Add(new MailboxAddress(fullName, email));
             userMsg.ReplyTo.Add(new MailboxAddress("Efficacious Support", recipient));
-            userMsg.Subject = $"We've Received Your Demo Request for {prodName} - Efficacious India";
+            userMsg.Subject = userSubject;
 
             var userHtml = $@"<div style=""font-family: Arial, sans-serif; max-width: 600px; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;"">
   <div style=""border-bottom: 2px solid #E48100; padding-bottom: 12px; margin-bottom: 16px;"">
-    <h2 style=""color: #0f172a; margin: 0; font-size: 20px;"">Demo Request Received</h2>
+    <h2 style=""color: #0f172a; margin: 0; font-size: 20px;"">{userHeading}</h2>
     <p style=""color: #64748b; font-size: 13px; margin: 4px 0 0 0;"">Efficacious India Limited</p>
   </div>
   <p style=""font-size: 14px; color: #334155; line-height: 1.6;"">Dear <strong>{fullName}</strong>,</p>
-  <p style=""font-size: 14px; color: #334155; line-height: 1.6;"">Thank you for your interest in <strong>{prodName}</strong>. We have received your demo request{(string.IsNullOrWhiteSpace(orgName) ? "" : $" for <strong>{orgName}</strong>")}.</p>
+  <p style=""font-size: 14px; color: #334155; line-height: 1.6;"">{userGreetingText}</p>
   <div style=""background: #fff7ed; border-left: 4px solid #E48100; padding: 14px; margin: 16px 0; border-radius: 4px;"">
     <p style=""margin: 0; font-size: 13px; color: #9a3412; font-weight: bold;"">Please wait, our team will contact you soon!</p>
-    <p style=""margin: 4px 0 0 0; font-size: 13px; color: #7c2d12;"">Our product specialist will reach out to you at <strong>{(string.IsNullOrWhiteSpace(contactPhone) ? "your phone number" : contactPhone)}</strong> within business hours to schedule your personalized live walkthrough.</p>
+    <p style=""margin: 4px 0 0 0; font-size: 13px; color: #7c2d12;"">{userWaitMessage}</p>
   </div>
-  <p style=""font-size: 13px; color: #64748b; line-height: 1.6;"">If you have any urgent questions, feel free to reply directly to this email or call us at <strong>+91 84549 43806</strong>.</p>
+  <table style=""width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;"">
+    {userSummaryHtml}
+  </table>
+  <p style=""font-size: 13px; color: #64748b; line-height: 1.6; margin-top: 16px;"">If you have any questions or need immediate assistance, feel free to reply directly to this email or call our team at <strong>+91 84549 43806</strong>.</p>
   <div style=""margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8;"">
     Warm regards,<br/>
     <strong>Efficacious India Limited Team</strong><br/>
@@ -330,7 +386,7 @@ public class EmailService
 
             userMsg.Body = new BodyBuilder
             {
-                TextBody = $"Dear {fullName},\n\nThank you for requesting a demo of {prodName}. Our team will contact you soon at {contactPhone} to schedule your demo.\n\nWarm regards,\nEfficacious India Limited",
+                TextBody = userPlainText,
                 HtmlBody = userHtml
             }.ToMessageBody();
 

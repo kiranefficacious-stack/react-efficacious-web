@@ -24,6 +24,7 @@ const Contact: React.FC = () => {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submittedData, setSubmittedData] = useState<{ name: string; email: string; mobile?: string } | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
   const validate = (values = formData): Record<string, string> => {
@@ -178,6 +179,11 @@ To / Recipient:   ${recipientEmail}
     }
 
     if (emailDelivered) {
+      setSubmittedData({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        mobile: formData.mobile.trim(),
+      });
       setSubmitSuccess(true);
       setFormData({
         name: '',
@@ -298,14 +304,21 @@ To / Recipient:   ${recipientEmail}
                   <CheckCircle2 size={36} />
                 </div>
                 <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Message Sent Successfully!</h4>
-                <p className="text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto mb-6">
-                  Thank you for reaching out. We have received your inquiry and our team will get in touch with you shortly.
+                <p className="text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto mb-4 leading-relaxed">
+                  Thank you, <strong>{submittedData?.name}</strong>. A confirmation email has been sent to <strong className="text-[#E48100]">{submittedData?.email}</strong>.
                 </p>
+
+                <div className="bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-xl p-4 text-xs text-amber-900 dark:text-amber-200 max-w-md mx-auto mb-6 text-left">
+                  <p className="font-bold mb-1 text-sm text-[#9a3412] dark:text-[#ea580c]">Please wait, our team will contact you soon!</p>
+                  <p className="text-amber-700 dark:text-amber-300 leading-relaxed">
+                    Our team has received your inquiry. A representative will review your message and reach out to you at <strong>{submittedData?.mobile || submittedData?.email}</strong> within business hours.
+                  </p>
+                </div>
 
                 <button
                   type="button"
                   onClick={() => setSubmitSuccess(false)}
-                  className="bg-gradient-to-r from-[#E48100] to-[#EF4444] text-white font-semibold px-6 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm"
+                  className="bg-gradient-to-r from-[#E48100] to-[#EF4444] text-white font-semibold px-6 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm cursor-pointer"
                 >
                   Send Another Message
                 </button>
