@@ -42,7 +42,7 @@ const TechExcellence: React.FC = () => {
                     We build tailored enterprise-grade software that streamlines your operations and solves complex business challenges. From CRM to ERP, we architect solutions that fit your unique needs perfectly.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                    {['React', 'Node.js', '.NET', 'Python'].map(tag => (
+                    {['React', 'Angular', 'Flutter', 'Dart', 'Node.js', '.NET', 'Python'].map(tag => (
                         <span key={tag} className="px-3 py-1 bg-slate-100 dark:bg-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300">
                             {tag}
                         </span>
