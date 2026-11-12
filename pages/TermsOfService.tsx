@@ -443,26 +443,44 @@ const TermsOfService: React.FC = () => {
     setActiveSection(id);
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const headerOffset = 110;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
     }
   };
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 200;
-      for (const section of sections) {
-        const el = document.getElementById(section.id);
+      // Offset from top of viewport for active section threshold
+      const headerOffset = 180;
+      let currentSection = sections[0].id;
+
+      for (const sec of sections) {
+        const el = document.getElementById(sec.id);
         if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            setActiveSection(section.id);
-            break;
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= headerOffset) {
+            currentSection = sec.id;
           }
         }
       }
+
+      // If user has scrolled near bottom of the page, activate the last section
+      const isAtBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 60;
+      if (isAtBottom && sections.length > 0) {
+        currentSection = sections[sections.length - 1].id;
+      }
+
+      setActiveSection(currentSection);
     };
 
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);

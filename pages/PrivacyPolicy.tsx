@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion as m } from 'framer-motion';
 import { 
   Shield, 
@@ -174,8 +174,50 @@ const PrivacyPolicy: React.FC = () => {
 
   const handleSectionScroll = (id: string) => {
     setActiveSection(id);
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const element = document.getElementById(id);
+    if (element) {
+      const headerOffset = 110;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
+    }
   };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Offset from top of viewport for active section threshold (navbar clearance)
+      const headerOffset = 180;
+      let currentSection = sections[0].id;
+
+      for (const sec of sections) {
+        const el = document.getElementById(sec.id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          // If the section top has scrolled past or reached the header line
+          if (rect.top <= headerOffset) {
+            currentSection = sec.id;
+          }
+        }
+      }
+
+      // If scrolled to the bottom of the page, activate the last section
+      const isAtBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 60;
+      if (isAtBottom && sections.length > 0) {
+        currentSection = sections[sections.length - 1].id;
+      }
+
+      setActiveSection(currentSection);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
@@ -214,6 +256,24 @@ const PrivacyPolicy: React.FC = () => {
 
       {/* Main Content Layout */}
       <section className="py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-grow">
+        {/* Mobile Quick Navigation Bar */}
+        <div className="lg:hidden sticky top-20 z-30 mb-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-md">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-500 shrink-0">Jump to:</span>
+            <select
+              value={activeSection}
+              onChange={(e) => handleSectionScroll(e.target.value)}
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#E99400]"
+            >
+              {sections.map((sec) => (
+                <option key={sec.id} value={sec.id}>
+                  {sec.title}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 md:gap-12 items-start">
           {/* Navigation Sidebar (Sticky on Desktop) */}
           <div className="hidden lg:block lg:col-span-1 sticky top-24">
@@ -259,7 +319,7 @@ const PrivacyPolicy: React.FC = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-100px' }}
                   transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 p-8 md:p-10 shadow-sm relative overflow-hidden group hover:border-[#E99400]/30 dark:hover:border-[#E99400]/30 transition-colors duration-300"
+                  className="scroll-mt-28 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 p-8 md:p-10 shadow-sm relative overflow-hidden group hover:border-[#E99400]/30 dark:hover:border-[#E99400]/30 transition-colors duration-300"
                 >
                   {/* Subtle hover background highlight */}
                   <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#E99400]/5 to-transparent rounded-bl-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
