@@ -39,6 +39,7 @@ import {
   CheckCircle2,
   DollarSign,
   QrCode,
+  Plus,
 } from "lucide-react";
 
 const motion = m as any;
@@ -81,6 +82,64 @@ const PhoneMockup: React.FC<PhoneMockupProps> = ({ activeSlide }) => {
       </div>
     </div>
   );
+
+  // Smart Dining Menu Items
+  const diningMenuItems = [
+    {
+      id: 1,
+      name: "Truffle Burger",
+      category: "Gourmet Angus",
+      price: "$12.99",
+      rating: "4.9",
+      badge: "Bestseller",
+      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80",
+    },
+    {
+      id: 2,
+      name: "Wood-Fired Pizza",
+      category: "Italian Artisan",
+      price: "$14.49",
+      rating: "4.8",
+      badge: "Popular",
+      image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=400&q=80",
+    },
+    {
+      id: 3,
+      name: "Truffle Alfredo",
+      category: "Artisan Pasta",
+      price: "$13.99",
+      rating: "4.9",
+      badge: "Chef Pick",
+      image: "https://images.unsplash.com/photo-1621996346565-e3d5d628120b?auto=format&fit=crop&w=400&q=80",
+    },
+    {
+      id: 4,
+      name: "Avocado Greens Bowl",
+      category: "Fresh & Healthy",
+      price: "$11.99",
+      rating: "4.7",
+      badge: "Organic",
+      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80",
+    },
+    {
+      id: 5,
+      name: "Crispy Street Tacos",
+      category: "Smoked Seasoned",
+      price: "$10.49",
+      rating: "4.8",
+      badge: "Crispy",
+      image: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=400&q=80",
+    },
+    {
+      id: 6,
+      name: "Berry Belgian Waffle",
+      category: "Dessert Special",
+      price: "$9.49",
+      rating: "4.9",
+      badge: "Sweet",
+      image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=400&q=80",
+    },
+  ];
 
   const screens: Record<number, React.ReactNode> = {
     // Screen 0: School App (Generic)
@@ -341,53 +400,156 @@ const PhoneMockup: React.FC<PhoneMockupProps> = ({ activeSlide }) => {
       </div>
     ),
 
-    // Screen 2: Restaurant
+    // Screen 2: Restaurant (Smart Dining)
     2: (
       <div
         key="restaurant"
-        className="h-full flex flex-col bg-white dark:bg-black text-slate-800 dark:text-white relative"
+        className="h-full flex flex-col bg-slate-50/50 dark:bg-black text-slate-800 dark:text-white relative font-sans select-none"
       >
-        {/* Simplified for brevity - reuse structure from previous */}
-        <div className="p-4 pt-10 flex items-center justify-between bg-white dark:bg-black sticky top-0 z-10">
+        {/* Sticky Header */}
+        <div className="p-4 pt-10 flex items-center justify-between bg-white/95 dark:bg-black/95 backdrop-blur-md sticky top-0 z-20 border-b border-slate-100 dark:border-slate-850">
           <div>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium tracking-wide uppercase">
               Delivering to
             </p>
-            <h3 className="font-bold text-sm text-rose-500 flex items-center gap-1 cursor-pointer hover:underline">
-              Home, Sector 7 <ChevronRight size={14} />
+            <h3 className="font-bold text-xs text-rose-500 flex items-center gap-1 cursor-pointer hover:underline">
+              Home, Sector 7 <ChevronRight size={13} />
             </h3>
           </div>
-        </div>
-        <div className="px-4 mb-4">
-          <div className="w-full h-28 bg-gradient-to-br from-rose-500 to-orange-600 rounded-2xl p-4 text-white relative overflow-hidden shadow-lg shadow-rose-500/20">
-            <div className="relative z-10 flex flex-col justify-center h-full">
-              <h3 className="font-extrabold text-2xl leading-none w-2/3 mb-2">
-                50% OFF
-              </h3>
-              <p className="text-xs opacity-90">On your first pizza order</p>
+          <div className="flex items-center gap-1.5">
+            <div className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-850 flex items-center justify-center text-slate-600 dark:text-slate-300">
+              <Search size={13} />
+            </div>
+            <div className="relative">
+              <div className="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-500 flex items-center justify-center">
+                <Utensils size={13} />
+              </div>
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-rose-500 text-white text-[8px] font-bold flex items-center justify-center shadow-sm">
+                2
+              </span>
             </div>
           </div>
         </div>
-        <div className="flex-1 px-4 overflow-y-auto grid grid-cols-2 gap-3 pb-24 content-start">
-          {[1, 2, 3, 4].map((i) => (
-            <div
-              key={i}
-              className="bg-white dark:bg-slate-900 rounded-2xl p-2.5 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col group hover:shadow-md transition-shadow"
-            >
-              <div className="w-full aspect-square bg-slate-100 dark:bg-slate-800 rounded-xl mb-2.5 relative overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center text-slate-300 dark:text-slate-600">
-                  <Utensils size={24} />
+
+        {/* Scrollable Food Menu */}
+        <div className="flex-1 overflow-y-auto pb-24 no-scrollbar">
+          {/* Promo Pizza Banner */}
+          <div className="px-3.5 pt-3 mb-3">
+            <div className="w-full h-28 bg-gradient-to-br from-rose-500 via-rose-600 to-orange-500 rounded-2xl p-3.5 text-white relative overflow-hidden shadow-lg shadow-rose-500/25 flex items-center">
+              {/* Pizza Image in banner */}
+              <div className="absolute -right-4 -bottom-4 w-28 h-28 rounded-full overflow-hidden border-2 border-white/20 shadow-2xl opacity-95 transform rotate-12 pointer-events-none">
+                <img
+                  src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=300&q=80"
+                  alt="Pizza Special Offer"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div className="relative z-10 flex flex-col justify-center h-full max-w-[62%]">
+                <span className="inline-block bg-white/20 backdrop-blur-md text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full w-max mb-1">
+                  Special Offer
+                </span>
+                <h3 className="font-extrabold text-2xl leading-none mb-1 drop-shadow-sm">
+                  50% OFF
+                </h3>
+                <p className="text-[11px] opacity-95 leading-tight font-medium">
+                  On your first pizza order
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Category Chips */}
+          <div className="px-3.5 mb-2.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            {["All", "Burgers", "Pizza", "Pasta", "Bowls"].map((cat, idx) => (
+              <span
+                key={cat}
+                className={`text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap transition-colors ${
+                  idx === 0
+                    ? "bg-rose-500 text-white shadow-sm shadow-rose-500/30"
+                    : "bg-white dark:bg-slate-850 text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-800"
+                }`}
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
+
+          {/* Section Heading */}
+          <div className="flex items-center justify-between px-3.5 mb-2">
+            <h4 className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider">
+              Popular Items
+            </h4>
+            <span className="text-[10px] font-semibold text-rose-500 cursor-pointer hover:underline">
+              View All
+            </span>
+          </div>
+
+          {/* Menu Items Grid */}
+          <div className="px-3.5 grid grid-cols-2 gap-2.5 content-start">
+            {diningMenuItems.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white dark:bg-slate-900 rounded-2xl p-2 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col group hover:shadow-md transition-shadow relative overflow-hidden"
+              >
+                {/* Food Image with Fallback and Badges */}
+                <div className="w-full aspect-[4/3] bg-gradient-to-br from-rose-50 to-orange-50 dark:from-slate-800 dark:to-slate-850 rounded-xl relative overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center text-rose-300 dark:text-slate-600">
+                    <Utensils size={20} />
+                  </div>
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 relative z-10"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = "none";
+                    }}
+                  />
+                  {/* Item Badge */}
+                  {item.badge && (
+                    <span className="absolute top-1 left-1 z-20 bg-rose-500/90 backdrop-blur-sm text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
+                      {item.badge}
+                    </span>
+                  )}
+                  {/* Rating */}
+                  <div className="absolute top-1 right-1 z-20 bg-black/60 backdrop-blur-md text-amber-300 text-[8px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                    <Star size={8} className="fill-amber-300 text-amber-300" />
+                    <span>{item.rating}</span>
+                  </div>
+                </div>
+
+                {/* Details */}
+                <div className="flex flex-col flex-1 justify-between mt-1.5">
+                  <div>
+                    <h4
+                      className="font-bold text-xs truncate text-slate-900 dark:text-white"
+                      title={item.name}
+                    >
+                      {item.name}
+                    </h4>
+                    <p className="text-[9px] text-slate-400 dark:text-slate-500 truncate">
+                      {item.category}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between mt-1.5 pt-1 border-t border-slate-100 dark:border-slate-800">
+                    <span className="text-xs font-black text-rose-600 dark:text-rose-400">
+                      {item.price}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={`Add ${item.name}`}
+                      className="w-5 h-5 rounded-full bg-rose-500 hover:bg-rose-600 active:scale-90 text-white flex items-center justify-center shadow-sm shadow-rose-500/30 transition-transform"
+                    >
+                      <Plus size={11} strokeWidth={3} />
+                    </button>
+                  </div>
                 </div>
               </div>
-              <h4 className="font-bold text-xs mb-0.5 truncate text-slate-900 dark:text-white">
-                Gourmet Burger
-              </h4>
-              <span className="text-xs font-bold text-slate-900 dark:text-white">
-                $12.99
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
         <BottomNav active={0} />
       </div>
     ),
