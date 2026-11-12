@@ -56,7 +56,7 @@ export function Services() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white mb-6"
           >
-            Smart College Management
+            Smart School Management
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -65,7 +65,7 @@ export function Services() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg text-slate-600 dark:text-slate-400"
           >
-            Empower your institution with our comprehensive suite of college management modules designed to automate daily operations.
+            Empower your institution with our comprehensive suite of school management modules designed to automate daily operations.
           </motion.p>
         </div>
 
