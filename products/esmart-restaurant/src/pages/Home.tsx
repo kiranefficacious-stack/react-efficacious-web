@@ -179,6 +179,16 @@ export default function Home() {
       return;
     }
 
+    const digits = formState.phone.replace(/\D/g, '');
+    if (digits.length < 10) {
+      setFormState(s => ({ ...s, error: 'Please enter a valid 10-digit phone number.' }));
+      return;
+    }
+    if (/^(\d)\1+$/.test(digits)) {
+      setFormState(s => ({ ...s, error: 'Please enter a valid phone number.' }));
+      return;
+    }
+
     setIsSubmitting(true);
     setFormState(s => ({ ...s, error: '' }));
 

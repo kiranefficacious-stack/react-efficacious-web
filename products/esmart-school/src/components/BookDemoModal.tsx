@@ -60,16 +60,77 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
     if (!form.name.trim())       e.name       = 'Full name is required.';
     if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
                                   e.email      = 'Valid email is required.';
-    if (!form.phone.trim())      e.phone      = 'Phone number is required.';
+    if (!form.phone.trim()) {
+      e.phone = 'Phone number is required.';
+    } else {
+      const digits = form.phone.replace(/\D/g, '');
+      if (digits.length < 10) {
+        e.phone = 'Please enter a valid 10-digit mobile number.';
+      } else if (digits.length > 15) {
+        e.phone = 'Phone number cannot exceed 15 digits.';
+      } else if (/^(\d)\1+$/.test(digits)) {
+        e.phone = 'Please enter a valid mobile number.';
+      } else {
+        const core = digits.length === 12 && digits.startsWith('91')
+          ? digits.slice(2)
+          : digits.length === 11 && digits.startsWith('0')
+          ? digits.slice(1)
+          : digits.length === 10
+          ? digits
+          : null;
+        if (core && !/^[6-9]\d{9}$/.test(core)) {
+          e.phone = 'Please enter a valid 10-digit mobile number (starting with 6-9).';
+        }
+      }
+    }
     if (!form.schoolName.trim()) e.schoolName = 'School name is required.';
+    if (!form.studentCount || form.studentCount === '') e.studentCount = 'Please select approximate student count.';
     return e;
   };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    setErrors(prev => ({ ...prev, [e.target.name]: undefined }));
+    const { name, value } = e.target;
+    if (name === 'phone') {
+      if (value && !/^[\d\s+\-()]*$/.test(value)) {
+        return;
+      }
+    }
+    setForm(prev => ({ ...prev, [name]: value }));
+    setErrors(prev => ({ ...prev, [name]: undefined }));
+  };
+
+  const handlePhoneBlur = () => {
+    if (!form.phone.trim()) {
+      setErrors(prev => ({ ...prev, phone: 'Phone number is required.' }));
+      return;
+    }
+    const digits = form.phone.replace(/\D/g, '');
+    if (digits.length < 10) {
+      setErrors(prev => ({ ...prev, phone: 'Please enter a valid 10-digit mobile number.' }));
+      return;
+    }
+    if (digits.length > 15) {
+      setErrors(prev => ({ ...prev, phone: 'Phone number cannot exceed 15 digits.' }));
+      return;
+    }
+    if (/^(\d)\1+$/.test(digits)) {
+      setErrors(prev => ({ ...prev, phone: 'Please enter a valid mobile number.' }));
+      return;
+    }
+    const core = digits.length === 12 && digits.startsWith('91')
+      ? digits.slice(2)
+      : digits.length === 11 && digits.startsWith('0')
+      ? digits.slice(1)
+      : digits.length === 10
+      ? digits
+      : null;
+    if (core && !/^[6-9]\d{9}$/.test(core)) {
+      setErrors(prev => ({ ...prev, phone: 'Please enter a valid 10-digit mobile number (starting with 6-9).' }));
+      return;
+    }
+    setErrors(prev => ({ ...prev, phone: undefined }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -235,6 +296,7 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
                             placeholder="+91 98765 43210"
                             value={form.phone}
                             onChange={handleChange}
+                            onBlur={handlePhoneBlur}
                             className={input(!!errors.phone)}
                           />
                         </div>

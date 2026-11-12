@@ -22,6 +22,18 @@ export function ContactUs() {
     setErrorMessage('');
     setSubmitSuccess(false);
 
+    const digits = formData.phone.replace(/\D/g, '');
+    if (digits.length < 10) {
+      setErrorMessage('Please enter a valid 10-digit contact number.');
+      setIsSubmitting(false);
+      return;
+    }
+    if (/^(\d)\1+$/.test(digits)) {
+      setErrorMessage('Please enter a valid contact phone number.');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const result = await sendEmailNotification({
         type: 'product_contact',
