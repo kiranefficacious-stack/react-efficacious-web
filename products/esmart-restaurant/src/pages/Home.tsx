@@ -5,7 +5,7 @@ import {
   FileText, ShoppingBag, BarChart2, Package, UtensilsCrossed,
   Heart, Zap, Shield, Users, ChevronDown, Star, Clock, Layers,
   Receipt, Printer, Coffee, TrendingUp, Settings, Bell, Globe,
-  MessageCircle, Headphones, PieChart
+  MessageCircle, Headphones, PieChart, Store
 } from 'lucide-react';
 import CTABand from '../components/CTABand';
 import TestimonialsCarousel from '../components/TestimonialsCarousel';
@@ -115,6 +115,7 @@ const CROSS_SELL = [
   { icon: BarChart2, title: 'Reports & Analytics', desc: 'Daily MIS, item-wise sales, waiter performance, and trend reports in real-time.', to: '/product/reports' },
   { icon: Package, title: 'Inventory Management', desc: 'Track raw materials to the gram. Auto-deduct from recipes with every bill generated.', to: '/product/inventory' },
   { icon: UtensilsCrossed, title: 'Menu Management', desc: 'Update prices, add combos, and manage modifiers across all outlets instantly.', to: '/product/menu' },
+  { icon: Store, title: 'Multi-Outlet Chains', desc: 'Centralise menu control, stock transfers, and aggregated reports across all your branches.', to: '/solutions/multi-outlet' },
 ];
 
 /* ─── Why Us ─────────────────────────────────────────── */
@@ -340,9 +341,13 @@ export default function Home() {
           <h2 className="text-3xl sm:text-4xl font-bold text-charcoal mb-4 font-sora">One system, every part of your restaurant</h2>
           <p className="text-gray-500 text-lg">Billing is just the start. Here's what else e-Smart powers.</p>
         </FadeIn>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
           {CROSS_SELL.map(({ icon: Icon, title, desc, to }, i) => (
-            <FadeIn key={title} delay={i * 70}>
+            <FadeIn 
+              key={title} 
+              delay={i * 70}
+              className={i === 4 ? "sm:col-span-2 lg:col-span-1 sm:max-w-md sm:mx-auto sm:w-full lg:max-w-none" : ""}
+            >
               <Link
                 to={to}
                 className="group block bg-white rounded-2xl p-6 border border-gray-100 hover:border-primary/30 hover:shadow-xl hover:shadow-orange-50 transition-all duration-300 h-full"
