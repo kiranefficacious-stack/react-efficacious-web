@@ -36,7 +36,12 @@ export default function Contact() {
     const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = 'Name is required';
     if (!form.email.trim() || !/\S+@\S+\.\S+/.test(form.email)) errs.email = 'Valid email required';
-    if (!form.phone.trim() || form.phone.length < 10) errs.phone = 'Valid phone required';
+    const digits = form.phone.replace(/\D/g, '');
+    if (!form.phone.trim() || digits.length < 10) {
+      errs.phone = 'Valid 10-digit phone number required';
+    } else if (/^(\d)\1+$/.test(digits)) {
+      errs.phone = 'Valid phone number required';
+    }
     if (!form.restaurant.trim()) errs.restaurant = 'Restaurant name is required';
     return errs;
   };
@@ -108,12 +113,40 @@ export default function Contact() {
             <h2 className="text-xl font-bold text-charcoal mb-6 font-sora">Book a Free Demo</h2>
 
             {form.submitted ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-5">
+              <div className="text-center py-10 px-2">
+                <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-5 shadow-sm">
                   <CheckCircle className="w-8 h-8 text-secondary" />
                 </div>
-                <h3 className="text-xl font-bold text-charcoal mb-2 font-sora">We got your request!</h3>
-                <p className="text-gray-500 text-sm">Our team will call you at <strong>{form.phone}</strong> within 2 business hours to schedule your demo.</p>
+                <h3 className="text-2xl font-bold text-charcoal mb-2 font-sora">Demo Request Received!</h3>
+                <p className="text-gray-600 text-sm max-w-md mx-auto mb-5 leading-relaxed">
+                  Thank you, <strong>{form.name}</strong>. A confirmation email has been sent to <strong className="text-primary">{form.email}</strong>.
+                </p>
+                <div className="bg-orange-50/80 border border-orange-200/80 rounded-2xl p-4 max-w-md mx-auto mb-6 text-left">
+                  <div className="flex items-start gap-3">
+                    <Clock className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-bold text-charcoal">Please wait, our team will contact you soon</p>
+                      <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                        A dedicated restaurant solutions specialist will call you at <strong>{form.phone}</strong> {form.time ? `during your preferred time (${form.time})` : 'within 2 business hours'} to schedule your live personalized walkthrough.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                  <button
+                    type="button"
+                    onClick={() => setForm({ name: '', email: '', phone: '', restaurant: '', city: '', outlets: '', time: '', message: '', submitted: false, errors: {} })}
+                    className="px-6 py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-700 hover:border-primary hover:text-primary transition-colors cursor-pointer"
+                  >
+                    Book Another Demo
+                  </button>
+                  <a
+                    href="tel:+918454943806"
+                    className="px-6 py-2.5 rounded-xl bg-orange-100/70 text-primary text-xs font-semibold hover:bg-orange-200/70 transition-colors inline-flex items-center gap-1.5"
+                  >
+                    <Phone className="w-3.5 h-3.5" /> Call +91 84549 43806
+                  </a>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate className="space-y-4">

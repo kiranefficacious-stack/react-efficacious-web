@@ -543,6 +543,96 @@ if (!$sent) {
 }
 
 if ($sent) {
+    // Dispatch confirmation copy to user's email if valid
+    if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL) && strtolower($email) !== strtolower($recipient)) {
+        $userSubject = $isProduct 
+            ? "We've Received Your Demo Request for " . ($prodName ?: 'e-Smart') . " - Efficacious India"
+            : "Thank you for contacting Efficacious India";
+
+        $userConfirmHtml = '<div style="font-family: Arial, sans-serif; max-width: 600px; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;">'
+            . '<div style="border-bottom: 2px solid #E48100; padding-bottom: 12px; margin-bottom: 16px;">'
+            . '<h2 style="color: #0f172a; margin: 0; font-size: 20px;">Demo Request Received</h2>'
+            . '<p style="color: #64748b; font-size: 13px; margin: 4px 0 0 0;">Efficacious India Limited</p>'
+            . '</div>'
+            . '<p style="font-size: 14px; color: #334155; line-height: 1.6;">Dear <strong>' . htmlspecialchars($fullName) . '</strong>,</p>'
+            . '<p style="font-size: 14px; color: #334155; line-height: 1.6;">Thank you for your interest in <strong>' . htmlspecialchars($prodName ?: 'our solution') . '</strong>. We have received your demo request' . ($orgName ? ' for <strong>' . htmlspecialchars($orgName) . '</strong>' : '') . '.</p>'
+            . '<div style="background: #fff7ed; border-left: 4px solid #E48100; padding: 14px; margin: 16px 0; border-radius: 4px;">'
+            . '<p style="margin: 0; font-size: 13px; color: #9a3412; font-weight: bold;">Please wait, our team will contact you soon!</p>'
+            . '<p style="margin: 4px 0 0 0; font-size: 13px; color: #7c2d12;">Our specialist will reach out to you at <strong>' . htmlspecialchars($mobile ?: 'your contact number') . '</strong>' . ($time ? ' during your preferred time (' . htmlspecialchars($time) . ')' : ' within 2 business hours') . ' to schedule your personalized live walkthrough.</p>'
+            . '</div>'
+            . '<p style="font-size: 13px; color: #64748b; line-height: 1.6;">If you have any questions or need immediate assistance, feel free to reply directly to this email or call our team at <strong>+91 84549 43806</strong>.</p>'
+            . '<div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8;">'
+            . 'Warm regards,<br/>'
+            . '<strong>Efficacious India Limited Team</strong><br/>'
+            . '<a href="https://efficacious.co.in" style="color: #E48100; text-decoration: none;">https://efficacious.co.in</a>'
+            . '</div></div>';
+
+        $userSent = false;
+        if ($phpMailerAvailable) {
+            try {
+                $userMail = new PHPMailer(true);
+                $userMail->isSMTP();
+                $userMail->Host       = $smtpHost;
+                $userMail->SMTPAuth   = true;
+                $userMail->Username   = $smtpUser;
+                $userMail->Password   = $smtpPass;
+                $userMail->SMTPSecure = ($smtpPort === 465) ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
+                $userMail->Port       = $smtpPort;
+                $userMail->Timeout    = 3;
+                $userMail->CharSet    = 'UTF-8';
+                $userMail->SMTPOptions = [
+                    'ssl' => ['verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true]
+                ];
+
+                $userMail->setFrom($smtpUser, 'Efficacious Team');
+                $userMail->addAddress($email);
+                $userMail->addReplyTo($recipient, 'Efficacious Support');
+                $userMail->isHTML(true);
+                $userMail->Subject = $userSubject;
+                $userMail->Body    = $userConfirmHtml;
+                $userMail->AltBody = "Dear {$fullName},\n\nThank you for requesting a demo of " . ($prodName ?: 'e-Smart') . ". Our team will contact you soon at " . ($mobile ?: 'your number') . " to schedule your demo.\n\nWarm regards,\nEfficacious India Limited";
+                $userMail->send();
+                $userSent = true;
+            } catch (\Throwable $eUser) {
+                // Port 465 fallback
+                try {
+                    $userMail465 = new PHPMailer(true);
+                    $userMail465->isSMTP();
+                    $userMail465->Host       = $smtpHost;
+                    $userMail465->SMTPAuth   = true;
+                    $userMail465->Username   = $smtpUser;
+                    $userMail465->Password   = $smtpPass;
+                    $userMail465->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                    $userMail465->Port       = 465;
+                    $userMail465->Timeout    = 3;
+                    $userMail465->CharSet    = 'UTF-8';
+                    $userMail465->SMTPOptions = [
+                        'ssl' => ['verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true]
+                    ];
+                    $userMail465->setFrom($smtpUser, 'Efficacious Team');
+                    $userMail465->addAddress($email);
+                    $userMail465->addReplyTo($recipient, 'Efficacious Support');
+                    $userMail465->isHTML(true);
+                    $userMail465->Subject = $userSubject;
+                    $userMail465->Body    = $userConfirmHtml;
+                    $userMail465->send();
+                    $userSent = true;
+                } catch (\Throwable $eUser465) {}
+            }
+        }
+
+        // Native cPanel mail() fallback if outbound SMTP sockets are blocked by hosting firewall
+        if (!$userSent) {
+            try {
+                $userHeaders  = "MIME-Version: 1.0\r\n";
+                $userHeaders .= "From: Efficacious Team <{$smtpUser}>\r\n";
+                $userHeaders .= "Reply-To: Efficacious Support <{$recipient}>\r\n";
+                $userHeaders .= "Content-Type: text/html; charset=UTF-8\r\n";
+                @mail($email, $userSubject, $userConfirmHtml, $userHeaders, "-f" . $smtpUser);
+            } catch (\Throwable $eNative) {}
+        }
+    }
+
     http_response_code(200);
     echo json_encode([
         "success" => true,

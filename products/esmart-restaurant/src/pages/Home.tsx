@@ -169,13 +169,18 @@ const ADDONS = [
 /* ═══════════════════════════════════════════════════════ */
 export default function Home() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
-  const [formState, setFormState] = useState({ name: '', phone: '', restaurant: '', city: '', outlets: '', submitted: false, error: '' });
+  const [formState, setFormState] = useState({ name: '', email: '', phone: '', restaurant: '', city: '', outlets: '', submitted: false, error: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleDemoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formState.name.trim() || !formState.phone.trim() || !formState.restaurant.trim()) {
       setFormState(s => ({ ...s, error: 'Please fill in Name, Phone, and Restaurant Name.' }));
+      return;
+    }
+
+    if (!formState.email.trim() || !/\S+@\S+\.\S+/.test(formState.email)) {
+      setFormState(s => ({ ...s, error: 'Please enter a valid email address.' }));
       return;
     }
 
@@ -197,7 +202,7 @@ export default function Home() {
         type: 'product_contact',
         product: 'e-Smart Restaurant (Free Demo Request)',
         name: formState.name.trim(),
-        email: 'info@efficacious.co.in',
+        email: formState.email.trim(),
         phone: formState.phone.trim(),
         mobile: formState.phone.trim(),
         restaurant: formState.restaurant.trim(),
@@ -477,8 +482,20 @@ export default function Home() {
             {formState.submitted ? (
               <div className="bg-green-50 border border-green-200 rounded-2xl p-8 text-center">
                 <CheckCircle className="w-12 h-12 text-secondary mx-auto mb-4" />
-                <h3 className="font-bold text-charcoal text-xl mb-2 font-sora">You're on the list!</h3>
-                <p className="text-gray-500">Our team will call you within 2 business hours to schedule your demo.</p>
+                <h3 className="font-bold text-charcoal text-xl mb-2 font-sora">Demo Request Received!</h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  Thank you, <strong>{formState.name}</strong>. A confirmation has been sent to <strong>{formState.email}</strong>.
+                </p>
+                <div className="bg-white/80 rounded-xl p-3 border border-green-200 text-xs text-gray-700 max-w-sm mx-auto mb-4">
+                  <strong>Please wait, our team will contact you soon</strong> on <strong>{formState.phone}</strong> within 2 business hours to schedule your demo.
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFormState({ name: '', email: '', phone: '', restaurant: '', city: '', outlets: '', submitted: false, error: '' })}
+                  className="px-5 py-2 text-xs font-semibold text-primary border border-primary/30 rounded-lg hover:bg-orange-50 transition-colors cursor-pointer"
+                >
+                  Book Another Demo
+                </button>
               </div>
             ) : (
               <form onSubmit={handleDemoSubmit} className="space-y-4" noValidate>
@@ -492,16 +509,23 @@ export default function Home() {
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:outline-none text-sm bg-white"
                   />
                   <input
+                    type="email" placeholder="Email Address *" value={formState.email}
+                    onChange={e => setFormState(s => ({ ...s, email: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:outline-none text-sm bg-white"
+                  />
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <input
                     type="tel" placeholder="Phone Number *" value={formState.phone}
                     onChange={e => setFormState(s => ({ ...s, phone: e.target.value }))}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:outline-none text-sm bg-white"
                   />
+                  <input
+                    type="text" placeholder="Restaurant Name *" value={formState.restaurant}
+                    onChange={e => setFormState(s => ({ ...s, restaurant: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:outline-none text-sm bg-white"
+                  />
                 </div>
-                <input
-                  type="text" placeholder="Restaurant Name *" value={formState.restaurant}
-                  onChange={e => setFormState(s => ({ ...s, restaurant: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:outline-none text-sm bg-white"
-                />
                 <div className="grid sm:grid-cols-2 gap-4">
                   <input
                     type="text" placeholder="City" value={formState.city}

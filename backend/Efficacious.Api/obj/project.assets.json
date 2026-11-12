@@ -4059,6 +4059,7 @@
       "outputPath": "/Users/Efficacious/development/Website/efficacious-react/backend/Efficacious.Api/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
+        "/Users/Efficacious/development/Website/efficacious-react/backend/Efficacious.Api/NuGet.Config",
         "/tmp/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [

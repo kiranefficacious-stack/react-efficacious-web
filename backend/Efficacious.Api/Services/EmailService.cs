@@ -252,6 +252,9 @@ public class EmailService
             await client.ConnectAsync(host, port, SecureSocketOptions.SslOnConnect);
             await client.AuthenticateAsync(smtpUser, smtpPass);
             await client.SendAsync(message);
+
+            await TrySendUserConfirmationAsync(client, smtpUser, recipient, fullName, email, contactPhone, orgName, request.Time ?? string.Empty, request.Product ?? "e-Smart Restaurant");
+
             await client.DisconnectAsync(true);
 
             _logger.LogInformation("Email sent successfully to {Recipient} for {FullName}", recipient, fullName);
@@ -270,6 +273,9 @@ public class EmailService
                 await client.ConnectAsync(host, 587, SecureSocketOptions.StartTls);
                 await client.AuthenticateAsync(smtpUser, smtpPass);
                 await client.SendAsync(message);
+
+                await TrySendUserConfirmationAsync(client, smtpUser, recipient, fullName, email, contactPhone, orgName, request.Time ?? string.Empty, request.Product ?? "e-Smart Restaurant");
+
                 await client.DisconnectAsync(true);
 
                 return new EmailResponse
@@ -287,6 +293,52 @@ public class EmailService
                     Error = $"SMTP Delivery failed: {exTls.Message}"
                 };
             }
+        }
+    }
+
+    private async Task TrySendUserConfirmationAsync(SmtpClient client, string smtpUser, string recipient, string fullName, string email, string contactPhone, string orgName, string time, string prodName)
+    {
+        if (string.IsNullOrWhiteSpace(email) || !email.Contains('@') || email.Equals(recipient, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        try
+        {
+            var userMsg = new MimeMessage();
+            userMsg.From.Add(new MailboxAddress("Efficacious Team", smtpUser));
+            userMsg.To.Add(new MailboxAddress(fullName, email));
+            userMsg.ReplyTo.Add(new MailboxAddress("Efficacious Support", recipient));
+            userMsg.Subject = $"We've Received Your Demo Request for {prodName} - Efficacious India";
+
+            var userHtml = $@"<div style=""font-family: Arial, sans-serif; max-width: 600px; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;"">
+  <div style=""border-bottom: 2px solid #E48100; padding-bottom: 12px; margin-bottom: 16px;"">
+    <h2 style=""color: #0f172a; margin: 0; font-size: 20px;"">Demo Request Received</h2>
+    <p style=""color: #64748b; font-size: 13px; margin: 4px 0 0 0;"">Efficacious India Limited</p>
+  </div>
+  <p style=""font-size: 14px; color: #334155; line-height: 1.6;"">Dear <strong>{fullName}</strong>,</p>
+  <p style=""font-size: 14px; color: #334155; line-height: 1.6;"">Thank you for your interest in <strong>{prodName}</strong>. We have received your demo request{(string.IsNullOrWhiteSpace(orgName) ? "" : $" for <strong>{orgName}</strong>")}.</p>
+  <div style=""background: #fff7ed; border-left: 4px solid #E48100; padding: 14px; margin: 16px 0; border-radius: 4px;"">
+    <p style=""margin: 0; font-size: 13px; color: #9a3412; font-weight: bold;"">Please wait, our team will contact you soon!</p>
+    <p style=""margin: 4px 0 0 0; font-size: 13px; color: #7c2d12;"">Our product specialist will reach out to you at <strong>{(string.IsNullOrWhiteSpace(contactPhone) ? "your phone number" : contactPhone)}</strong> within business hours to schedule your personalized live walkthrough.</p>
+  </div>
+  <p style=""font-size: 13px; color: #64748b; line-height: 1.6;"">If you have any urgent questions, feel free to reply directly to this email or call us at <strong>+91 84549 43806</strong>.</p>
+  <div style=""margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8;"">
+    Warm regards,<br/>
+    <strong>Efficacious India Limited Team</strong><br/>
+    <a href=""https://efficacious.co.in"" style=""color: #E48100; text-decoration: none;"">https://efficacious.co.in</a>
+  </div>
+</div>";
+
+            userMsg.Body = new BodyBuilder
+            {
+                TextBody = $"Dear {fullName},\n\nThank you for requesting a demo of {prodName}. Our team will contact you soon at {contactPhone} to schedule your demo.\n\nWarm regards,\nEfficacious India Limited",
+                HtmlBody = userHtml
+            }.ToMessageBody();
+
+            await client.SendAsync(userMsg);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to send user confirmation email copy to {Email}", email);
         }
     }
 }

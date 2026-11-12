@@ -125,6 +125,7 @@ export default defineConfig(({ mode }) => {
                     const contactPhone = (mobile || phone || '').trim();
                     const orgName = (schoolName || restaurant || company || '').trim();
                     const location = (city || address || '').trim();
+                    const prodName = (product || 'e-Smart Solution').trim();
 
                     const isCareer = type === 'career';
                     const isProduct = Boolean(product) || type === 'product_contact';
@@ -157,7 +158,6 @@ export default defineConfig(({ mode }) => {
   </div>
 </div>`;
                     } else if (isProduct) {
-                      const prodName = product || 'Product';
                       emailSubject = `${fullName} <${email.trim()}> - [${prodName}] ${orgName ? `${orgName} - ` : ''}${subject || 'Demo / Inquiry'}`;
                       emailText = `New ${prodName} Inquiry Received:\n--------------------------------------------------\nProduct:          ${prodName}\nFull Name:        ${fullName}\nEmail Address:    ${email}\nPhone Number:     ${contactPhone || 'N/A'}\nOrganization:     ${orgName || 'N/A'}\nCity/Location:    ${location || 'N/A'}\nScale / Details:  ${studentCount ? `${studentCount} Students` : ''}${outlets ? `${outlets} Outlets` : ''}${details ? `${details}` : ''}${time ? ` (Preferred: ${time})` : ''}\n\nMessage / Notes:\n${message || 'No message provided'}\n--------------------------------------------------\nTo: info@efficacious.co.in\nFrom: info@efficacious.co.in`;
                       emailHtml = `<div style="font-family: Arial, sans-serif; max-width: 620px; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;">
@@ -231,6 +231,7 @@ export default defineConfig(({ mode }) => {
 
                     // Official GoDaddy SMTP for info@efficacious.co.in
                     // Primary: Port 587 (STARTTLS), Fallback: Port 465 (SSL)
+                    let activeTransporter: any = null;
                     let sent = false;
                     let lastSmtpErr: any = null;
 
@@ -252,6 +253,7 @@ export default defineConfig(({ mode }) => {
                         socketTimeout: 15000
                       });
                       await transporter587.sendMail(mailOptions);
+                      activeTransporter = transporter587;
                       sent = true;
                     } catch (err587: any) {
                       console.warn('Vite dev server Port 587 SMTP error, attempting fallback port 465:', err587.message);
@@ -276,6 +278,7 @@ export default defineConfig(({ mode }) => {
                           socketTimeout: 15000
                         });
                         await transporter465.sendMail(mailOptions);
+                        activeTransporter = transporter465;
                         sent = true;
                       } catch (err465: any) {
                         console.error('Vite dev server Port 465 fallback also failed:', err465.message);
@@ -284,6 +287,46 @@ export default defineConfig(({ mode }) => {
                     }
 
                     if (sent) {
+                      // Also dispatch confirmation copy to user's email if valid
+                      if (email && email.includes('@') && email.toLowerCase() !== creds.user.toLowerCase() && activeTransporter) {
+                        try {
+                          const userSubject = isProduct
+                            ? `We've Received Your Demo Request for ${prodName} - Efficacious India`
+                            : `Thank you for contacting Efficacious India`;
+
+                          const userHtml = `<div style="font-family: Arial, sans-serif; max-width: 600px; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;">
+  <div style="border-bottom: 2px solid #E48100; padding-bottom: 12px; margin-bottom: 16px;">
+    <h2 style="color: #0f172a; margin: 0; font-size: 20px;">Demo Request Received</h2>
+    <p style="color: #64748b; font-size: 13px; margin: 4px 0 0 0;">Efficacious India Limited</p>
+  </div>
+  <p style="font-size: 14px; color: #334155; line-height: 1.6;">Dear <strong>${fullName}</strong>,</p>
+  <p style="font-size: 14px; color: #334155; line-height: 1.6;">Thank you for your interest in <strong>${prodName}</strong>. We have received your demo request${orgName ? ` for <strong>${orgName}</strong>` : ''}.</p>
+  <div style="background: #fff7ed; border-left: 4px solid #E48100; padding: 14px; margin: 16px 0; border-radius: 4px;">
+    <p style="margin: 0; font-size: 13px; color: #9a3412; font-weight: bold;">Please wait, our team will contact you soon!</p>
+    <p style="margin: 4px 0 0 0; font-size: 13px; color: #7c2d12;">Our specialist will reach out to you at <strong>${contactPhone || 'your contact number'}</strong>${time ? ` during your preferred time (${time})` : ' within 2 business hours'} to schedule your personalized live walkthrough.</p>
+  </div>
+  <p style="font-size: 13px; color: #64748b; line-height: 1.6;">If you have any questions or need immediate assistance, feel free to reply directly to this email or call our team at <strong>+91 84549 43806</strong>.</p>
+  <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8;">
+    Warm regards,<br/>
+    <strong>Efficacious India Limited Team</strong><br/>
+    <a href="https://efficacious.co.in" style="color: #E48100; text-decoration: none;">https://efficacious.co.in</a>
+  </div>
+</div>`;
+
+                          await activeTransporter.sendMail({
+                            from: `"Efficacious Team" <${creds.user}>`,
+                            to: email,
+                            replyTo: creds.user,
+                            subject: userSubject,
+                            text: `Dear ${fullName},\n\nThank you for requesting a demo of ${prodName}. Our team will contact you soon at ${contactPhone} to schedule your demo.\n\nWarm regards,\nEfficacious India Limited`,
+                            html: userHtml
+                          });
+                          console.log(`Confirmation email dispatched successfully to client: ${email}`);
+                        } catch (uErr) {
+                          console.warn('Could not dispatch confirmation email to user:', uErr);
+                        }
+                      }
+
                       res.statusCode = 200;
                       res.setHeader('Content-Type', 'application/json');
                       return res.end(JSON.stringify({

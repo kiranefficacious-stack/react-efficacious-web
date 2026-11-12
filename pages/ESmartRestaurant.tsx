@@ -102,10 +102,10 @@ const ESmartRestaurant: React.FC = () => {
                     Digitize your restaurant operations from kitchen to customer. Enhance service speed, reduce wastage, and increase profitability.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-500 transition-colors shadow-lg shadow-rose-600/30 active:scale-95 flex items-center justify-center gap-2">
+                    <a href="/products/esmart-restaurant/contact" className="px-8 py-4 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-500 transition-colors shadow-lg shadow-rose-600/30 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
                         Book a Demo <ArrowRight size={20} />
-                    </button>
-                    <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 bg-transparent border border-white/20 text-white rounded-xl font-bold hover:bg-white/10 transition-colors">
+                    </a>
+                    <button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 bg-transparent border border-white/20 text-white rounded-xl font-bold hover:bg-white/10 transition-colors cursor-pointer">
                         View Features
                     </button>
                 </div>
