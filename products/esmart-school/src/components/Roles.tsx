@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { UserCheck, Users, GraduationCap, Building2, Server, Globe2, ArrowRight } from 'lucide-react';
+import { UserCheck, Users, GraduationCap, Building2, Server, Globe2 } from 'lucide-react';
 import { useState } from 'react';
 
 const roles = [
@@ -182,9 +182,6 @@ export function Roles() {
                         <Server className="w-5 h-5 text-slate-400" />
                         <span>Connected to <span className="text-slate-800 dark:text-slate-300 font-bold">Centralized Database</span></span>
                      </div>
-                     <button className="text-slate-700 dark:text-white bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 px-6 py-2.5 rounded-full font-bold transition-colors flex items-center gap-2 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm">
-                       Learn More <ArrowRight className="w-4 h-4 text-primary-600 dark:text-primary-400" />
-                     </button>
                    </div>
                  </motion.div>
                </AnimatePresence>
