@@ -100,7 +100,16 @@ export function FAQ() {
           <div className="relative z-10">
              <h3 className="text-xl font-bold text-white mb-2">Still have questions?</h3>
              <p className="text-primary-100 mb-6 max-w-md mx-auto">Our team is ready to provide a customized demo and answer any specific queries about your school's requirements.</p>
-             <button className="bg-white text-primary-900 px-6 py-2.5 rounded-full font-bold hover:bg-primary-50 transition-colors shadow-lg">
+             <button 
+               type="button"
+               onClick={() => {
+                 const contactSection = document.getElementById('contact');
+                 if (contactSection) {
+                   contactSection.scrollIntoView({ behavior: 'smooth' });
+                 }
+               }}
+               className="bg-white text-primary-900 px-6 py-2.5 rounded-full font-bold hover:bg-primary-50 transition-all shadow-lg cursor-pointer hover:scale-105 active:scale-95"
+             >
                Contact Support
              </button>
           </div>
