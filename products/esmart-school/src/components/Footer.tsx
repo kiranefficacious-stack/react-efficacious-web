@@ -91,7 +91,7 @@ export function Footer() {
 
       {/* ── Main Grid ── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">
 
           {/* Column 1 — Brand */}
           <motion.div
@@ -99,7 +99,7 @@ export function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="sm:col-span-2 lg:col-span-1"
+            className="sm:col-span-2 lg:col-span-4"
           >
             <a 
               href="#home" 
@@ -162,6 +162,7 @@ export function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
+            className="lg:col-span-2"
           >
             <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-5">
               Quick Links
@@ -197,6 +198,7 @@ export function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            className="lg:col-span-3"
           >
             <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-5">
               Solutions
@@ -223,21 +225,29 @@ export function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
+            className="lg:col-span-3"
           >
             <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-5">
               Get In Touch
             </h4>
             <address className="not-italic space-y-4">
-              <div className="flex gap-3">
-                <div className="mt-1 w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
+              <a
+                href="https://maps.google.com/?q=Sushma+Niwas,+Road+No.+6,+Sector-1,+New+Panvel,+Maharashtra+410206"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex gap-3 items-start group"
+                title="View on Google Maps"
+              >
+                <div className="mt-1 w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 group-hover:border-primary-500 flex items-center justify-center shrink-0 transition-colors">
                   <MapPin className="w-4 h-4 text-primary-400" />
                 </div>
-                <p className="text-sm text-slate-400 leading-relaxed">
-                  Ground Floor, Plot No. 7, Sushma Niwas,<br />
-                  Road No. 6, Sector-1, New Panvel,<br />
+                <p className="text-sm text-slate-400 group-hover:text-primary-400 transition-colors leading-relaxed">
+                  Ground Floor, Plot No. 7,<br />
+                  Sushma Niwas, Road No. 6,<br />
+                  Sector-1, New Panvel,<br />
                   Raigad, Maharashtra — 410206.
                 </p>
-              </div>
+              </a>
 
               <a
                 href="tel:+918454943806"
@@ -247,7 +257,7 @@ export function Footer() {
                   <Phone className="w-4 h-4 text-primary-400" />
                 </div>
                 <span className="text-sm text-slate-400 group-hover:text-primary-400 transition-colors">
-                  +91 8454943806
+                  +91 84549 43806
                 </span>
               </a>
 
