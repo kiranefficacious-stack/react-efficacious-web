@@ -46,7 +46,7 @@ export default function Footer() {
           {/* Brand column */}
           <div className="col-span-2 md:col-span-3 lg:col-span-2">
             <Link to="/" className="inline-block mb-5">
-              <Logo className="h-10 sm:h-12" lightText={true} />
+              <Logo className="h-10 sm:h-12" variant="dark" />
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed mb-5 max-w-sm">
               Cloud-based billing & POS software for restaurants, cafés, cloud kitchens, and multi-outlet chains across India.
