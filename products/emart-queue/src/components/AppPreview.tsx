@@ -503,7 +503,7 @@ export function AppPreview() {
   const { component: ActiveScreen } = SCREENS[active];
 
   return (
-    <section id="app-preview" className="py-24 bg-slate-900 relative overflow-hidden">
+    <section id="app-preview" className="py-24 bg-slate-900 relative overflow-hidden scroll-mt-20">
       {/* Background glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-primary-600/10 blur-[120px] rounded-full pointer-events-none"/>
       <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-primary-500/5 blur-3xl rounded-full pointer-events-none"/>

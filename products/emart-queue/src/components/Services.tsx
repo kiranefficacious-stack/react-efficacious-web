@@ -31,7 +31,7 @@ const industries = [
 
 export function Services() {
   return (
-    <section id="services" className="py-24 bg-slate-50 border-t border-slate-200">
+    <section id="services" className="py-24 bg-slate-50 border-t border-slate-200 scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-16">
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">

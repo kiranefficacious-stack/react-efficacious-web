@@ -13,10 +13,24 @@ import { Footer } from './components/Footer';
 import { Modal } from './components/Modal';
 import { PrivacyPolicyContent } from './components/PrivacyPolicyContent';
 import { TermsContent } from './components/TermsContent';
+import { DeveloperModalContent, type DevModalType } from './components/DeveloperModalContent';
 
 export default function App() {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
+  const [devModal, setDevModal] = useState<{ open: boolean; title: string; type: DevModalType | null }>({
+    open: false,
+    title: '',
+    type: null,
+  });
+
+  const handleOpenDevModal = (type: DevModalType, title: string) => {
+    setDevModal({ open: true, title, type });
+  };
+
+  const handleCloseDevModal = () => {
+    setDevModal({ open: false, title: '', type: null });
+  };
 
   return (
     <>
@@ -34,6 +48,7 @@ export default function App() {
         <Footer
           onPrivacyClick={() => setPrivacyOpen(true)}
           onTermsClick={() => setTermsOpen(true)}
+          onDeveloperResourceClick={handleOpenDevModal}
         />
       </main>
 
@@ -51,6 +66,19 @@ export default function App() {
         title="Terms & Conditions"
       >
         <TermsContent />
+      </Modal>
+
+      <Modal
+        isOpen={devModal.open}
+        onClose={handleCloseDevModal}
+        title={devModal.title}
+      >
+        {devModal.type && (
+          <DeveloperModalContent
+            type={devModal.type}
+            onNavigateContact={handleCloseDevModal}
+          />
+        )}
       </Modal>
     </>
   );
