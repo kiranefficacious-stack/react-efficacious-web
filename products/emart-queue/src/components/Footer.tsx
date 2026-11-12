@@ -91,7 +91,19 @@ export function Footer({ onPrivacyClick, onTermsClick, onDeveloperResourceClick 
             className="lg:col-span-4 flex flex-col gap-6"
           >
             {/* Logo in Full Vibrant Colors */}
-            <a href="/" title="Efficacious Home" className="w-fit inline-block">
+            <a 
+              href="#" 
+              title="Smart Queue - Main Screen" 
+              className="w-fit inline-block cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                if (window.scrollY < 20) {
+                  window.location.reload();
+                } else {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+            >
               <img 
                 src={logoColor} 
                 alt="Smart Queue" 

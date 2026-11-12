@@ -101,7 +101,21 @@ export function Footer() {
             transition={{ duration: 0.5 }}
             className="sm:col-span-2 lg:col-span-1"
           >
-            <img src="/esmart-school/logo-dark.svg" alt="eSMARTs" className="h-12 w-auto mb-3" />
+            <a 
+              href="#home" 
+              onClick={(e) => {
+                e.preventDefault();
+                if (window.scrollY < 20) {
+                  window.location.reload();
+                } else {
+                  scrollTo('#home');
+                }
+              }}
+              className="inline-block cursor-pointer mb-3"
+              title="eSMARTs School - Main Screen"
+            >
+              <img src="/esmart-school/logo-dark.svg" alt="eSMARTs" className="h-12 w-auto hover:opacity-90 transition-opacity" />
+            </a>
             <p className="text-xs font-bold text-primary-500 uppercase tracking-widest mb-4">
               By Efficacious India Limited
             </p>

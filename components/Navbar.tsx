@@ -144,7 +144,18 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
     >
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 group relative z-50">
+        <Link 
+          to="/" 
+          onClick={() => {
+            if (location.pathname === '/' && window.scrollY < 20) {
+              window.location.reload();
+            } else {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
+          className="flex items-center gap-2 group relative z-50 cursor-pointer"
+          title="Efficacious - Main Screen"
+        >
             <img 
               src={useDarkThemeNav || isDark ? "https://res.cloudinary.com/davnxvrps/image/upload/v1776243556/dark_icon_jhu54g.png" : "https://res.cloudinary.com/davnxvrps/image/upload/v1776243556/light-icon_rmesur.png"} 
               alt="Efficacious Logo" 

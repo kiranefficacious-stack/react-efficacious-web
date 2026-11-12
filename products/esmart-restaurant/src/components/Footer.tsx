@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
 import { Twitter, Linkedin, Instagram, Facebook, Youtube } from 'lucide-react';
 
@@ -38,6 +38,8 @@ const SOCIAL = [
 ].filter(s => s.href && s.href.trim() !== '' && s.href.trim() !== '#' && !s.href.startsWith('javascript:'));
 
 export default function Footer() {
+  const location = useLocation();
+
   return (
     <footer className="bg-charcoal text-gray-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
@@ -45,7 +47,18 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10 mb-14">
           {/* Brand column */}
           <div className="col-span-2 md:col-span-3 lg:col-span-2">
-            <Link to="/" className="inline-block mb-5">
+            <Link 
+              to="/" 
+              onClick={() => {
+                if (location.pathname === '/' && window.scrollY < 20) {
+                  window.location.reload();
+                } else {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+              className="inline-block mb-5 cursor-pointer"
+              title="e-Smart Restaurant - Main Screen"
+            >
               <Logo className="h-10 sm:h-12" variant="dark" />
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed mb-5 max-w-sm">

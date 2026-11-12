@@ -88,7 +88,18 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-6">
 
           {/* Logo */}
-          <Link to="/" className="shrink-0 flex items-center -mt-6">
+          <Link 
+            to="/" 
+            onClick={() => {
+              if (location.pathname === '/' && window.scrollY < 20) {
+                window.location.reload();
+              } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
+            className="shrink-0 flex items-center -mt-6 cursor-pointer"
+            title="e-Smart Restaurant - Main Screen"
+          >
             <Logo className="h-10 sm:h-12" />
           </Link>
 

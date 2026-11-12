@@ -37,11 +37,24 @@ const Footer: React.FC = () => {
           {/* Logo & About */}
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center gap-2 mb-6">
-              <img 
-                src="https://res.cloudinary.com/davnxvrps/image/upload/v1776243556/dark_icon_jhu54g.png" 
-                alt="Efficacious Logo" 
-                className="h-[80px] w-auto object-contain"
-              />
+              <Link 
+                to="/" 
+                onClick={() => {
+                  if (location.pathname === '/' && window.scrollY < 20) {
+                    window.location.reload();
+                  } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+                className="cursor-pointer inline-block"
+                title="Efficacious - Main Screen"
+              >
+                <img 
+                  src="https://res.cloudinary.com/davnxvrps/image/upload/v1776243556/dark_icon_jhu54g.png" 
+                  alt="Efficacious Logo" 
+                  className="h-[80px] w-auto object-contain hover:opacity-90 transition-opacity"
+                />
+              </Link>
             </div>
             <p className="text-sm leading-relaxed mb-6">
               Empowering organizations with smart ERP solutions. We believe in efficiency, security, and seamless innovation.

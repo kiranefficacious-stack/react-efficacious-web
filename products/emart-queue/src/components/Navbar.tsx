@@ -27,7 +27,21 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <div className="flex-shrink-0">
-            <img src={logo} alt="Smart Queue" className="h-12 w-auto -translate-y-[10px]" />
+            <a 
+              href="#" 
+              onClick={(e) => {
+                e.preventDefault();
+                if (window.scrollY < 20) {
+                  window.location.reload();
+                } else {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+              className="inline-block cursor-pointer"
+              title="Smart Queue - Main Screen"
+            >
+              <img src={logo} alt="Smart Queue" className="h-12 w-auto -translate-y-[10px] hover:opacity-90 transition-opacity" />
+            </a>
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
