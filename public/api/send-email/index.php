@@ -22,6 +22,9 @@ if (file_exists(__DIR__ . '/PHPMailer/PHPMailer.php')) {
 // Disable error display in production output to ensure pure JSON response
 error_reporting(0);
 ini_set('display_errors', '0');
+@ini_set('memory_limit', '256M');
+@ini_set('post_max_size', '30M');
+@ini_set('upload_max_filesize', '30M');
 
 // Set CORS and JSON response headers
 header("Access-Control-Allow-Origin: *");
@@ -256,9 +259,16 @@ $attachmentFilename = null;
 $attachmentType = "application/octet-stream";
 
 if ($resumeDataUrl && $resumeName) {
-    if (preg_match('/^data:([^;]+);base64,(.+)$/', $resumeDataUrl, $matches)) {
-        $attachmentType = $matches[1];
-        $attachmentContent = base64_decode($matches[2]);
+    $commaPos = strpos($resumeDataUrl, ',');
+    if ($commaPos !== false) {
+        $header = substr($resumeDataUrl, 0, $commaPos);
+        $base64Data = substr($resumeDataUrl, $commaPos + 1);
+        if (preg_match('/^data:([^;]+);base64/', $header, $matches)) {
+            $attachmentType = $matches[1];
+        } else {
+            $attachmentType = "application/octet-stream";
+        }
+        $attachmentContent = base64_decode($base64Data);
         $attachmentFilename = $resumeName;
     }
 }

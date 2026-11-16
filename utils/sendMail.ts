@@ -155,12 +155,17 @@ function buildEmailContent(payload: MailPayload) {
 
   const attachments: any[] = [];
   if (resumeDataUrl && resumeName) {
-    const matches = resumeDataUrl.match(/^data:([^;]+);base64,(.+)$/);
-    if (matches) {
+    const commaIndex = resumeDataUrl.indexOf(',');
+    if (commaIndex !== -1) {
+      const meta = resumeDataUrl.substring(0, commaIndex);
+      const base64Content = resumeDataUrl.substring(commaIndex + 1);
+      const mimeMatch = meta.match(/^data:([^;]+);base64/);
+      const contentType = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
       attachments.push({
         filename: resumeName,
-        content: matches[2],
-        encoding: 'base64'
+        content: base64Content,
+        encoding: 'base64',
+        contentType: contentType
       });
     }
   }
@@ -232,7 +237,7 @@ async function triggerHttpEndpoints(payload: MailPayload): Promise<MailResponse>
   for (const url of candidates) {
     try {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 25000);
+      const timer = setTimeout(() => controller.abort(), 60000);
 
       let res: Response;
       try {
@@ -303,6 +308,12 @@ async function triggerHttpEndpoints(payload: MailPayload): Promise<MailResponse>
  * 2. Never produces fake confirmations
  */
 export async function sendEmailNotification(payload: MailPayload): Promise<MailResponse> {
+  if (payload.email) {
+    payload.email = payload.email.trim();
+    if (payload.email.toLowerCase() === 'kiran.efficacious.co.in') {
+      payload.email = 'kiran@efficacious.co.in';
+    }
+  }
   // Direct verified GoDaddy SSL SMTP execution via serverless mailer
   const result = await triggerHttpEndpoints(payload);
   if (result.success) {

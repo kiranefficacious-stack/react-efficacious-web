@@ -51,6 +51,7 @@ public class EmailController : ControllerBase
 
     [HttpPost("/api/send-email")]
     [HttpPost("/send-email")]
+    [RequestSizeLimit(50 * 1024 * 1024)]
     public async Task<IActionResult> SendEmail([FromBody] EmailRequest request)
     {
         // 1. Save to Database

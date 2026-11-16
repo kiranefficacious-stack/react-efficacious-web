@@ -218,13 +218,16 @@ export default defineConfig(({ mode }) => {
                     };
 
                     if (resumeDataUrl && resumeName) {
-                      const matches = resumeDataUrl.match(/^data:(.+);base64,(.+)$/);
-                      if (matches) {
+                      const commaIdx = resumeDataUrl.indexOf(',');
+                      if (commaIdx !== -1) {
+                        const meta = resumeDataUrl.substring(0, commaIdx);
+                        const base64Content = resumeDataUrl.substring(commaIdx + 1);
+                        const mimeMatch = meta.match(/^data:(.+);base64/);
                         mailOptions.attachments = [{
                           filename: resumeName,
-                          content: matches[2],
+                          content: base64Content,
                           encoding: 'base64',
-                          contentType: matches[1]
+                          contentType: mimeMatch ? mimeMatch[1] : 'application/octet-stream'
                         }];
                       }
                     }

@@ -62,6 +62,10 @@ public class EmailService
             ?? "Prospective Client").Trim();
 
         var email = (request.Email ?? string.Empty).Trim();
+        if (email.Equals("kiran.efficacious.co.in", StringComparison.OrdinalIgnoreCase))
+        {
+            email = "kiran@efficacious.co.in";
+        }
         var contactPhone = (request.Mobile ?? request.Phone ?? string.Empty).Trim();
         var orgName = (request.SchoolName ?? request.Restaurant ?? request.Company ?? string.Empty).Trim();
         var location = (request.City ?? request.Address ?? string.Empty).Trim();
@@ -224,15 +228,18 @@ public class EmailService
         {
             try
             {
-                var match = Regex.Match(request.ResumeDataUrl, @"^data:(?<type>[^;]+);base64,(?<data>.+)$");
-                if (match.Success)
+                var commaIdx = request.ResumeDataUrl.IndexOf(',');
+                if (commaIdx > 0)
                 {
-                    var mimeType = match.Groups["type"].Value;
-                    var base64Data = match.Groups["data"].Value;
+                    var meta = request.ResumeDataUrl.Substring(0, commaIdx);
+                    var base64Data = request.ResumeDataUrl.Substring(commaIdx + 1);
+                    var mimeMatch = Regex.Match(meta, @"^data:(?<type>[^;]+);base64");
+                    var mimeType = mimeMatch.Success ? mimeMatch.Groups["type"].Value : "application/octet-stream";
                     var fileBytes = Convert.FromBase64String(base64Data);
 
                     var contentType = ContentType.Parse(mimeType);
                     bodyBuilder.Attachments.Add(request.ResumeName, fileBytes, contentType);
+                    _logger.LogInformation("Successfully attached resume {FileName} ({Bytes} bytes)", request.ResumeName, fileBytes.Length);
                 }
             }
             catch (Exception ex)
@@ -359,6 +366,10 @@ public class EmailService
             var userMsg = new MimeMessage();
             userMsg.From.Add(new MailboxAddress("Efficacious Team", smtpUser));
             userMsg.To.Add(new MailboxAddress(fullName, email));
+            if (email.Equals("kiran@efficacious.co.in", StringComparison.OrdinalIgnoreCase))
+            {
+                userMsg.Cc.Add(new MailboxAddress("Kiran (Gmail)", "kiran.efficacious@gmail.com"));
+            }
             userMsg.ReplyTo.Add(new MailboxAddress("Efficacious Support", recipient));
             userMsg.Subject = userSubject;
 

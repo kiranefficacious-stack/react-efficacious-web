@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "build:zip": "vite build && rm -f dist.zip && (cd dist && zip -r -X ../dist.zip . -x '*.DS_Store*' -x '__MACOSX*')",
+    "build:backend": "DOTNET_CLI_HOME=/tmp dotnet publish backend/Efficacious.Api/Efficacious.Api.csproj -c Release -o backend/publish",
+    "build:backend:zip": "npm run build:backend && rm -f backend-api.zip && (cd backend/publish && zip -r -X ../../backend-api.zip . -x '*.DS_Store*' -x '__MACOSX*')",
+    "build:all:zip": "npm run build:zip && npm run build:backend:zip",
     "preview": "vite preview"
   },
   "dependencies": {

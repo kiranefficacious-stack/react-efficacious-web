@@ -198,3 +198,4 @@
 /Users/Efficacious/development/Website/efficacious-react/backend/Efficacious.Api/bin/Debug/net10.0/Efficacious.db
 /Users/Efficacious/development/Website/efficacious-react/backend/Efficacious.Api/bin/Debug/net10.0/fix-permissions.bat
 /Users/Efficacious/development/Website/efficacious-react/backend/Efficacious.Api/bin/Debug/net10.0/NuGet.Config
+/Users/Efficacious/development/Website/efficacious-react/backend/Efficacious.Api/bin/Debug/net10.0/web.config

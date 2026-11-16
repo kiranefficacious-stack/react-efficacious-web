@@ -9,6 +9,17 @@ builder.Services.AddSingleton<Efficacious.Api.Services.EmailService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configure request size limits up to 50 MB for resume attachments
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 50 * 1024 * 1024; // 50 MB
+});
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 50 * 1024 * 1024;
+    options.ValueLengthLimit = 50 * 1024 * 1024;
+});
+
 // Configure Database Engine (Supports Microsoft SQL Server & SQLite seamlessly)
 var dbProvider = (builder.Configuration["DatabaseProvider"] ?? "Sqlite").Trim();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? string.Empty;

@@ -197,9 +197,9 @@ const Careers: React.FC = () => {
     const recipientEmail = 'info@efficacious.co.in';
     let emailDelivered = false;
 
-    // 1. Read file as Data URL if under 850KB for direct email attachment
+    // 1. Read file as Data URL for direct email attachment (supports full 5 MB limit)
     let resumeDataUrl = '';
-    if (selectedFile && selectedFile.size <= 850 * 1024) {
+    if (selectedFile && selectedFile.size <= 5.5 * 1024 * 1024) {
       try {
         resumeDataUrl = await readFileAsDataUrl(selectedFile);
       } catch (readErr) {
@@ -554,15 +554,50 @@ To / Recipient:   ${recipientEmail}
                           transition={{ delay: 0.2 }}
                           className="bg-white dark:bg-slate-800 rounded-3xl p-8 lg:p-10 shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700"
                       >
-                          <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-8">Application Form</h3>
-                          <form 
-                              noValidate 
-                              onSubmit={handleSubmit} 
-                              method="POST" 
-                              encType="multipart/form-data" 
-                              action="https://formsubmit.co/99a588cd0cd777cbb113f4394a597440"
-                              className="space-y-6"
-                          >
+                          <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-8">
+                              {submitStatus === 'success' ? 'Application Status' : 'Application Form'}
+                          </h3>
+
+                          {submitStatus === 'success' ? (
+                              <motion.div 
+                                  initial={{ opacity: 0, scale: 0.95 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  className="p-8 sm:p-10 text-center bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-2xl flex flex-col items-center justify-center"
+                              >
+                                  <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-4 shadow-sm">
+                                      <CheckCircle2 size={36} />
+                                  </div>
+                                  <h4 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Application Sent Successfully!</h4>
+                                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-md mx-auto mb-6 leading-relaxed">
+                                      Thank you, <strong>{submittedCandidate?.name}</strong>. A confirmation email has been sent to <strong className="text-brand-500">{submittedCandidate?.email}</strong>.
+                                  </p>
+
+                                  <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl p-5 text-sm text-amber-900 dark:text-amber-200 max-w-md mx-auto mb-8 text-left shadow-sm">
+                                      <p className="font-bold mb-1.5 text-base text-[#9a3412] dark:text-[#ea580c]">
+                                          Please wait, our team will contact you soon!
+                                      </p>
+                                      <p className="text-amber-800 dark:text-amber-300 leading-relaxed text-xs sm:text-sm">
+                                          Our HR team is reviewing your application for <strong>{submittedCandidate?.position}</strong>. We will reach out to you at <strong>{submittedCandidate?.mobile || submittedCandidate?.email}</strong> to schedule an interview.
+                                      </p>
+                                  </div>
+
+                                  <button 
+                                      type="button"
+                                      onClick={() => setSubmitStatus('idle')}
+                                      className="px-8 py-3.5 bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg shadow-brand-500/20 hover:shadow-brand-500/30 transition-all cursor-pointer text-sm"
+                                  >
+                                      Submit Another Application
+                                  </button>
+                              </motion.div>
+                          ) : (
+                              <form 
+                                  noValidate 
+                                  onSubmit={handleSubmit} 
+                                  method="POST" 
+                                  encType="multipart/form-data" 
+                                  action="https://formsubmit.co/99a588cd0cd777cbb113f4394a597440"
+                                  className="space-y-6"
+                              >
                               {submitStatus === 'error' && (
                                   <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm flex items-start gap-2">
                                       <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
@@ -794,36 +829,7 @@ To / Recipient:   ${recipientEmail}
                                   </div>
                               </div>
 
-                              <div className="relative pt-2">
-                                  {submitStatus === 'success' && (
-                                      <motion.div 
-                                          initial={{ opacity: 0, scale: 0.95 }}
-                                          animate={{ opacity: 1, scale: 1 }}
-                                          className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white dark:bg-slate-800 rounded-2xl border border-emerald-500 text-center p-6 sm:p-8 shadow-2xl overflow-y-auto"
-                                      >
-                                          <div className="w-14 h-14 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-3">
-                                              <CheckCircle2 size={32} />
-                                          </div>
-                                          <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Application Sent Successfully!</h4>
-                                          <p className="text-sm text-slate-600 dark:text-slate-300 max-w-sm mb-4 leading-relaxed">
-                                              Thank you, <strong>{submittedCandidate?.name}</strong>. A confirmation email has been sent to <strong className="text-brand-500">{submittedCandidate?.email}</strong>.
-                                          </p>
-                                          <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl p-3.5 text-xs text-amber-900 dark:text-amber-200 max-w-sm mb-5 text-left">
-                                              <p className="font-bold mb-1 text-sm text-[#9a3412] dark:text-[#ea580c]">Please wait, our team will contact you soon!</p>
-                                              <p className="text-amber-700 dark:text-amber-300 leading-relaxed">
-                                                  Our HR team is reviewing your application for <strong>{submittedCandidate?.position}</strong>. We will reach out to you at <strong>{submittedCandidate?.mobile || submittedCandidate?.email}</strong> to schedule an interview.
-                                              </p>
-                                          </div>
-                                          <button 
-                                            type="button"
-                                            onClick={() => setSubmitStatus('idle')}
-                                            className="px-5 py-2.5 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-xs font-bold rounded-xl uppercase tracking-wider hover:bg-brand-100 transition-colors cursor-pointer"
-                                          >
-                                            Submit Another Application
-                                          </button>
-                                      </motion.div>
-                                  )}
-
+                              <div className="pt-2">
                                   {isSubmitting && (
                                       <div className="mb-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl text-amber-700 dark:text-amber-300 text-xs flex items-center gap-2 animate-pulse font-medium">
                                           <Loader2 size={14} className="animate-spin shrink-0 text-amber-600 dark:text-amber-400" />
@@ -850,6 +856,7 @@ To / Recipient:   ${recipientEmail}
                                   </button>
                               </div>
                           </form>
+                          )}
                       </motion.div>
                   </div>
               </div>

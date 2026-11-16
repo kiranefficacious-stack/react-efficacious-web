@@ -5,7 +5,7 @@ import * as LucideIcons from 'lucide-react';
 import { 
   Menu, X, Sun, Moon, ChevronDown, 
   Layout, Smartphone, Palette, Globe,
-  Users, Briefcase, Rocket
+  Users, Briefcase
 } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
 import { initialData } from '../data';
@@ -22,7 +22,6 @@ const serviceItems = [
   { name: 'Mobile App Development', href: '/services/mobile-development', icon: <Smartphone size={18} /> },
   { name: 'Graphic Design', href: '/services/graphic-design', icon: <Palette size={18} /> },
   { name: 'IT Outsourcing Work', href: '/services/it-outsourcing', icon: <Globe size={18} /> },
-  { name: 'Software Outsourcing', href: '/software-outsourcing', icon: <Rocket size={18} /> },
 ];
 
 const partnerItems = [
