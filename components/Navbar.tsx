@@ -5,7 +5,7 @@ import * as LucideIcons from 'lucide-react';
 import { 
   Menu, X, Sun, Moon, ChevronDown, 
   Layout, Smartphone, Palette, Globe,
-  Users, Briefcase
+  Users, Briefcase, Rocket
 } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
 import { initialData } from '../data';
@@ -22,6 +22,7 @@ const serviceItems = [
   { name: 'Mobile App Development', href: '/services/mobile-development', icon: <Smartphone size={18} /> },
   { name: 'Graphic Design', href: '/services/graphic-design', icon: <Palette size={18} /> },
   { name: 'IT Outsourcing Work', href: '/services/it-outsourcing', icon: <Globe size={18} /> },
+  { name: 'Software Outsourcing', href: '/software-outsourcing', icon: <Rocket size={18} /> },
 ];
 
 const partnerItems = [
@@ -126,7 +127,18 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
       setMobileExpanded(null);
   };
 
-  const isActive = (path: string) => location.pathname === path || (path !== '/' && location.pathname.startsWith(path));
+  const isActive = (link: { href: string; dropdownItems?: any[] } | string) => {
+    if (typeof link === 'string') {
+      return location.pathname === link || (link !== '/' && location.pathname.startsWith(link));
+    }
+    if (location.pathname === link.href || (link.href !== '/' && location.pathname.startsWith(link.href))) {
+      return true;
+    }
+    if (link.dropdownItems?.some((item: any) => item.href === location.pathname || (item.href && item.href !== '/' && location.pathname.startsWith(item.href)))) {
+      return true;
+    }
+    return false;
+  };
 
   // Early return: If we are on an admin route, do not render the Navbar
   if (isAdminRoute) {
@@ -172,7 +184,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
               : 'bg-white/50 dark:bg-slate-800/50 border-slate-200/50 dark:border-slate-700/50'
           }`}>
               {navLinks.map((link) => {
-                const active = isActive(link.href);
+                const active = isActive(link);
                 const isDropdownOpen = activeDropdown === link.name;
                 
                 // Determine text color based on state and context
@@ -336,7 +348,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDark, toggleTheme }) => {
                         to={link.href}
                         onClick={handleLinkClick}
                         className={`text-xl font-medium ${
-                            isActive(link.href)
+                            isActive(link)
                             ? 'text-[#E48100] dark:text-[#E48100]'
                             : 'text-slate-800 dark:text-slate-200'
                         }`}

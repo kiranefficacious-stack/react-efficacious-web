@@ -41,6 +41,7 @@ import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import SoftwareOutsourcing from './pages/SoftwareOutsourcing';
 
 const ESmartSchoolRedirect = () => {
   useEffect(() => {
@@ -88,8 +89,8 @@ function App() {
 
   // Scroll to top on route change
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location]);
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [location.pathname]);
 
   return (
     <>
@@ -169,6 +170,8 @@ function App() {
                       <Route path="/terms-of-service" element={<TermsOfService />} />
                       <Route path="/terms-and-conditions" element={<TermsOfService />} />
                       <Route path="/terms" element={<TermsOfService />} />
+                      <Route path="/software-outsourcing" element={<SoftwareOutsourcing />} />
+                      <Route path="/services/software-outsourcing" element={<SoftwareOutsourcing />} />
                       <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                   </ErrorBoundary>
