@@ -9,11 +9,11 @@ const isLocal = typeof window !== 'undefined' &&
 
 const getLiveApiBase = () => {
   if (typeof window !== 'undefined') {
-    if (window.location.hostname === 'wp.efficacious.co.in' || window.location.hostname.endsWith('efficacious.co.in')) {
+    if (window.location.hostname === 'efficacious.co.in' || window.location.hostname.endsWith('efficacious.co.in')) {
       return `${window.location.protocol}//${window.location.host}/api`;
     }
   }
-  return 'http://wp.efficacious.co.in/api';
+  return 'http://efficacious.co.in/api';
 };
 
 export const API_BASE = (typeof window !== 'undefined' && (window as any).__EFFICACIOUS_API_URL__)

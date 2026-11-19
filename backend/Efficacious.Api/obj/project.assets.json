@@ -4047,7 +4047,7 @@
     ]
   },
   "packageFolders": {
-    "/tmp/.nuget/packages/": {}
+    "/Users/Efficacious/.nuget/packages": {}
   },
   "project": {
     "version": "1.0.0",
@@ -4055,7 +4055,7 @@
       "projectUniqueName": "/Users/Efficacious/development/Website/efficacious-react/backend/Efficacious.Api/Efficacious.Api.csproj",
       "projectName": "Efficacious.Api",
       "projectPath": "/Users/Efficacious/development/Website/efficacious-react/backend/Efficacious.Api/Efficacious.Api.csproj",
-      "packagesPath": "/tmp/.nuget/packages/",
+      "packagesPath": "/Users/Efficacious/.nuget/packages",
       "outputPath": "/Users/Efficacious/development/Website/efficacious-react/backend/Efficacious.Api/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
