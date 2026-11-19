@@ -37,7 +37,7 @@ export function useTeamMembers(defaultItems: TeamMember[] = []): TeamMember[] {
           window.location.hostname.endsWith('.local')
         );
         const apiBase = (typeof window !== 'undefined' && (window as any).__EFFICACIOUS_API_URL__)
-          || (isLocal ? 'http://localhost:5231/api' : 'http://wp.efficacious.co.in/api');
+          || (isLocal ? 'http://localhost:5231/api' : 'http://efficacious.co.in/api');
 
         const res = await fetch(`${apiBase}/content/team`);
         if (res.ok) {

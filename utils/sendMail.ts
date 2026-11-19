@@ -217,7 +217,7 @@ export function getCandidateEndpoints(): string[] {
 
   // On live server (wp.efficacious.co.in or custom domain)
   return [
-    'http://wp.efficacious.co.in/api/send-email',
+    'http://efficacious.co.in/api/send-email',
     `${origin}/api/send-email`,
     `${origin}/api/send-email.php`,
     `${origin}/api/send-email/index.php`,

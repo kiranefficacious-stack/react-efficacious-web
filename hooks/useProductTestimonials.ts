@@ -39,7 +39,7 @@ export function useProductTestimonials(productIdOrTitle: string | number, defaul
           window.location.hostname === '127.0.0.1' ||
           window.location.hostname.endsWith('.local')
         );
-        const apiBase = isLocal ? 'http://localhost:5231/api' : 'http://wp.efficacious.co.in/api';
+        const apiBase = isLocal ? 'http://localhost:5231/api' : 'http://efficacious.co.in/api';
         const res = await fetch(`${apiBase}/content/products`);
         if (res.ok) {
           const json = await res.json();
